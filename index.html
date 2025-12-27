@@ -52,7 +52,7 @@
 
         @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
 
-        /* --- 开场打字机 (优化版) --- */
+        /* --- 开场打字机 (JS版) --- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b1121; z-index: 9999;
@@ -60,7 +60,6 @@
             transition: opacity 0.8s ease; padding: 20px; text-align: center;
         }
 
-        /* 打字机光标 */
         .cursor {
             display: inline-block; width: 3px; height: 1.2em; background-color: var(--accent);
             margin-left: 5px; vertical-align: middle; animation: blink 1s infinite;
@@ -70,7 +69,7 @@
 
         #typewriter-content {
             font-family: 'Courier New', monospace; font-size: 1.8rem; font-weight: bold;
-            color: var(--text-main); height: 60px; /* 占位高度 */
+            color: var(--text-main); min-height: 60px;
             display: flex; align-items: center; justify-content: center;
         }
 
@@ -90,7 +89,7 @@
         }
         .container.visible { opacity: 1; transform: translateY(0); }
 
-        /* --- 头部区域 (适配手机) --- */
+        /* --- 头部区域 --- */
         header { text-align: center; margin-bottom: 50px; }
         
         h1 { 
@@ -100,14 +99,6 @@
         
         .subtitle { 
             color: var(--text-sub); font-size: 1.25rem; line-height: 1.6; max-width: 700px; margin: 0 auto;
-        }
-        
-        .profile-tags {
-            margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
-        }
-        .profile-tag {
-            font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;
-            background: rgba(255,255,255,0.05); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.2);
         }
 
         .header-actions {
@@ -150,15 +141,10 @@
         .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
         .tag-pill { font-size: 0.7rem; padding: 4px 10px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 6px; }
 
-        /* --- 特别卡片：AI 实验室 (New) --- */
-        .card-ai {
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            position: relative;
-        }
+        /* --- 特别卡片：AI 实验室 --- */
+        .card-ai { border: 1px solid rgba(168, 85, 247, 0.3); position: relative; }
         .card-ai:hover { border-color: var(--ai-color); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
         .card-ai .card-meta { color: var(--ai-color); }
-        
-        /* 呼吸灯特效 */
         @keyframes border-pulse { 0% { border-color: rgba(168, 85, 247, 0.3); } 50% { border-color: rgba(168, 85, 247, 0.8); } 100% { border-color: rgba(168, 85, 247, 0.3); } }
         .card-ai { animation: border-pulse 3s infinite; }
 
@@ -193,7 +179,6 @@
             display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10;
         }
 
-        /* 微信二维码弹窗 */
         .qr-content { text-align: center; padding: 40px 20px; max-width: 350px; }
         .qr-img { width: 220px; height: 220px; border-radius: 12px; margin: 20px 0; border: 2px solid #fff; }
 
@@ -215,28 +200,17 @@
         }
         .status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
 
-        /* --- 📱 移动端深度适配 (Media Queries) --- */
+        /* --- 手机端适配 --- */
         @media (max-width: 768px) {
-            /* 1. 字体调整 */
             h1 { font-size: 2.2rem; }
             .subtitle { font-size: 1rem; padding: 0 10px; }
-            
-            /* 2. 间距调整 */
             header { margin-bottom: 30px; }
             .container { padding-top: 40px; }
-            
-            /* 3. 隐藏不必要元素 */
             .status-bar { display: none; }
-            
-            /* 4. 按钮优化 */
             .header-actions { flex-direction: column; width: 100%; padding: 0 20px; }
             .btn { width: 100%; justify-content: center; }
-            
-            /* 5. 背景优化 */
-            .orb { opacity: 0.15; } /* 手机上减淡背景 */
-            
-            /* 6. 打字机优化 */
-            #typewriter-content { font-size: 1.4rem; height: 50px; }
+            .orb { opacity: 0.15; }
+            #typewriter-content { font-size: 1.4rem; min-height: 50px; }
         }
 
         @media print {
@@ -278,7 +252,7 @@
             <h1>你好，我是 许诺</h1>
             <p class="subtitle">
                 致力于连接 AI 技术边界与用户核心价值<br>
-                <span style="font-size: 0.9em; opacity: 0.7; display:block; margin-top:5px;">数据驱动策略 · B端产品创新 · 商业化闭环</span>
+                <span style="font-size: 0.9em; opacity: 0.7; display:block; margin-top:5px;">数据驱动策略 · 产品创新 · 商业化闭环</span>
             </p>
             
             <div class="header-actions">
@@ -295,7 +269,7 @@
             
             <div class="card" onclick="openModal('modal-gov')">
                 <div class="card-img-wrap">
-                    <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Office Collaboration">
+                    <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Paperwork & Service">
                 </div>
                 <div class="card-content">
                     <div class="card-meta">椿林镇人民政府</div>
@@ -363,7 +337,7 @@
                     <div class="tags-row">
                         <span class="tag-pill" style="color:var(--ai-color); border-color:var(--ai-color);">Coming Soon</span>
                     </div>
-                    <p style="margin-top:10px;">正在构建一个基于 LLM 的垂直领域应用，探索 AI Agent 在 B 端场景的落地能力。</p>
+                    <p style="margin-top:10px;">正在构建一个基于 LLM 的垂直领域应用，探索 AI Agent 在实际复杂场景下的落地能力。</p>
                 </div>
             </div>
 
@@ -382,7 +356,7 @@
     <div class="modal-overlay" id="modal-gov">
         <div class="modal-content">
             <div class="close-btn" onclick="closeModal('modal-gov')">&times;</div>
-            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800');"></div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=800');"></div>
             <div class="modal-body">
                 <h2>政务服务流程数字化重构</h2>
                 <span class="subtitle-text">椿林镇人民政府 | 产品助理 (实习)</span>
@@ -475,7 +449,7 @@
                 <span class="subtitle-text">In Progress | 正在构建中...</span>
                 <div class="modal-section">
                     <h4>项目愿景</h4>
-                    <p>我正在利用业余时间开发一款垂直领域的 AI Agent，旨在验证 LLM 在特定 B 端场景下的逻辑推理与任务执行能力。</p>
+                    <p>我正在利用业余时间开发一款垂直领域的 AI Agent，旨在验证 LLM 在特定复杂场景下的逻辑推理与任务执行能力。</p>
                 </div>
                 <div class="modal-section">
                     <h4>计划技术栈</h4>
@@ -493,8 +467,6 @@
     </div>
 
     <script>
-        // --- 逻辑控制 ---
-        
         const splash = document.getElementById('splash-screen');
         const mainContent = document.getElementById('main-content');
         const bgm = document.getElementById('bgm');
@@ -504,7 +476,7 @@
         const textTarget = document.getElementById('text-target');
         const cursor = document.querySelector('.cursor');
 
-        // 打字机逻辑 (JS版)
+        // 打字机逻辑
         const textToType = "Hello, I am Xu Nuo.";
         let charIndex = 0;
 
@@ -512,18 +484,16 @@
             if (charIndex < textToType.length) {
                 textTarget.textContent += textToType.charAt(charIndex);
                 charIndex++;
-                setTimeout(typeWriter, 100); // 打字速度
+                setTimeout(typeWriter, 100); 
             } else {
-                // 打字结束
-                cursor.classList.add('stopped'); // 停止光标
+                cursor.classList.add('stopped'); 
                 setTimeout(() => {
-                    cursor.style.display = 'none'; // 隐藏光标
-                    enterBtn.classList.add('show'); // 显示按钮
+                    cursor.style.display = 'none'; 
+                    enterBtn.classList.add('show'); 
                 }, 500);
             }
         }
 
-        // 页面加载后开始打字
         window.onload = () => {
             setTimeout(typeWriter, 500);
         };
@@ -545,7 +515,6 @@
             });
         });
 
-        // 音乐开关
         function toggleMusic() {
             if (bgm.paused) {
                 bgm.play();
@@ -558,7 +527,6 @@
             }
         }
 
-        // 弹窗控制
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
             document.body.style.overflow = 'hidden';
