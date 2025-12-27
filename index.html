@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>许诺 | 交互式简历 Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // 这里的 ID也要替换
+      gtag('config', 'G-XXXXXXXXXX');
+    </script>
+    <style>
+        /* --- 核心变量 --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --text-main: #ffffff;
+            --text-sub: #a0a0a0;
+            --accent: #00f260; /* 极简荧光绿 */
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --modal-bg: rgba(0, 0, 0, 0.85);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* --- 动态背景 --- */
+        .bg-fixed {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 20%, #1a1a1a 0%, #000000 90%);
+            z-index: -1;
+        }
+        
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 10s infinite ease-in-out;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #0575e6; }
+        .orb-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #00f260; animation-delay: -5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 50px); }
+        }
+
+        /* --- 入场封面 (Splash Screen) --- */
+        #splash-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+        
+        #enter-btn {
+            padding: 15px 40px;
+            border: 1px solid var(--text-main);
+            background: transparent;
+            color: var(--text-main);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+        #enter-btn:hover { background: var(--text-main); color: #000; }
+
+        /* --- 主容器 --- */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            opacity: 0; 
+            transform: translateY(20px);
+            transition: all 1s ease;
+            padding-bottom: 100px; /* 为底部状态栏留空间 */
+        }
+
+        .container.visible { opacity: 1; transform: translateY(0); }
+
+        /* --- 头部 --- */
+        header { text-align: center; margin-bottom: 80px; }
+        h1 { font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 10px; }
+        .subtitle { color: var(--text-sub); font-size: 1.2rem; letter-spacing: 1px; }
+
+        .header-actions {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* [功能 1] PDF 下载按钮样式 */
+        .download-btn {
+            padding: 10px 20px;
+            background: var(--accent);
+            color: #000;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-btn:hover {
+            box-shadow: 0 0 15px rgba(0, 242, 96, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .contact-link {
+            color: var(--text-sub);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-bottom: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .contact-link:hover { border-color: var(--text-sub); }
+
+        /* --- 卡片网格 --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s, border-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .card-bg-img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s;
+            z-index: 0;
+        }
+        .card:hover .card-bg-img { opacity: 0.15; }
+
+        .card-content { position: relative; z-index: 1; }
+        .card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .card p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; }
+        .card-tag { 
+            display: inline-block; 
+            font-size: 0.75rem; 
+            padding: 4px 10px; 
+            border: 1px solid var(--accent); 
+            color: var(--accent); 
+            border-radius: 20px; 
+            margin-right: 5px;
+        }
+
+        /* --- 详情弹窗 (Modal) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--modal-bg);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: #111;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.4s;
+        }
+
+        .modal-overlay.active .modal-content { transform: scale(1); }
+
+        .modal-header {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .modal-header::after {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to bottom, transparent, #111);
+        }
+
+        .modal-body { padding: 40px; color: #ccc; line-height: 1.8; }
+        .modal-body h2 { color: #fff; margin-bottom: 10px; font-size: 2rem; }
+        .modal-body h4 { color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .modal-body ul { margin-left: 20px; margin-top: 10px; }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 20px;
+            font-size: 2rem; color: #fff; cursor: pointer; z-index: 10;
+        }
+
+        /* --- 音乐控制器 --- */
+        #music-control {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 1000;
+            background: rgba(0,0,0,0.5);
+            transition: 0.3s;
+        }
+        #music-control:hover { border-color: var(--accent); }
+        .rotate { animation: spin 4s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- [功能 3] 状态栏彩蛋 --- */
+        .status-bar {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 242, 96, 0.4); }
+            70% { opacity: 1; box-shadow: 0 0 0 5px rgba(0, 242, 96, 0); }
+            100% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 242, 96, 0); }
+        }
+
+        audio { display: none; }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .header-actions { flex-direction: column; }
+            .status-bar { display: none; } /* 手机屏幕小，隐藏左下角状态栏 */
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="splash-screen">
+        <h1 style="font-size: 2rem; margin-bottom: 10px;">XU NUO</h1>
+        <p style="color: #666; margin-bottom: 30px;">2026 PRODUCT & HARDWARE PORTFOLIO</p>
+        <button id="enter-btn">ENTER EXPERIENCE</button>
+    </div>
+
+    <div class="bg-fixed">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div id="music-control" onclick="toggleMusic()">
+        <i class="fas fa-music" id="music-icon" style="color: #fff;"></i>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span>Current Status: Open to Work (Product / Hardware)</span>
+    </div>
+
+    <div class="container" id="main-content">
+        <header>
+            <h1>你好，我是 许诺</h1>
+            <p class="subtitle">致力于将硬件底层逻辑转化为极致产品体验</p>
+            
+            <div class="header-actions">
+                <a href="./resume.pdf" class="download-btn" download="许诺_简历_2026.pdf">
+                    <i class="fas fa-file-download"></i> 下载 PDF 简历
+                </a>
+                
+                <a href="mailto:3115448015@qq.com" class="contact-link">
+                    3115448015@qq.com
+                </a>
+            </div>
+        </header>
+
+        <div class="grid">
+            
+            <div class="card" onclick="openModal('modal-1')">
+                <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Hardware">
+                <div class="card-content">
+                    <span class="card-tag">实习</span>
+                    <h3>西谷微电子 · 质量助理</h3>
+                    <p>拦截严重硬件缺陷 20+ 次，Python 自动化测试效率提升 30%。</p>
+                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('modal-2')">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Data">
+                <div class="card-content">
+                    <span class="card-tag">实习</span>
+                    <h3>政务数字化 · 产品助理</h3>
+                    <p>利用用户旅程地图重构业务流程，填表错误率降低 40%。</p>
+                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+            <div class="card" onclick="openModal('modal-3')">
+                <img src="https://images.unsplash.com/photo-1581093458791-9f302e6d38e0?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="3D">
+                <div class="card-content">
+                    <span class="card-tag">项目负责人</span>
+                    <h3>丹江水质数字孪生平台</h3>
+                    <p>3D全景漫游 + 数据看板，解决污染源定位痛点。</p>
+                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+             <div class="card" onclick="openModal('modal-4')">
+                <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Medical">
+                <div class="card-content">
+                    <span class="card-tag">AI 研究</span>
+                    <h3>肝癌分型诊断研究</h3>
+                    <p>ETL 数据清洗与模型调优，完成 Bad Case 闭环分析。</p>
+                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-1">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-1')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000');"></div>
+            <div class="modal-body">
+                <h2>产品质量助理 @ 西谷微电子</h2>
+                <h4>2025.07 - 2025.09</h4>
+                <p>在这个岗位上，我主要负责连接技术实现与产品质量标准：</p>
+                <ul>
+                    <li><b>可靠性验证：</b>模拟高低温、老化场景，成功拦截了20余次严重硬件缺陷。</li>
+                    <li><b>自动化提效：</b>由于人工处理数据效率低，我编写了 Python 脚本，将数据处理时间缩短了30%。</li>
+                    <li><b>跨部门沟通：</b>我发现研发和测试之间存在理解偏差，因此我输出了结构化的失效分析报告，推动了产品从原型到量产的转化。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-2">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-2')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000');"></div>
+            <div class="modal-body">
+                <h2>政务数字化产品助理</h2>
+                <h4>2024.12 - 2025.02</h4>
+                <p>在基层政府实习期间，我运用产品思维解决了实际民生痛点：</p>
+                <ul>
+                    <li><b>痛点挖掘：</b>通过观察，我发现群众填表错误率高是因为流程断点多。</li>
+                    <li><b>解决方案：</b>设计了适老化交互指引（MVP），并绘制了包含20+节点的业务流程图。</li>
+                    <li><b>数据结果：</b>试点后，群众重复咨询次数下降了约30%。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-3">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-3')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000');"></div>
+            <div class="modal-body">
+                <h2>丹江流域水质量金属预警可视化平台</h2>
+                <h4>项目负责人</h4>
+                <p>这是一个典型的数字孪生项目，我负责从需求到落地的全流程：</p>
+                <ul>
+                    <li><b>需求转化：</b>将晦涩的PH值、重金属含量转化为可视化的 3D 全景漫游。</li>
+                    <li><b>技术标准：</b>主导制定了前后端 JSON 数据接口标准，降低了沟通成本。</li>
+                    <li><b>交互闭环：</b>实现了从“宏观监控”点击下钻到“微观排查”的交互逻辑。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-4">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-4')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1000');"></div>
+            <div class="modal-body">
+                <h2>基于长时依赖的肝癌分型诊断研究</h2>
+                <h4>数据与算法研究</h4>
+                <p>该项目锻炼了我对底层数据的理解能力：</p>
+                <ul>
+                    <li><b>ETL清洗：</b>制定了医疗数据的清洗与标注规范。</li>
+                    <li><b>Bad Case 分析：</b>专门针对误判案例进行归因分析（如图像特征不明显），并据此反向调优模型参数。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const splash = document.getElementById('splash-screen');
+        const mainContent = document.getElementById('main-content');
+        const bgm = document.getElementById('bgm');
+        const musicIcon = document.getElementById('music-icon');
+        const musicControl = document.getElementById('music-control');
+
+        // Enter Button
+        document.getElementById('enter-btn').addEventListener('click', () => {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                mainContent.classList.add('visible');
+            }, 1000);
+            
+            // Play Music
+            bgm.volume = 0.3;
+            bgm.play().then(() => {
+                musicControl.classList.add('rotate');
+            }).catch(error => {
+                console.log("Autoplay prevented");
+                musicControl.classList.remove('rotate');
+            });
+        });
+
+        // Toggle Music
+        function toggleMusic() {
+            if (bgm.paused) {
+                bgm.play();
+                musicControl.classList.add('rotate');
+                musicIcon.className = "fas fa-music";
+            } else {
+                bgm.pause();
+                musicControl.classList.remove('rotate');
+                musicIcon.className = "fas fa-volume-mute";
+            }
+        }
+
+        // Modals
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
