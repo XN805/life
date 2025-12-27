@@ -2,8 +2,8 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>许诺 | 产品经理作品集 Product Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>许诺 | AI产品经理作品集 Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -11,279 +11,239 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-QR12GMWMJW');
+      gtag('config', 'G-XXXXXXXXXX');
     </script>
 
     <style>
-        /* --- 全局变量 --- */
+        /* --- 核心变量 --- */
         :root {
-            --bg-dark: #0f172a;
-            --text-main: #f8fafc;
+            --bg-dark: #0b1121;
+            --text-main: #f1f5f9;
             --text-sub: #94a3b8;
             --accent: #38bdf8; /* 科技蓝 */
-            --glass: rgba(30, 41, 59, 0.7);
+            --accent-glow: rgba(56, 189, 248, 0.5);
+            --ai-color: #a855f7; /* 紫色，专门用于AI项目 */
+            --glass: rgba(30, 41, 59, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --modal-bg: rgba(15, 23, 42, 0.98);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
             height: 100vh;
         }
 
-        /* --- [功能 B] 打印适配 (Print Friendly) --- */
-        /* 当 HR 按下 Ctrl+P 时，网页会自动变成白底黑字文档 */
-        @media print {
-            body { background: white !important; color: black !important; overflow: auto !important; height: auto !important; }
-            .bg-fixed, #splash-screen, #music-control, .status-bar, .download-btn, .close-btn { display: none !important; }
-            .container { opacity: 1 !important; transform: none !important; padding: 0 !important; max-width: 100% !important; }
-            .card { break-inside: avoid; border: 1px solid #ccc !important; background: none !important; color: black !important; box-shadow: none !important; margin-bottom: 20px; }
-            .card h3, .card-company { color: black !important; }
-            .card p { color: #333 !important; }
-            .card-tag { border: 1px solid #000 !important; color: #000 !important; background: none !important; }
-            header { margin-bottom: 20px !important; }
-            h1 { font-size: 24pt !important; color: black !important; }
-            .subtitle { font-size: 12pt !important; color: #555 !important; }
-            a { text-decoration: underline !important; color: black !important; }
-        }
-
         /* --- 动态背景 --- */
         .bg-fixed {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 90%);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b1121 80%);
             z-index: -1;
         }
-        
         .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.3;
-            animation: float 15s infinite ease-in-out;
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.2;
+            animation: float 20s infinite ease-in-out;
         }
-        .orb-1 { top: -10%; left: 20%; width: 40vw; height: 40vw; background: #0ea5e9; }
-        .orb-2 { bottom: -10%; right: 10%; width: 35vw; height: 35vw; background: #6366f1; animation-delay: -5s; }
+        .orb-1 { top: -10%; left: 10%; width: 50vw; height: 50vw; background: #0ea5e9; }
+        .orb-2 { bottom: 0%; right: 0%; width: 60vw; height: 60vw; background: #6366f1; animation-delay: -5s; }
 
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(20px, 30px) scale(1.05); }
-        }
+        @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
 
-        /* --- [功能 C] 打字机开场 (Typewriter Splash) --- */
+        /* --- 开场打字机 (优化版) --- */
         #splash-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.8s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b1121; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s ease; padding: 20px; text-align: center;
         }
 
-        /* 打字机光标效果 */
-        .typewriter-text {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 1.5rem;
-            color: var(--accent);
-            border-right: 2px solid var(--accent);
-            white-space: nowrap;
-            overflow: hidden;
-            width: 0;
-            animation: typing 3s steps(30, end) forwards, blink .75s step-end infinite;
+        /* 打字机光标 */
+        .cursor {
+            display: inline-block; width: 3px; height: 1.2em; background-color: var(--accent);
+            margin-left: 5px; vertical-align: middle; animation: blink 1s infinite;
+        }
+        .cursor.stopped { display: none; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        #typewriter-content {
+            font-family: 'Courier New', monospace; font-size: 1.8rem; font-weight: bold;
+            color: var(--text-main); height: 60px; /* 占位高度 */
+            display: flex; align-items: center; justify-content: center;
         }
 
-        @keyframes typing { from { width: 0 } to { width: 100% } }
-        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
-        
         #enter-btn {
-            opacity: 0; /* 初始隐藏，打字结束后显示 */
-            animation: fadeIn 1s ease 3.2s forwards; /* 延时出现 */
-            padding: 12px 35px;
-            border: 1px solid var(--accent);
-            background: rgba(56, 189, 248, 0.1);
-            color: var(--accent);
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 25px;
-            border-radius: 4px;
+            opacity: 0; margin-top: 40px; padding: 12px 40px;
+            border: 1px solid var(--accent); background: transparent;
+            color: var(--accent); font-size: 1rem; letter-spacing: 2px;
+            cursor: pointer; transition: 0.3s; border-radius: 4px;
         }
-        #enter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
-
-        @keyframes fadeIn { to { opacity: 1; } }
+        #enter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 25px var(--accent-glow); }
+        #enter-btn.show { opacity: 1; transform: translateY(0); }
 
         /* --- 主容器 --- */
         .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 80px 20px;
-            opacity: 0; 
-            transform: translateY(20px);
-            transition: all 1s ease;
-            padding-bottom: 120px;
+            max-width: 1100px; margin: 0 auto; padding: 60px 20px 120px;
+            opacity: 0; transform: translateY(30px); transition: all 1s ease;
         }
         .container.visible { opacity: 1; transform: translateY(0); }
 
-        header { text-align: center; margin-bottom: 70px; }
-        h1 { font-size: 3.5rem; letter-spacing: -1px; margin-bottom: 15px; font-weight: 700; }
-        .subtitle { color: var(--text-sub); font-size: 1.3rem; letter-spacing: 0.5px; line-height: 1.6; }
+        /* --- 头部区域 (适配手机) --- */
+        header { text-align: center; margin-bottom: 50px; }
+        
+        h1 { 
+            font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px;
+            background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle { 
+            color: var(--text-sub); font-size: 1.25rem; line-height: 1.6; max-width: 700px; margin: 0 auto;
+        }
+        
+        .profile-tags {
+            margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+        }
+        .profile-tag {
+            font-size: 0.85rem; padding: 4px 12px; border-radius: 20px;
+            background: rgba(255,255,255,0.05); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.2);
+        }
 
         .header-actions {
-            margin-top: 35px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
+            margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
         }
 
-        .download-btn {
-            padding: 10px 25px;
-            background: var(--text-main);
-            color: var(--bg-dark);
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            transition: 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .btn {
+            padding: 10px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 600;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
         }
-        .download-btn:hover { background: var(--accent); transform: translateY(-2px); }
-
-        /* [功能 A] 微信按钮样式 */
-        .wechat-btn {
-            padding: 10px 25px;
-            border: 1px solid rgba(255,255,255,0.3);
-            color: var(--text-main);
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: 0.3s;
-        }
-        .wechat-btn:hover { border-color: #07c160; color: #07c160; background: rgba(7, 193, 96, 0.1); }
+        .btn-primary { background: var(--text-main); color: #000; }
+        .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
+        
+        .btn-outline { border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); cursor: pointer; }
+        .btn-outline:hover { border-color: #07c160; color: #07c160; background: rgba(7, 193, 96, 0.1); }
 
         /* --- 卡片网格 --- */
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;
         }
 
         .card {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(12px);
-            border-radius: 16px;
-            cursor: pointer;
-            transition: transform 0.3s, border-color 0.3s;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px); border-radius: 16px; overflow: hidden;
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex; flex-direction: column; group;
         }
         .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
-        /* 修复后的图片容器 */
-        .card-img-wrap { height: 160px; width: 100%; position: relative; overflow: hidden; background: #222; }
-        .card-bg-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; opacity: 0.9; }
-        .card:hover .card-bg-img { transform: scale(1.1); opacity: 1; }
+        .card-img-wrap { height: 180px; width: 100%; position: relative; overflow: hidden; }
+        .card-bg-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+        .card:hover .card-bg-img { transform: scale(1.08); }
 
-        .card-content { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
         
-        /* 公司名称显性化 */
-        .card-company {
-            font-size: 0.85rem;
-            color: var(--accent);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .card h3 { font-size: 1.4rem; margin-bottom: 8px; color: var(--text-main); }
-        .card p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6; }
+        .card-meta { font-size: 0.75rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+        .card h3 { font-size: 1.35rem; margin-bottom: 12px; color: #fff; line-height: 1.3; }
+        .card p { font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
         
-        .tags-row { margin-bottom: 15px; }
-        .card-tag { 
-            display: inline-block; font-size: 0.7rem; padding: 4px 8px; 
-            background: rgba(56, 189, 248, 0.1); color: var(--accent); 
-            border-radius: 6px; margin-right: 6px; margin-bottom: 6px; 
-        }
+        .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag-pill { font-size: 0.7rem; padding: 4px 10px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 6px; }
 
-        /* --- 模态框 (通用 + 微信) --- */
+        /* --- 特别卡片：AI 实验室 (New) --- */
+        .card-ai {
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            position: relative;
+        }
+        .card-ai:hover { border-color: var(--ai-color); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
+        .card-ai .card-meta { color: var(--ai-color); }
+        
+        /* 呼吸灯特效 */
+        @keyframes border-pulse { 0% { border-color: rgba(168, 85, 247, 0.3); } 50% { border-color: rgba(168, 85, 247, 0.8); } 100% { border-color: rgba(168, 85, 247, 0.3); } }
+        .card-ai { animation: border-pulse 3s infinite; }
+
+        /* --- 弹窗 --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
             z-index: 2000; display: flex; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            background: #1e293b; width: 92%; max-width: 750px; max-height: 85vh;
-            overflow-y: auto; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);
-            position: relative; transform: scale(0.95); transition: transform 0.3s;
+            background: #1e293b; width: 100%; max-width: 700px; max-height: 85vh;
+            overflow-y: auto; border-radius: 16px; border: 1px solid var(--glass-border);
+            position: relative; transform: scale(0.95); transition: 0.3s;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
 
-        /* 微信二维码专用弹窗样式 */
-        .qr-modal { text-align: center; padding: 40px; max-width: 400px; }
-        .qr-modal img { width: 250px; height: 250px; border-radius: 10px; margin: 20px 0; border: 2px solid #fff; }
+        .modal-header-img { height: 200px; background-size: cover; background-position: center; position: relative; }
+        .modal-header-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #1e293b); }
 
-        .modal-header { height: 180px; background-size: cover; background-position: center; position: relative; }
-        .modal-header::after { content: ''; position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(to bottom, transparent, #1e293b); }
-
-        .modal-body { padding: 40px; color: #cbd5e1; line-height: 1.8; }
-        .modal-body h2 { color: #fff; margin-bottom: 5px; font-size: 1.8rem; }
-        .modal-company { color: var(--accent); font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; display: block; } 
-        .modal-body h4 { color: #94a3b8; margin-bottom: 25px; font-weight: normal; font-size: 0.9rem; }
-        .modal-section-title { color: #fff; font-size: 1.1rem; margin-top: 25px; margin-bottom: 10px; border-left: 3px solid var(--accent); padding-left: 10px; font-weight: bold; }
-        .modal-body ul { margin-left: 20px; } .modal-body li { margin-bottom: 10px; }
-
+        .modal-body { padding: 30px; color: #cbd5e1; line-height: 1.7; }
+        .modal-body h2 { color: #fff; font-size: 1.6rem; margin-bottom: 5px; }
+        .modal-body .subtitle-text { color: var(--accent); font-size: 0.95rem; margin-bottom: 25px; display: block; }
+        .modal-section { margin-bottom: 25px; }
+        .modal-section h4 { color: #fff; font-size: 1.1rem; border-left: 3px solid var(--accent); padding-left: 10px; margin-bottom: 10px; }
+        
         .close-btn {
-            position: absolute; top: 15px; right: 20px; font-size: 2rem; color: #fff; 
-            cursor: pointer; z-index: 10; background: rgba(0,0,0,0.3); width: 40px; height: 40px; 
-            line-height: 36px; text-align: center; border-radius: 50%; transition: 0.2s;
+            position: absolute; top: 15px; right: 15px; width: 36px; height: 36px;
+            background: rgba(0,0,0,0.4); border-radius: 50%; color: #fff;
+            display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10;
         }
-        .close-btn:hover { background: var(--accent); color: #000; }
 
-        /* --- 音乐 & 状态栏 --- */
+        /* 微信二维码弹窗 */
+        .qr-content { text-align: center; padding: 40px 20px; max-width: 350px; }
+        .qr-img { width: 220px; height: 220px; border-radius: 12px; margin: 20px 0; border: 2px solid #fff; }
+
+        /* --- 底部控制 --- */
         #music-control {
-            position: fixed; bottom: 30px; right: 30px; width: 45px; height: 45px;
+            position: fixed; bottom: 25px; right: 25px; width: 44px; height: 44px;
             border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 1000; background: rgba(15, 23, 42, 0.8); transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.8);
+            z-index: 1000; cursor: pointer;
         }
-        #music-control:hover { border-color: var(--accent); color: var(--accent); }
         .rotate { animation: spin 4s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .status-bar {
-            position: fixed; bottom: 30px; left: 30px; background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(5px); padding: 8px 16px; border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1); font-size: 0.85rem; color: var(--text-sub);
-            display: flex; align-items: center; gap: 10px; z-index: 1000;
+            position: fixed; bottom: 25px; left: 25px;
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
+            padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+            font-size: 0.8rem; color: var(--text-sub); display: flex; align-items: center; gap: 8px; z-index: 1000;
         }
-        .status-dot { width: 8px; height: 8px; background-color: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
-        
-        @keyframes pulse { 0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); } 70% { opacity: 1; box-shadow: 0 0 0 5px rgba(56, 189, 248, 0); } 100% { opacity: 0.5; } }
+        .status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
 
-        audio { display: none; }
-        @media (max-width: 768px) { .status-bar { display: none; } .header-actions { flex-direction: column; } .download-btn, .wechat-btn { width: 100%; justify-content: center; } }
+        /* --- 📱 移动端深度适配 (Media Queries) --- */
+        @media (max-width: 768px) {
+            /* 1. 字体调整 */
+            h1 { font-size: 2.2rem; }
+            .subtitle { font-size: 1rem; padding: 0 10px; }
+            
+            /* 2. 间距调整 */
+            header { margin-bottom: 30px; }
+            .container { padding-top: 40px; }
+            
+            /* 3. 隐藏不必要元素 */
+            .status-bar { display: none; }
+            
+            /* 4. 按钮优化 */
+            .header-actions { flex-direction: column; width: 100%; padding: 0 20px; }
+            .btn { width: 100%; justify-content: center; }
+            
+            /* 5. 背景优化 */
+            .orb { opacity: 0.15; } /* 手机上减淡背景 */
+            
+            /* 6. 打字机优化 */
+            #typewriter-content { font-size: 1.4rem; height: 50px; }
+        }
+
+        @media print {
+             body { background: white !important; color: black !important; }
+             #splash-screen, .bg-fixed, #music-control, .btn { display: none !important; }
+             .card { border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
@@ -293,8 +253,10 @@
     </audio>
 
     <div id="splash-screen">
-        <div class="typewriter-text">Hello, I am Xu Nuo.</div>
-        <button id="enter-btn">ENTER PORTFOLIO</button>
+        <div id="typewriter-content">
+            <span id="text-target"></span><span class="cursor"></span>
+        </div>
+        <button id="enter-btn">进入简历 | ENTER</button>
     </div>
 
     <div class="bg-fixed">
@@ -303,28 +265,27 @@
     </div>
 
     <div id="music-control" onclick="toggleMusic()">
-        <i class="fas fa-music" id="music-icon" style="color: inherit;"></i>
+        <i class="fas fa-music" id="music-icon" style="color: white;"></i>
     </div>
 
     <div class="status-bar">
         <div class="status-dot"></div>
-        <span>Open to Work: Product Manager / Data Product</span>
+        <span>Open to Work: AI Product Manager</span>
     </div>
 
     <div class="container" id="main-content">
         <header>
             <h1>你好，我是 许诺</h1>
             <p class="subtitle">
-                致力于将硬件底层逻辑转化为极致产品体验<br>
-                <span style="font-size: 0.9em; opacity: 0.8;">西北大学(211) · 智能科学与技术 · 2026届</span>
+                致力于连接 AI 技术边界与用户核心价值<br>
+                <span style="font-size: 0.9em; opacity: 0.7; display:block; margin-top:5px;">数据驱动策略 · B端产品创新 · 商业化闭环</span>
             </p>
             
             <div class="header-actions">
-                <a href="./resume.pdf" class="download-btn" download="许诺_产品经理_2026.pdf">
-                    <i class="fas fa-file-download"></i> 获取 PDF 简历
+                <a href="./resume.pdf" class="btn btn-primary" download="许诺_AI产品经理_2026.pdf">
+                    <i class="fas fa-file-download"></i> 下载简历 PDF
                 </a>
-                
-                <div class="wechat-btn" onclick="openModal('modal-wechat')">
+                <div class="btn btn-outline" onclick="openModal('modal-wechat')">
                     <i class="fab fa-weixin"></i> 微信联系
                 </div>
             </div>
@@ -334,59 +295,75 @@
             
             <div class="card" onclick="openModal('modal-gov')">
                 <div class="card-img-wrap">
-                    <img src="https://placehold.co/600x400/232742/38bdf8?text=Public+Service+Design" class="card-bg-img" alt="Government Service">
+                    <img src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Office Collaboration">
                 </div>
                 <div class="card-content">
-                    <span class="card-company">椿林镇人民政府</span> <h3>政务服务流程重构</h3>
+                    <div class="card-meta">椿林镇人民政府</div>
+                    <h3>政务服务流程数字化重构</h3>
                     <div class="tags-row">
-                        <span class="card-tag">用户调研</span>
-                        <span class="card-tag">MVP设计</span>
+                        <span class="tag-pill">用户调研</span>
+                        <span class="tag-pill">MVP落地</span>
                     </div>
-                    <p>通过用户旅程地图分析痛点，设计适老化交互指引 MVP，将填表错误率降低 40%。</p>
+                    <p style="margin-top:10px;">通过用户旅程地图分析痛点，设计适老化 MVP，将填表错误率降低 40%。</p>
                 </div>
             </div>
 
             <div class="card" onclick="openModal('modal-xigu')">
                 <div class="card-img-wrap">
-                    <img src="https://placehold.co/600x400/102a43/38bdf8?text=Chip+Testing+Automation" class="card-bg-img" alt="Chip Testing">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Tech Chip">
                 </div>
                 <div class="card-content">
-                    <span class="card-company">西安西谷微电子</span> <h3>自动化测试效能优化</h3>
+                    <div class="card-meta">西谷微电子</div>
+                    <h3>自动化测试效能工具</h3>
                     <div class="tags-row">
-                        <span class="card-tag">Python自动化</span>
-                        <span class="card-tag">效能工具</span>
+                        <span class="tag-pill">Python</span>
+                        <span class="tag-pill">内部提效</span>
                     </div>
-                    <p>针对内部手动测试低效痛点，开发自动化脚本工具，将数据处理效率提升 30%。</p>
+                    <p style="margin-top:10px;">开发自动化脚本替代手工处理，数据处理效率提升 30%，推动研发测试闭环。</p>
                 </div>
             </div>
 
             <div class="card" onclick="openModal('modal-water')">
                 <div class="card-img-wrap">
-                    <img src="https://placehold.co/600x400/0f4c75/ffffff?text=3D+Data+Visualization" class="card-bg-img" alt="Water Project">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Data Screen">
                 </div>
                 <div class="card-content">
-                    <span class="card-company">项目经历</span>
+                    <div class="card-meta">项目负责人</div>
                     <h3>丹江水质数字孪生平台</h3>
                     <div class="tags-row">
-                        <span class="card-tag">0-1 产品设计</span>
-                        <span class="card-tag">可视化</span>
+                        <span class="tag-pill">3D可视化</span>
+                        <span class="tag-pill">产品设计</span>
                     </div>
-                    <p>定义产品前后端接口标准，设计“3D漫游+数据看板”交互形态，解决监管痛点。</p>
+                    <p style="margin-top:10px;">定义前后端数据标准，设计“3D漫游+数据看板”，解决监管决策滞后痛点。</p>
                 </div>
             </div>
 
              <div class="card" onclick="openModal('modal-ai')">
                 <div class="card-img-wrap">
-                    <img src="https://placehold.co/600x400/2c3e50/00d2d3?text=AI+Medical+Research" class="card-bg-img" alt="Medical AI">
+                    <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Medical AI">
                 </div>
                 <div class="card-content">
-                    <span class="card-company">学术研究</span>
+                    <div class="card-meta">算法研究</div>
                     <h3>医疗 AI 诊断模型优化</h3>
                     <div class="tags-row">
-                        <span class="card-tag">AI 产品策略</span>
-                        <span class="card-tag">Bad Case分析</span>
+                        <span class="tag-pill">数据治理</span>
+                        <span class="tag-pill">Bad Case分析</span>
                     </div>
-                    <p>负责底层数据清洗 (ETL) 标准制定，建立 Bad Case 归因分析机制，驱动模型迭代。</p>
+                    <p style="margin-top:10px;">制定 ETL 清洗标准，建立误判归因机制，从数据侧驱动 AI 模型精度提升。</p>
+                </div>
+            </div>
+
+            <div class="card card-ai" onclick="openModal('modal-ai-lab')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800&auto=format&fit=crop" class="card-bg-img" alt="Future AI">
+                </div>
+                <div class="card-content">
+                    <div class="card-meta"><i class="fas fa-rocket"></i> Side Project</div>
+                    <h3>个人 AI 产品实验室</h3>
+                    <div class="tags-row">
+                        <span class="tag-pill" style="color:var(--ai-color); border-color:var(--ai-color);">Coming Soon</span>
+                    </div>
+                    <p style="margin-top:10px;">正在构建一个基于 LLM 的垂直领域应用，探索 AI Agent 在 B 端场景的落地能力。</p>
                 </div>
             </div>
 
@@ -394,106 +371,165 @@
     </div>
 
     <div class="modal-overlay" id="modal-wechat">
-        <div class="modal-content qr-modal">
-            <span class="close-btn" onclick="closeModal('modal-wechat')">&times;</span>
-            <h2 style="font-size: 1.5rem;">Let's Talk</h2>
-            <p>扫码添加我的微信</p>
-            <img src="./wechat.jpg" alt="我的微信二维码">
-            <p style="color: #94a3b8; font-size: 0.9rem;">微信号: 17343978187</p>
+        <div class="modal-content qr-content">
+            <div class="close-btn" onclick="closeModal('modal-wechat')">&times;</div>
+            <h2 style="color:#fff;">添加微信</h2>
+            <img src="./wechat.jpg" class="qr-img" alt="WeChat QR">
+            <p style="color:#94a3b8;">微信号: 17343978187</p>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-gov">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-gov')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://placehold.co/800x300/232742/38bdf8?text=Government+Service+Design');"></div>
+            <div class="close-btn" onclick="closeModal('modal-gov')">&times;</div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=800');"></div>
             <div class="modal-body">
-                <span class="modal-company">椿林镇人民政府</span>
                 <h2>政务服务流程数字化重构</h2>
-                <h4>产品助理 (实习) | 2024.12 - 2025.02</h4>
-                
-                <div class="modal-section-title">痛点挖掘</div>
-                <p>在便民服务中心，群众办事“填表错、排队长”是高频痛点。数据显示，医保核销业务填表错误率高达 40%。</p>
-                
-                <div class="modal-section-title">我的行动</div>
-                <ul>
-                    <li><b>用户旅程地图：</b>拆解出“政策理解难”核心断点，摒弃复杂开发，设计低成本的“可视化指引”作为 MVP。</li>
-                    <li><b>流程重组：</b>输出了包含 20+ 节点的标准业务流程图 (Flowchart) 作为窗口 SOP。</li>
-                </ul>
-                
-                <div class="modal-section-title">结果</div>
-                <p>试点窗口重复咨询次数下降约 30%，有效缓解了二次排队现象。</p>
+                <span class="subtitle-text">椿林镇人民政府 | 产品助理 (实习)</span>
+                <div class="modal-section">
+                    <h4>背景与痛点</h4>
+                    <p>群众办事“填表错、排队长”是高频痛点，医保核销业务填表错误率高达 40%。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>行动</h4>
+                    <ul>
+                        <li><b>用户调研：</b>通过用户旅程地图拆解核心断点。</li>
+                        <li><b>MVP设计：</b>设计低成本的可视化指引，而非昂贵的系统开发。</li>
+                    </ul>
+                </div>
+                <div class="modal-section">
+                    <h4>结果</h4>
+                    <p>试点窗口重复咨询下降 30%，有效缓解二次排队。</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-xigu">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-xigu')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://placehold.co/800x300/102a43/38bdf8?text=Lab+Environment');"></div>
+            <div class="close-btn" onclick="closeModal('modal-xigu')">&times;</div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800');"></div>
             <div class="modal-body">
-                <span class="modal-company">西安西谷微电子有限责任公司</span>
-                <h2>内部自动化测试效能工具</h2>
-                <h4>质量助理 (实习) | 2025.07 - 2025.09</h4>
-                
-                <div class="modal-section-title">背景</div>
-                <p>在芯片可靠性验证环节，人工记录数据效率低下且易出错。</p>
-
-                <div class="modal-section-title">我的行动</div>
-                <ul>
-                    <li><b>工具产品化：</b>开发 Python 自动化脚本替代 Excel 手工处理，实现数据自动清洗。</li>
-                    <li><b>流程标准化：</b>主导输出《失效分析报告》模板，统一研发与测试部门的沟通语言。</li>
-                    <li><b>质量把控：</b>拦截了 20+ 次严重缺陷，避免了潜在召回风险。</li>
-                </ul>
+                <h2>自动化测试效能工具</h2>
+                <span class="subtitle-text">西谷微电子 | 质量助理 (实习)</span>
+                <div class="modal-section">
+                    <h4>问题</h4>
+                    <p>芯片验证环节，人工记录数据效率低下且易出错。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>解决方案</h4>
+                    <p>开发 Python 自动化脚本替代 Excel 手工处理，并主导输出标准化的《失效分析报告》。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>价值</h4>
+                    <p>数据处理效率提升 30%，拦截 20+ 次严重缺陷。</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-water">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-water')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://placehold.co/800x300/0f4c75/ffffff?text=Digital+Twin+Platform');"></div>
+            <div class="close-btn" onclick="closeModal('modal-water')">&times;</div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800');"></div>
             <div class="modal-body">
                 <h2>丹江流域水质数字孪生平台</h2>
-                <h4>项目负责人</h4>
-                <div class="modal-section-title">解决方案</div>
-                <ul>
-                    <li><b>交互设计：</b>设计“3D全景漫游 + 悬浮数据看板”，支持从宏观地图下钻到微观监测点。</li>
-                    <li><b>接口定义：</b>主导撰写前后端 JSON 接口文档，规范数据格式与报警阈值。</li>
-                </ul>
+                <span class="subtitle-text">项目负责人</span>
+                <div class="modal-section">
+                    <h4>方案</h4>
+                    <p>设计“3D全景漫游 + 悬浮数据看板”，支持从宏观地图下钻到微观监测点。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>执行</h4>
+                    <p>主导撰写前后端 JSON 接口文档，规范数据格式与报警阈值。</p>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-ai">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-ai')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://placehold.co/800x300/2c3e50/00d2d3?text=AI+Model+Training');"></div>
+            <div class="close-btn" onclick="closeModal('modal-ai')">&times;</div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800');"></div>
             <div class="modal-body">
-                <h2>AI 医疗诊断模型优化</h2>
-                <h4>算法研究</h4>
-                <div class="modal-section-title">策略</div>
-                <ul>
-                    <li><b>数据治理 (ETL)：</b>制定医疗数据清洗与标注 SOP，解决原始数据“脏乱差”问题。</li>
-                    <li><b>闭环优化：</b>建立 Bad Case 误判分析库，反向指导模型参数调整。</li>
-                </ul>
+                <h2>医疗 AI 诊断模型优化</h2>
+                <span class="subtitle-text">算法与数据研究</span>
+                <div class="modal-section">
+                    <h4>数据治理</h4>
+                    <p>制定医疗数据清洗 (ETL) 与标注 SOP，解决原始数据“脏乱差”问题。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>闭环优化</h4>
+                    <p>建立 Bad Case 误判分析库，反向指导模型参数调整。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-ai-lab">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closeModal('modal-ai-lab')">&times;</div>
+            <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800');"></div>
+            <div class="modal-body">
+                <h2 style="color:var(--ai-color);">个人 AI 产品实验室</h2>
+                <span class="subtitle-text">In Progress | 正在构建中...</span>
+                <div class="modal-section">
+                    <h4>项目愿景</h4>
+                    <p>我正在利用业余时间开发一款垂直领域的 AI Agent，旨在验证 LLM 在特定 B 端场景下的逻辑推理与任务执行能力。</p>
+                </div>
+                <div class="modal-section">
+                    <h4>计划技术栈</h4>
+                    <ul>
+                        <li>LangChain / Dify</li>
+                        <li>Prompt Engineering</li>
+                        <li>RAG (检索增强生成)</li>
+                    </ul>
+                </div>
+                <div style="margin-top:20px; padding:15px; background:rgba(168, 85, 247, 0.1); border:1px solid rgba(168, 85, 247, 0.3); border-radius:8px; text-align:center;">
+                    <i class="fas fa-tools"></i> Demo 即将上线，敬请期待
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // --- 逻辑控制 ---
+        
         const splash = document.getElementById('splash-screen');
         const mainContent = document.getElementById('main-content');
         const bgm = document.getElementById('bgm');
         const musicIcon = document.getElementById('music-icon');
         const musicControl = document.getElementById('music-control');
+        const enterBtn = document.getElementById('enter-btn');
+        const textTarget = document.getElementById('text-target');
+        const cursor = document.querySelector('.cursor');
 
-        // 打字机文字定义
-        const texts = ["Hello, I am Xu Nuo.", "Product Manager.", "Hardware Engineer."];
-        let textIndex = 0;
-        
+        // 打字机逻辑 (JS版)
+        const textToType = "Hello, I am Xu Nuo.";
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                textTarget.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 100); // 打字速度
+            } else {
+                // 打字结束
+                cursor.classList.add('stopped'); // 停止光标
+                setTimeout(() => {
+                    cursor.style.display = 'none'; // 隐藏光标
+                    enterBtn.classList.add('show'); // 显示按钮
+                }, 500);
+            }
+        }
+
+        // 页面加载后开始打字
+        window.onload = () => {
+            setTimeout(typeWriter, 500);
+        };
+
         // 进入按钮
-        document.getElementById('enter-btn').addEventListener('click', () => {
+        enterBtn.addEventListener('click', () => {
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.style.display = 'none';
