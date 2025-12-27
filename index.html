@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="许诺的个人作品集 - AI产品经理 | 数据驱动策略 | 产品创新">
     <title>许诺 | AI产品经理作品集 Portfolio</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="data:;base64,="> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QR12GMWMJW"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-QR12GMWMJW');
     </script>
 
     <style>
@@ -22,19 +23,27 @@
             --text-sub: #94a3b8;
             --accent: #38bdf8; /* 科技蓝 */
             --accent-glow: rgba(56, 189, 248, 0.5);
-            --ai-color: #a855f7; /* 紫色，专门用于AI项目 */
+            --ai-color: #a855f7; /* 紫色 */
             --glass: rgba(30, 41, 59, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
+        html { scroll-behavior: smooth; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
             height: 100vh;
+        }
+
+        /* --- [新增] 顶部阅读进度条 --- */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
+            width: 0%; z-index: 10001; transition: width 0.1s;
+            box-shadow: 0 0 10px var(--accent);
         }
 
         /* --- 动态背景 --- */
@@ -90,7 +99,7 @@
         .container.visible { opacity: 1; transform: translateY(0); }
 
         /* --- 头部区域 --- */
-        header { text-align: center; margin-bottom: 50px; }
+        header { text-align: center; margin-bottom: 30px; }
         
         h1 { 
             font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px;
@@ -114,6 +123,24 @@
         
         .btn-outline { border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); cursor: pointer; }
         .btn-outline:hover { border-color: #07c160; color: #07c160; background: rgba(7, 193, 96, 0.1); }
+
+        /* --- [新增] 产品思维板块 (Philosophy) --- */
+        .philosophy-section {
+            text-align: center; max-width: 800px; margin: 0 auto 60px;
+            padding: 30px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+        .philosophy-quote {
+            font-size: 1.1rem; color: #cbd5e1; line-height: 1.8; font-style: italic; position: relative;
+        }
+        .philosophy-quote::before {
+            content: '"'; font-size: 3rem; color: var(--accent); opacity: 0.3;
+            position: absolute; top: -20px; left: -15px; font-family: serif;
+        }
+        .philosophy-tag {
+            display: inline-block; margin-top: 15px; font-size: 0.8rem; color: var(--accent);
+            text-transform: uppercase; letter-spacing: 1px; font-weight: bold;
+        }
 
         /* --- 卡片网格 --- */
         .grid {
@@ -182,16 +209,27 @@
         .qr-content { text-align: center; padding: 40px 20px; max-width: 350px; }
         .qr-img { width: 220px; height: 220px; border-radius: 12px; margin: 20px 0; border: 2px solid #fff; }
 
-        /* --- 底部控制 --- */
-        #music-control {
-            position: fixed; bottom: 25px; right: 25px; width: 44px; height: 44px;
-            border-radius: 50%; border: 1px solid rgba(255,255,255,0.2);
-            display: flex; justify-content: center; align-items: center; background: rgba(15, 23, 42, 0.8);
-            z-index: 1000; cursor: pointer;
+        /* --- 底部控制按钮组 --- */
+        .bottom-controls {
+            position: fixed; bottom: 25px; right: 25px;
+            display: flex; flex-direction: column; gap: 15px; z-index: 1000;
         }
+
+        .control-btn {
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.2); background: rgba(15, 23, 42, 0.8);
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            color: #fff; transition: 0.3s;
+        }
+        .control-btn:hover { border-color: var(--accent); color: var(--accent); }
         .rotate { animation: spin 4s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
+        /* [新增] 返回顶部按钮 (默认隐藏) */
+        #back-to-top { opacity: 0; visibility: hidden; transition: 0.3s; }
+        #back-to-top.show { opacity: 1; visibility: visible; }
+
+        /* 状态栏 */
         .status-bar {
             position: fixed; bottom: 25px; left: 25px;
             background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px);
@@ -211,16 +249,20 @@
             .btn { width: 100%; justify-content: center; }
             .orb { opacity: 0.15; }
             #typewriter-content { font-size: 1.4rem; min-height: 50px; }
+            /* 手机上隐藏返回顶部，节省空间 */
+            #back-to-top { display: none; } 
         }
 
         @media print {
              body { background: white !important; color: black !important; }
-             #splash-screen, .bg-fixed, #music-control, .btn { display: none !important; }
+             #splash-screen, .bg-fixed, .bottom-controls, .btn, #scroll-progress { display: none !important; }
              .card { border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; }
         }
     </style>
 </head>
 <body>
+
+    <div id="scroll-progress"></div>
 
     <audio id="bgm" loop>
         <source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
@@ -238,8 +280,13 @@
         <div class="orb orb-2"></div>
     </div>
 
-    <div id="music-control" onclick="toggleMusic()">
-        <i class="fas fa-music" id="music-icon" style="color: white;"></i>
+    <div class="bottom-controls">
+        <div id="back-to-top" class="control-btn" onclick="scrollToTop()">
+            <i class="fas fa-arrow-up"></i>
+        </div>
+        <div id="music-control" class="control-btn" onclick="toggleMusic()">
+            <i class="fas fa-music" id="music-icon"></i>
+        </div>
     </div>
 
     <div class="status-bar">
@@ -264,6 +311,14 @@
                 </div>
             </div>
         </header>
+
+        <section class="philosophy-section">
+            <div class="philosophy-quote">
+                我相信，卓越的 AI 产品不是技术的堆砌，而是技术边界与人文关怀的交集。
+                我的目标是利用 LLM 降低复杂系统的认知门槛，通过数据闭环提升决策质量，让技术真正服务于人。
+            </div>
+            <span class="philosophy-tag">PRODUCT PHILOSOPHY</span>
+        </section>
 
         <div class="grid">
             
@@ -471,7 +526,8 @@
         const mainContent = document.getElementById('main-content');
         const bgm = document.getElementById('bgm');
         const musicIcon = document.getElementById('music-icon');
-        const musicControl = document.getElementById('music-control');
+        const backToTopBtn = document.getElementById('back-to-top');
+        const scrollProgress = document.getElementById('scroll-progress');
         const enterBtn = document.getElementById('enter-btn');
         const textTarget = document.getElementById('text-target');
         const cursor = document.querySelector('.cursor');
@@ -497,6 +553,28 @@
         window.onload = () => {
             setTimeout(typeWriter, 500);
         };
+
+        // 滚动监听：进度条 + 返回顶部按钮
+        window.onscroll = function() {
+            // 进度条
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            scrollProgress.style.width = scrolled + "%";
+
+            // 返回顶部按钮
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        };
+
+        // 返回顶部功能
+        function scrollToTop() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
 
         // 进入按钮
         enterBtn.addEventListener('click', () => {
