@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>许诺 | 交互式简历 Portfolio</title>
+    <title>许诺 | 产品经理作品集 PM Portfolio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
@@ -11,26 +11,24 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
-      // 这里的 ID也要替换
       gtag('config', 'G-XXXXXXXXXX');
     </script>
     <style>
         /* --- 核心变量 --- */
         :root {
-            --bg-dark: #0a0a0a;
-            --text-main: #ffffff;
-            --text-sub: #a0a0a0;
-            --accent: #00f260; /* 极简荧光绿 */
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --modal-bg: rgba(0, 0, 0, 0.85);
+            --bg-dark: #0f172a; /* 更深邃的蓝黑背景 */
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent: #38bdf8; /* 调整为：极客蓝 (Sky Blue)，更符合软件产品调性 */
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --modal-bg: rgba(15, 23, 42, 0.95);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-dark);
             color: var(--text-main);
             overflow-x: hidden;
@@ -41,50 +39,52 @@
         .bg-fixed {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 10% 20%, #1a1a1a 0%, #000000 90%);
+            background: radial-gradient(circle at 50% 10%, #1e293b 0%, #0f172a 90%);
             z-index: -1;
         }
         
+        /* 粒子改为更柔和的流动 */
         .orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: float 10s infinite ease-in-out;
+            filter: blur(100px);
+            opacity: 0.3;
+            animation: float 15s infinite ease-in-out;
         }
-        .orb-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #0575e6; }
-        .orb-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #00f260; animation-delay: -5s; }
+        .orb-1 { top: -10%; left: 20%; width: 40vw; height: 40vw; background: #0ea5e9; }
+        .orb-2 { bottom: -10%; right: 10%; width: 35vw; height: 35vw; background: #6366f1; animation-delay: -5s; }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, 50px); }
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, 30px) scale(1.05); }
         }
 
         /* --- 入场封面 (Splash Screen) --- */
         #splash-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
+            background: #0f172a;
             z-index: 9999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 1s ease;
+            transition: opacity 0.8s ease;
         }
         
         #enter-btn {
-            padding: 15px 40px;
-            border: 1px solid var(--text-main);
-            background: transparent;
-            color: var(--text-main);
-            font-size: 1.2rem;
+            padding: 12px 35px;
+            border: 1px solid var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            font-size: 1.1rem;
             letter-spacing: 2px;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 20px;
+            margin-top: 25px;
+            border-radius: 4px;
         }
-        #enter-btn:hover { background: var(--text-main); color: #000; }
+        #enter-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(56, 189, 248, 0.4); }
 
         /* --- 主容器 --- */
         .container {
@@ -94,183 +94,244 @@
             opacity: 0; 
             transform: translateY(20px);
             transition: all 1s ease;
-            padding-bottom: 100px; /* 为底部状态栏留空间 */
+            padding-bottom: 120px;
         }
 
         .container.visible { opacity: 1; transform: translateY(0); }
 
         /* --- 头部 --- */
-        header { text-align: center; margin-bottom: 80px; }
-        h1 { font-size: 3.5rem; letter-spacing: -2px; margin-bottom: 10px; }
-        .subtitle { color: var(--text-sub); font-size: 1.2rem; letter-spacing: 1px; }
+        header { text-align: center; margin-bottom: 70px; }
+        h1 { font-size: 3.5rem; letter-spacing: -1px; margin-bottom: 15px; font-weight: 700; }
+        .subtitle { 
+            color: var(--text-sub); 
+            font-size: 1.3rem; 
+            letter-spacing: 0.5px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            line-height: 1.6;
+        }
 
         .header-actions {
-            margin-top: 30px;
+            margin-top: 35px;
             display: flex;
             justify-content: center;
             gap: 20px;
             align-items: center;
         }
 
-        /* [功能 1] PDF 下载按钮样式 */
+        /* PDF 下载按钮 */
         .download-btn {
-            padding: 10px 20px;
-            background: var(--accent);
-            color: #000;
+            padding: 12px 25px;
+            background: var(--text-main);
+            color: var(--bg-dark);
             text-decoration: none;
             font-weight: bold;
             border-radius: 30px;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: 0.3s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
         .download-btn:hover {
-            box-shadow: 0 0 15px rgba(0, 242, 96, 0.4);
+            background: var(--accent);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .contact-link {
             color: var(--text-sub);
             text-decoration: none;
-            font-size: 0.9rem;
-            border-bottom: 1px solid transparent;
+            font-size: 0.95rem;
             transition: 0.3s;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
         }
-        .contact-link:hover { border-color: var(--text-sub); }
+        .contact-link:hover { color: var(--accent); border-color: var(--accent); }
 
         /* --- 卡片网格 --- */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* 卡片稍微宽一点 */
+            gap: 25px;
         }
 
         .card {
             background: var(--glass);
             border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            padding: 0; /* 图片铺满头部，内容在下面 */
+            border-radius: 16px;
             cursor: pointer;
             transition: transform 0.3s, border-color 0.3s;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card-img-wrap {
+            height: 160px;
+            width: 100%;
             position: relative;
             overflow: hidden;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-        }
-
         .card-bg-img {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 0;
+            transition: transform 0.5s;
+            opacity: 0.8;
         }
-        .card:hover .card-bg-img { opacity: 0.15; }
+        .card:hover .card-bg-img { transform: scale(1.1); opacity: 1; }
 
-        .card-content { position: relative; z-index: 1; }
-        .card h3 { font-size: 1.5rem; margin-bottom: 10px; }
-        .card p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; }
+        .card-content { 
+            padding: 25px; 
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card h3 { font-size: 1.4rem; margin-bottom: 8px; color: var(--text-main); }
+        .card p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6; flex-grow: 1; }
+        
+        .tags-row {
+            margin-bottom: 15px;
+        }
+
         .card-tag { 
             display: inline-block; 
-            font-size: 0.75rem; 
-            padding: 4px 10px; 
-            border: 1px solid var(--accent); 
+            font-size: 0.7rem; 
+            padding: 4px 8px; 
+            background: rgba(56, 189, 248, 0.1); 
             color: var(--accent); 
-            border-radius: 20px; 
-            margin-right: 5px;
+            border-radius: 6px; 
+            margin-right: 6px;
+            margin-bottom: 6px;
+            font-weight: 600;
         }
+
+        .learn-more {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.8;
+        }
+        .card:hover .learn-more { color: var(--accent); opacity: 1; }
 
         /* --- 详情弹窗 (Modal) --- */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--modal-bg);
-            backdrop-filter: blur(15px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
             z-index: 2000;
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.4s;
+            transition: opacity 0.3s;
         }
 
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            background: #111;
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
+            background: #1e293b;
+            width: 92%;
+            max-width: 750px;
+            max-height: 85vh;
             overflow-y: auto;
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.1);
             position: relative;
-            transform: scale(0.9);
-            transition: transform 0.4s;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
         .modal-overlay.active .modal-content { transform: scale(1); }
 
         .modal-header {
-            height: 200px;
+            height: 180px;
             background-size: cover;
             background-position: center;
             position: relative;
         }
         .modal-header::after {
             content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
-            background: linear-gradient(to bottom, transparent, #111);
+            background: linear-gradient(to bottom, transparent, #1e293b);
         }
 
-        .modal-body { padding: 40px; color: #ccc; line-height: 1.8; }
-        .modal-body h2 { color: #fff; margin-bottom: 10px; font-size: 2rem; }
-        .modal-body h4 { color: var(--accent); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .modal-body ul { margin-left: 20px; margin-top: 10px; }
+        .modal-body { padding: 40px; color: #cbd5e1; line-height: 1.8; }
+        .modal-body h2 { color: #fff; margin-bottom: 5px; font-size: 1.8rem; }
+        .modal-body h4 { color: var(--accent); margin-bottom: 25px; font-weight: normal; font-size: 0.9rem; letter-spacing: 1px; }
+        
+        .modal-section-title {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--accent);
+            padding-left: 10px;
+            font-weight: bold;
+        }
+
+        .modal-body ul { margin-left: 20px; margin-bottom: 20px; }
+        .modal-body li { margin-bottom: 10px; }
+        .modal-body b { color: #e2e8f0; }
 
         .close-btn {
-            position: absolute; top: 20px; right: 20px;
+            position: absolute; top: 15px; right: 20px;
             font-size: 2rem; color: #fff; cursor: pointer; z-index: 10;
+            background: rgba(0,0,0,0.3);
+            width: 40px; height: 40px;
+            line-height: 36px;
+            text-align: center;
+            border-radius: 50%;
+            transition: 0.2s;
         }
+        .close-btn:hover { background: var(--accent); color: #000; }
 
-        /* --- 音乐控制器 --- */
+        /* --- 音乐 & 状态栏 --- */
         #music-control {
             position: fixed; bottom: 30px; right: 30px;
-            width: 50px; height: 50px;
+            width: 45px; height: 45px;
             border-radius: 50%;
             border: 1px solid rgba(255,255,255,0.2);
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 1000;
-            background: rgba(0,0,0,0.5);
+            background: rgba(15, 23, 42, 0.8);
             transition: 0.3s;
         }
-        #music-control:hover { border-color: var(--accent); }
+        #music-control:hover { border-color: var(--accent); color: var(--accent); }
         .rotate { animation: spin 4s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- [功能 3] 状态栏彩蛋 --- */
         .status-bar {
             position: fixed;
             bottom: 30px;
             left: 30px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(15, 23, 42, 0.8);
             backdrop-filter: blur(5px);
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 30px;
             border: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-sub);
             display: flex;
             align-items: center;
             gap: 10px;
             z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .status-dot {
             width: 8px; height: 8px;
@@ -280,31 +341,33 @@
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
-            0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 242, 96, 0.4); }
-            70% { opacity: 1; box-shadow: 0 0 0 5px rgba(0, 242, 96, 0); }
-            100% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 242, 96, 0); }
+            0% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); }
+            70% { opacity: 1; box-shadow: 0 0 0 5px rgba(56, 189, 248, 0); }
+            100% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
         }
 
         audio { display: none; }
 
-        /* 移动端适配 */
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
-            .header-actions { flex-direction: column; }
-            .status-bar { display: none; } /* 手机屏幕小，隐藏左下角状态栏 */
+            .header-actions { flex-direction: column; width: 100%; }
+            .download-btn { width: 100%; justify-content: center; }
+            .status-bar { display: none; }
+            .grid { grid-template-columns: 1fr; }
+            .modal-content { width: 100%; height: 100%; border-radius: 0; max-height: 100vh; }
         }
     </style>
 </head>
 <body>
 
     <audio id="bgm" loop>
-        <source src="https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3" type="audio/mpeg">
+        <source src="https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8a73467.mp3" type="audio/mpeg">
     </audio>
 
     <div id="splash-screen">
-        <h1 style="font-size: 2rem; margin-bottom: 10px;">XU NUO</h1>
-        <p style="color: #666; margin-bottom: 30px;">2026 PRODUCT & HARDWARE PORTFOLIO</p>
-        <button id="enter-btn">ENTER EXPERIENCE</button>
+        <h1 style="font-size: 2.2rem; margin-bottom: 10px; font-weight: 700;">XU NUO</h1>
+        <p style="color: var(--text-sub); margin-bottom: 30px; letter-spacing: 1px;">PRODUCT MANAGER PORTFOLIO 2026</p>
+        <button id="enter-btn">ENTER</button>
     </div>
 
     <div class="bg-fixed">
@@ -313,24 +376,26 @@
     </div>
 
     <div id="music-control" onclick="toggleMusic()">
-        <i class="fas fa-music" id="music-icon" style="color: #fff;"></i>
+        <i class="fas fa-music" id="music-icon" style="color: inherit;"></i>
     </div>
 
     <div class="status-bar">
         <div class="status-dot"></div>
-        <span>Current Status: Open to Work (Product / Hardware)</span>
+        <span>Open to Work: Product Manager / Data Product</span>
     </div>
 
     <div class="container" id="main-content">
         <header>
             <h1>你好，我是 许诺</h1>
-            <p class="subtitle">致力于将硬件底层逻辑转化为极致产品体验</p>
+            <p class="subtitle">
+                这里不仅有代码，更有对产品价值的思考。<br>
+                我擅长从复杂技术原理中提炼用户需求，并推动产品从 0 到 1 落地。
+            </p>
             
             <div class="header-actions">
-                <a href="./resume.pdf" class="download-btn" download="许诺_简历_2026.pdf">
-                    <i class="fas fa-file-download"></i> 下载 PDF 简历
+                <a href="./resume.pdf" class="download-btn" download="许诺_产品经理_2026.pdf">
+                    <i class="fas fa-file-download"></i> 获取 PDF 简历
                 </a>
-                
                 <a href="mailto:3115448015@qq.com" class="contact-link">
                     3115448015@qq.com
                 </a>
@@ -339,111 +404,167 @@
 
         <div class="grid">
             
-            <div class="card" onclick="openModal('modal-1')">
-                <img src="https://images.unsplash.com/photo-1555664424-778a1e5e1b48?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Hardware">
+            <div class="card" onclick="openModal('modal-gov')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="User Research">
+                </div>
                 <div class="card-content">
-                    <span class="card-tag">实习</span>
-                    <h3>西谷微电子 · 质量助理</h3>
-                    <p>拦截严重硬件缺陷 20+ 次，Python 自动化测试效率提升 30%。</p>
-                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                    <div class="tags-row">
+                        <span class="card-tag">用户调研</span>
+                        <span class="card-tag">MVP设计</span>
+                        <span class="card-tag">G端</span>
+                    </div>
+                    <h3>政务服务流程重构</h3>
+                    <p>通过用户旅程地图分析痛点，设计适老化交互指引 MVP，将填表错误率降低 40%。</p>
+                    <div class="learn-more">查看产品复盘 <i class="fas fa-arrow-right"></i></div>
                 </div>
             </div>
 
-            <div class="card" onclick="openModal('modal-2')">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Data">
+            <div class="card" onclick="openModal('modal-xigu')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1504384308090-c54be3855833?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Efficiency">
+                </div>
                 <div class="card-content">
-                    <span class="card-tag">实习</span>
-                    <h3>政务数字化 · 产品助理</h3>
-                    <p>利用用户旅程地图重构业务流程，填表错误率降低 40%。</p>
-                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                    <div class="tags-row">
+                        <span class="card-tag">效能优化</span>
+                        <span class="card-tag">数据分析</span>
+                        <span class="card-tag">跨部门协同</span>
+                    </div>
+                    <h3>自动化测试效能优化</h3>
+                    <p>针对内部手动测试低效痛点，开发自动化脚本工具，将数据处理效率提升 30%，推动研发测试闭环。</p>
+                    <div class="learn-more">查看项目详情 <i class="fas fa-arrow-right"></i></div>
                 </div>
             </div>
 
-            <div class="card" onclick="openModal('modal-3')">
-                <img src="https://images.unsplash.com/photo-1581093458791-9f302e6d38e0?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="3D">
+            <div class="card" onclick="openModal('modal-water')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Visualization">
+                </div>
                 <div class="card-content">
-                    <span class="card-tag">项目负责人</span>
+                    <div class="tags-row">
+                        <span class="card-tag">0-1 产品设计</span>
+                        <span class="card-tag">可视化</span>
+                        <span class="card-tag">PRD撰写</span>
+                    </div>
                     <h3>丹江水质数字孪生平台</h3>
-                    <p>3D全景漫游 + 数据看板，解决污染源定位痛点。</p>
-                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                    <p>定义产品前后端接口标准，设计“3D漫游+数据看板”交互形态，解决监管人员无法直观定位污染源的痛点。</p>
+                    <div class="learn-more">查看设计思路 <i class="fas fa-arrow-right"></i></div>
                 </div>
             </div>
 
-             <div class="card" onclick="openModal('modal-4')">
-                <img src="https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="Medical">
+             <div class="card" onclick="openModal('modal-ai')">
+                <div class="card-img-wrap">
+                    <img src="https://images.unsplash.com/photo-1527474305487-b8744be6d120?q=80&w=1000&auto=format&fit=crop" class="card-bg-img" alt="AI Strategy">
+                </div>
                 <div class="card-content">
-                    <span class="card-tag">AI 研究</span>
-                    <h3>肝癌分型诊断研究</h3>
-                    <p>ETL 数据清洗与模型调优，完成 Bad Case 闭环分析。</p>
-                    <div style="font-size: 0.8rem; color: #666;">点击查看详情 <i class="fas fa-arrow-right"></i></div>
+                    <div class="tags-row">
+                        <span class="card-tag">AI 产品策略</span>
+                        <span class="card-tag">数据治理</span>
+                        <span class="card-tag">Bad Case分析</span>
+                    </div>
+                    <h3>医疗 AI 诊断模型优化</h3>
+                    <p>负责底层数据清洗 (ETL) 标准制定，建立 Bad Case 归因分析机制，从数据侧驱动模型迭代。</p>
+                    <div class="learn-more">查看策略分析 <i class="fas fa-arrow-right"></i></div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-1">
+    <div class="modal-overlay" id="modal-gov">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-1')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1000');"></div>
+            <span class="close-btn" onclick="closeModal('modal-gov')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1531403009284-440f080d1e12?q=80&w=1000');"></div>
             <div class="modal-body">
-                <h2>产品质量助理 @ 西谷微电子</h2>
-                <h4>2025.07 - 2025.09</h4>
-                <p>在这个岗位上，我主要负责连接技术实现与产品质量标准：</p>
+                <h2>政务服务流程数字化重构</h2>
+                <h4>产品助理 (实习) | 2024.12 - 2025.02</h4>
+                
+                <div class="modal-section-title">背景与痛点 (Problem)</div>
+                <p>在椿林镇便民服务中心，群众办事“填表错、排队长、重复问”是高频痛点。数据显示，仅医保核销业务的填表错误率就高达 40%。</p>
+
+                <div class="modal-section-title">行动与策略 (Action)</div>
                 <ul>
-                    <li><b>可靠性验证：</b>模拟高低温、老化场景，成功拦截了20余次严重硬件缺陷。</li>
-                    <li><b>自动化提效：</b>由于人工处理数据效率低，我编写了 Python 脚本，将数据处理时间缩短了30%。</li>
-                    <li><b>跨部门沟通：</b>我发现研发和测试之间存在理解偏差，因此我输出了结构化的失效分析报告，推动了产品从原型到量产的转化。</li>
+                    <li><b>用户调研：</b>绘制用户旅程地图 (User Journey Map)，拆解出“理解政策难”和“表格填写繁”两个核心断点。</li>
+                    <li><b>MVP 设计：</b>摒弃复杂的系统开发，设计了低成本的“可视化适老交互指引”作为最小可行性产品 (MVP)。将复杂的政策转化为模块化的条件判断流程。</li>
+                    <li><b>流程重组：</b>输出了包含 20+ 个核心节点的标准业务流程图 (Flowchart)，作为窗口人员的操作SOP。</li>
+                </ul>
+
+                <div class="modal-section-title">结果 (Result)</div>
+                <ul>
+                    <li>试点窗口的群众重复咨询次数下降约 30%。</li>
+                    <li>填表错误率显著降低，有效缓解了“二次排队”现象。</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-2">
+    <div class="modal-overlay" id="modal-xigu">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-2')">&times;</span>
+            <span class="close-btn" onclick="closeModal('modal-xigu')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1504384308090-c54be3855833?q=80&w=1000');"></div>
+            <div class="modal-body">
+                <h2>内部自动化测试效能工具</h2>
+                <h4>质量助理 (实习) | 2025.07 - 2025.09</h4>
+                
+                <div class="modal-section-title">背景 (Context)</div>
+                <p>在芯片及整机可靠性验证环节，原有的人工记录和分析数据方式效率低下，且容易产生人为误差。</p>
+
+                <div class="modal-section-title">产品化思维解决问题</div>
+                <ul>
+                    <li><b>工具开发：</b>利用 Python 开发自动化脚本，替代人工 Excel 处理，实现了测试数据的自动抓取与清洗。</li>
+                    <li><b>流程标准化：</b>发现研发与测试部门对“故障”定义不一致，我主导输出了结构化的《失效分析报告》模板，统一了跨部门沟通语言。</li>
+                    <li><b>质量把控：</b>通过模拟极端用户场景（高低温、老化），拦截了 20+ 次严重缺陷，避免了潜在的批量召回风险。</li>
+                </ul>
+
+                <div class="modal-section-title">数据成果</div>
+                <ul>
+                    <li>数据处理效率提升 <b>30%</b>，让团队能将更多精力投入到核心问题分析中。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-water">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-water')">&times;</span>
             <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000');"></div>
             <div class="modal-body">
-                <h2>政务数字化产品助理</h2>
-                <h4>2024.12 - 2025.02</h4>
-                <p>在基层政府实习期间，我运用产品思维解决了实际民生痛点：</p>
+                <h2>丹江流域水质数字孪生平台</h2>
+                <h4>项目负责人 (PM Owner)</h4>
+                
+                <div class="modal-section-title">需求分析</div>
+                <p>监管人员面对海量的 PH 值、重金属含量等 excel 表格数据，无法快速直观地定位污染源头，决策滞后。</p>
+
+                <div class="modal-section-title">产品方案</div>
                 <ul>
-                    <li><b>痛点挖掘：</b>通过观察，我发现群众填表错误率高是因为流程断点多。</li>
-                    <li><b>解决方案：</b>设计了适老化交互指引（MVP），并绘制了包含20+节点的业务流程图。</li>
-                    <li><b>数据结果：</b>试点后，群众重复咨询次数下降了约30%。</li>
+                    <li><b>可视化交互设计：</b>设计了“3D全景漫游 + 悬浮数据看板”的界面形态。用户既可以宏观查看流域全貌，也可以点击监测点“下钻”查看实时数据。</li>
+                    <li><b>技术标准制定：</b>为了确保前端展示与后端数据的实时性，我主导撰写了接口文档，定义了 JSON 数据格式和异常报警阈值。</li>
+                </ul>
+
+                <div class="modal-section-title">价值</div>
+                <ul>
+                    <li>实现了从“被动查表”到“主动预警”的管理模式转变。</li>
+                    <li>通过标准化接口文档，降低了前后端开发人员的沟通成本。</li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div class="modal-overlay" id="modal-3">
+    <div class="modal-overlay" id="modal-ai">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-3')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1000');"></div>
+            <span class="close-btn" onclick="closeModal('modal-ai')">&times;</span>
+            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1527474305487-b8744be6d120?q=80&w=1000');"></div>
             <div class="modal-body">
-                <h2>丹江流域水质量金属预警可视化平台</h2>
-                <h4>项目负责人</h4>
-                <p>这是一个典型的数字孪生项目，我负责从需求到落地的全流程：</p>
-                <ul>
-                    <li><b>需求转化：</b>将晦涩的PH值、重金属含量转化为可视化的 3D 全景漫游。</li>
-                    <li><b>技术标准：</b>主导制定了前后端 JSON 数据接口标准，降低了沟通成本。</li>
-                    <li><b>交互闭环：</b>实现了从“宏观监控”点击下钻到“微观排查”的交互逻辑。</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+                <h2>AI 医疗诊断模型优化策略</h2>
+                <h4>算法与数据研究</h4>
+                
+                <div class="modal-section-title">产品视角</div>
+                <p>AI 产品的核心壁垒不仅在于算法模型，更在于高质量的数据治理和持续的反馈闭环。</p>
 
-    <div class="modal-overlay" id="modal-4">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-4')">&times;</span>
-            <div class="modal-header" style="background-image: url('https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=1000');"></div>
-            <div class="modal-body">
-                <h2>基于长时依赖的肝癌分型诊断研究</h2>
-                <h4>数据与算法研究</h4>
-                <p>该项目锻炼了我对底层数据的理解能力：</p>
+                <div class="modal-section-title">执行策略</div>
                 <ul>
-                    <li><b>ETL清洗：</b>制定了医疗数据的清洗与标注规范。</li>
-                    <li><b>Bad Case 分析：</b>专门针对误判案例进行归因分析（如图像特征不明显），并据此反向调优模型参数。</li>
+                    <li><b>数据资产治理 (ETL)：</b>面对原始临床数据“脏、乱、差”的问题，制定了清洗与标注的 SOP，为模型训练提供高质量“燃料”。</li>
+                    <li><b>Bad Case 闭环：</b>建立误判案例库。不只是统计准确率，而是深入分析每一个错误案例（如图像模糊、特征重叠），并将分析结果反馈给算法参数调整，完成了“数据-模型-评估-优化”的闭环。</li>
                 </ul>
             </div>
         </div>
@@ -456,25 +577,23 @@
         const musicIcon = document.getElementById('music-icon');
         const musicControl = document.getElementById('music-control');
 
-        // Enter Button
+        // Enter
         document.getElementById('enter-btn').addEventListener('click', () => {
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.style.display = 'none';
                 mainContent.classList.add('visible');
-            }, 1000);
+            }, 800);
             
-            // Play Music
-            bgm.volume = 0.3;
+            bgm.volume = 0.4;
             bgm.play().then(() => {
                 musicControl.classList.add('rotate');
-            }).catch(error => {
-                console.log("Autoplay prevented");
+            }).catch(() => {
                 musicControl.classList.remove('rotate');
             });
         });
 
-        // Toggle Music
+        // Music Toggle
         function toggleMusic() {
             if (bgm.paused) {
                 bgm.play();
