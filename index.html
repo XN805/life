@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="许诺的个人作品集 - AI产品经理 | 数据驱动策略 | 产品创新">
     <title>许诺 | AI产品经理作品集 Portfolio</title>
-    <link rel="icon" href="data:;base64,="> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="data:;base64,=">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-QR12GMWMJW"></script>
     <script>
@@ -39,7 +40,6 @@
             height: 100vh;
         }
 
-        /* --- [新增] 顶部阅读进度条 --- */
         #scroll-progress {
             position: fixed; top: 0; left: 0; height: 3px; background: var(--accent);
             width: 0%; z-index: 10001; transition: width 0.1s;
@@ -58,30 +58,26 @@
         }
         .orb-1 { top: -10%; left: 10%; width: 50vw; height: 50vw; background: #0ea5e9; }
         .orb-2 { bottom: 0%; right: 0%; width: 60vw; height: 60vw; background: #6366f1; animation-delay: -5s; }
-
         @keyframes float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(30px, 50px); } }
 
-        /* --- 开场打字机 (JS版) --- */
+        /* --- 开场打字机 --- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #0b1121; z-index: 9999;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 0.8s ease; padding: 20px; text-align: center;
         }
-
         .cursor {
             display: inline-block; width: 3px; height: 1.2em; background-color: var(--accent);
             margin-left: 5px; vertical-align: middle; animation: blink 1s infinite;
         }
         .cursor.stopped { display: none; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
         #typewriter-content {
             font-family: 'Courier New', monospace; font-size: 1.8rem; font-weight: bold;
             color: var(--text-main); min-height: 60px;
             display: flex; align-items: center; justify-content: center;
         }
-
         #enter-btn {
             opacity: 0; margin-top: 40px; padding: 12px 40px;
             border: 1px solid var(--accent); background: transparent;
@@ -100,31 +96,26 @@
 
         /* --- 头部区域 --- */
         header { text-align: center; margin-bottom: 30px; }
-        
         h1 { 
             font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 15px;
             background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        
         .subtitle { 
             color: var(--text-sub); font-size: 1.25rem; line-height: 1.6; max-width: 700px; margin: 0 auto;
         }
-
         .header-actions {
             margin-top: 30px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
         }
-
         .btn {
             padding: 10px 24px; border-radius: 30px; font-size: 0.95rem; font-weight: 600;
             text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
         }
         .btn-primary { background: var(--text-main); color: #000; }
         .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
-        
         .btn-outline { border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); cursor: pointer; }
         .btn-outline:hover { border-color: #07c160; color: #07c160; background: rgba(7, 193, 96, 0.1); }
 
-        /* --- [新增] 产品思维板块 (Philosophy) --- */
+        /* --- 产品思维板块 --- */
         .philosophy-section {
             text-align: center; max-width: 800px; margin: 0 auto 60px;
             padding: 30px; border-radius: 12px;
@@ -143,9 +134,7 @@
         }
 
         /* --- 卡片网格 --- */
-        .grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px;
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
 
         .card {
             background: var(--glass); border: 1px solid var(--glass-border);
@@ -154,21 +143,17 @@
             display: flex; flex-direction: column; group;
         }
         .card:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-
         .card-img-wrap { height: 180px; width: 100%; position: relative; overflow: hidden; }
         .card-bg-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
         .card:hover .card-bg-img { transform: scale(1.08); }
-
         .card-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
-        
         .card-meta { font-size: 0.75rem; color: var(--accent); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
         .card h3 { font-size: 1.35rem; margin-bottom: 12px; color: #fff; line-height: 1.3; }
         .card p { font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 15px; flex-grow: 1; }
-        
         .tags-row { display: flex; flex-wrap: wrap; gap: 6px; }
         .tag-pill { font-size: 0.7rem; padding: 4px 10px; background: rgba(255,255,255,0.05); color: #cbd5e1; border-radius: 6px; }
 
-        /* --- 特别卡片：AI 实验室 --- */
+        /* AI 实验室卡片 */
         .card-ai { border: 1px solid rgba(168, 85, 247, 0.3); position: relative; }
         .card-ai:hover { border-color: var(--ai-color); box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); }
         .card-ai .card-meta { color: var(--ai-color); }
@@ -183,38 +168,33 @@
             opacity: 0; pointer-events: none; transition: 0.3s; padding: 20px;
         }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
         .modal-content {
             background: #1e293b; width: 100%; max-width: 700px; max-height: 85vh;
             overflow-y: auto; border-radius: 16px; border: 1px solid var(--glass-border);
             position: relative; transform: scale(0.95); transition: 0.3s;
         }
         .modal-overlay.active .modal-content { transform: scale(1); }
-
         .modal-header-img { height: 200px; background-size: cover; background-position: center; position: relative; }
         .modal-header-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #1e293b); }
-
         .modal-body { padding: 30px; color: #cbd5e1; line-height: 1.7; }
         .modal-body h2 { color: #fff; font-size: 1.6rem; margin-bottom: 5px; }
         .modal-body .subtitle-text { color: var(--accent); font-size: 0.95rem; margin-bottom: 25px; display: block; }
         .modal-section { margin-bottom: 25px; }
         .modal-section h4 { color: #fff; font-size: 1.1rem; border-left: 3px solid var(--accent); padding-left: 10px; margin-bottom: 10px; }
-        
         .close-btn {
             position: absolute; top: 15px; right: 15px; width: 36px; height: 36px;
             background: rgba(0,0,0,0.4); border-radius: 50%; color: #fff;
             display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 10;
         }
-
         .qr-content { text-align: center; padding: 40px 20px; max-width: 350px; }
         .qr-img { width: 220px; height: 220px; border-radius: 12px; margin: 20px 0; border: 2px solid #fff; }
 
-        /* --- 底部控制按钮组 --- */
+        /* --- 底部控制按钮组 (位置调整，避免遮挡 Coze 气泡) --- */
         .bottom-controls {
-            position: fixed; bottom: 25px; right: 25px;
+            position: fixed; bottom: 100px; /* 调高，给 Coze 气泡留位置 */
+            right: 20px;
             display: flex; flex-direction: column; gap: 15px; z-index: 1000;
         }
-
         .control-btn {
             width: 44px; height: 44px; border-radius: 50%;
             border: 1px solid rgba(255,255,255,0.2); background: rgba(15, 23, 42, 0.8);
@@ -224,8 +204,6 @@
         .control-btn:hover { border-color: var(--accent); color: var(--accent); }
         .rotate { animation: spin 4s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* [新增] 返回顶部按钮 (默认隐藏) */
         #back-to-top { opacity: 0; visibility: hidden; transition: 0.3s; }
         #back-to-top.show { opacity: 1; visibility: visible; }
 
@@ -238,7 +216,6 @@
         }
         .status-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 8px var(--accent); }
 
-        /* --- 手机端适配 --- */
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
             .subtitle { font-size: 1rem; padding: 0 10px; }
@@ -249,7 +226,6 @@
             .btn { width: 100%; justify-content: center; }
             .orb { opacity: 0.15; }
             #typewriter-content { font-size: 1.4rem; min-height: 50px; }
-            /* 手机上隐藏返回顶部，节省空间 */
             #back-to-top { display: none; } 
         }
 
@@ -390,9 +366,9 @@
                     <div class="card-meta"><i class="fas fa-rocket"></i> Side Project</div>
                     <h3>个人 AI 产品实验室</h3>
                     <div class="tags-row">
-                        <span class="tag-pill" style="color:var(--ai-color); border-color:var(--ai-color);">Coming Soon</span>
+                        <span class="tag-pill" style="color:var(--ai-color); border-color:var(--ai-color);">已上线</span>
                     </div>
-                    <p style="margin-top:10px;">正在构建一个基于 LLM 的垂直领域应用，探索 AI Agent 在实际复杂场景下的落地能力。</p>
+                    <p style="margin-top:10px;">基于 RAG 技术构建的 Digital Twin。点击查看实现原理，或点击右下角气泡直接对话。</p>
                 </div>
             </div>
 
@@ -500,22 +476,26 @@
             <div class="close-btn" onclick="closeModal('modal-ai-lab')">&times;</div>
             <div class="modal-header-img" style="background-image: url('https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=800');"></div>
             <div class="modal-body">
-                <h2 style="color:var(--ai-color);">个人 AI 产品实验室</h2>
-                <span class="subtitle-text">In Progress | 正在构建中...</span>
+                <h2 style="color:var(--ai-color);">AI 许诺 · 智能简历助手</h2>
+                <span class="subtitle-text">基于 RAG 技术构建的 Digital Twin (已上线)</span>
+                
                 <div class="modal-section">
-                    <h4>项目愿景</h4>
-                    <p>我正在利用业余时间开发一款垂直领域的 AI Agent，旨在验证 LLM 在特定复杂场景下的逻辑推理与任务执行能力。</p>
+                    <h4>项目简介</h4>
+                    <p>这是一个基于 LLM + 知识库 (RAG) 技术构建的 AI Agent。我将我的个人简历、项目文档作为私有数据灌入模型，经过 Prompt 调优，使其能准确解答关于我的职业经历问题。</p>
                 </div>
+                
                 <div class="modal-section">
-                    <h4>计划技术栈</h4>
+                    <h4>技术实现 (Tech Stack)</h4>
                     <ul>
-                        <li>LangChain / Dify</li>
-                        <li>Prompt Engineering</li>
-                        <li>RAG (检索增强生成)</li>
+                        <li><b>模型层：</b>Doubao-Pro-32k / Coze</li>
+                        <li><b>数据层：</b>Knowledge Base (向量检索)</li>
+                        <li><b>交互层：</b>Web SDK 集成</li>
+                        <li><b>策略：</b>Role-Play + 边界控制 (Guardrails)</li>
                     </ul>
                 </div>
+
                 <div style="margin-top:20px; padding:15px; background:rgba(168, 85, 247, 0.1); border:1px solid rgba(168, 85, 247, 0.3); border-radius:8px; text-align:center;">
-                    <i class="fas fa-tools"></i> Demo 即将上线，敬请期待
+                    <i class="fas fa-robot"></i> <b>体验方式：</b><br>请点击屏幕右下角的悬浮气泡图标<br>试着问它：“许诺最擅长的技能是什么？”
                 </div>
             </div>
         </div>
@@ -532,7 +512,6 @@
         const textTarget = document.getElementById('text-target');
         const cursor = document.querySelector('.cursor');
 
-        // 打字机逻辑
         const textToType = "Hello, I am Xu Nuo.";
         let charIndex = 0;
 
@@ -550,19 +529,14 @@
             }
         }
 
-        window.onload = () => {
-            setTimeout(typeWriter, 500);
-        };
+        window.onload = () => { setTimeout(typeWriter, 500); };
 
-        // 滚动监听：进度条 + 返回顶部按钮
         window.onscroll = function() {
-            // 进度条
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             let scrolled = (winScroll / height) * 100;
             scrollProgress.style.width = scrolled + "%";
-
-            // 返回顶部按钮
+            
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
                 backToTopBtn.classList.add('show');
             } else {
@@ -570,27 +544,19 @@
             }
         };
 
-        // 返回顶部功能
         function scrollToTop() {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
         }
 
-        // 进入按钮
         enterBtn.addEventListener('click', () => {
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.style.display = 'none';
                 mainContent.classList.add('visible');
             }, 800);
-            
-            // 尝试播放音乐
             bgm.volume = 0.5;
-            bgm.play().then(() => {
-                musicControl.classList.add('rotate');
-            }).catch(() => {
-                musicControl.classList.remove('rotate');
-            });
+            bgm.play().then(() => { musicControl.classList.add('rotate'); }).catch(() => { musicControl.classList.remove('rotate'); });
         });
 
         function toggleMusic() {
@@ -623,6 +589,45 @@
                 }
             });
         });
+    </script>
+
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.20/libs/cn/index.js"></script>
+    <script>
+      new CozeWebSDK.WebChatClient({
+        config: {
+          type: 'bot',
+          bot_id: '7588594012135849994',
+        },
+        auth: {
+          type: 'token',
+          token: 'pat_xTc1D7bSxLrj8KRruumvZhKlYz5ER5VAziNDbuG08ceCUSuOpXmkyYXRs0cRTVCQ',
+          onRefreshToken: async () => 'pat_xTc1D7bSxLrj8KRruumvZhKlYz5ER5VAziNDbuG08ceCUSuOpXmkyYXRs0cRTVCQ'
+        },
+        userInfo: {
+          id: 'visitor',
+          url: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/coze-logo.png',
+          nickname: 'Visitor',
+        },
+        ui: {
+            base: {
+                icon: 'https://lf-coze-web-cdn.coze.cn/obj/eden-cn/lm-lgvj/ljhwZthlaukjlkulzlp/coze/chatsdk-logo.png',
+                layout: 'pc',
+                lang: 'zh-CN',
+                zIndex: 1000,
+            },
+            chatBot: {
+                title: "AI 许诺 (简历助手)",
+                uploadable: true,
+                width: 390,
+            },
+            asstBtn: {
+                isNeed: true,
+            },
+            footer: {
+                isShow: false,
+            }
+        }
+      });
     </script>
 </body>
 </html>
