@@ -1,0 +1,120 @@
+                <div class="moment-subsection">
+                  <div class="moment-subsection-title"><span>朋友圈文案</span><span class="tiny">最多1000字</span></div>
+                  <div class="source-switch"><div class="source-tab active" data-copy-source="ai">AI生成文案</div><div class="source-tab" data-copy-source="manual">使用已有文案</div></div>
+                  <div class="copy-layout compact-copy-layout">
+                    <div class="surface copy-source-panel">
+                      <div id="copyAiSource" class="generator-box compact-generator">
+                        <div class="copy-config-head"><div class="label">文案诉求</div></div>
+                        <div class="copy-toolbar"><div class="template-chips compact-chips"><div class="template-chip active" data-template="new">新品宣传</div><div class="template-chip" data-template="double11">618活动</div><div class="template-chip" data-template="intent">高意向跟进</div><div class="template-chip" data-template="old">老客维护</div></div><div class="count-picker"><label class="tiny" for="copyCountSelect">生成数量</label><select id="copyCountSelect" class="select copy-count-select"><option value="1" selected>1条</option><option value="2">2条</option><option value="3">3条</option><option value="4">4条</option><option value="5">5条</option><option value="6">6条</option></select></div></div>
+                        <div id="copyAudienceContext" class="context-bar hidden"></div>
+                        <div id="audienceCopyNotice" class="edit-warning hidden">推送人群已调整，建议重新确认当前文案。</div>
+                        <textarea id="copyGoal" class="textarea compact-goal" rows="3" placeholder="例如：生成一条618活动预热朋友圈，先制造期待感，不直接堆叠完整优惠规则。"></textarea>
+                        <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="generateCopyBtn" class="btn primary">生成文案</button></div>
+                        <div class="candidate-head"><span class="label">候选文案</span><span class="tiny">点击后在右侧编辑</span></div>
+                        <div id="copyList" class="copy-list compact-copy-list"><div class="tiny empty-copy-state">还没有生成候选文案</div></div>
+                      </div>
+                      <div id="copyManualSource" class="generator-box compact-generator hidden">
+                        <div class="label" style="margin-bottom:8px">已有文案</div><textarea id="manualSourceCopy" class="textarea manual-source-editor" rows="10" maxlength="1000" placeholder="直接粘贴已经写好的朋友圈内容"></textarea>
+                        <div class="row between" style="margin-top:12px"><span class="tiny">复制到最终编辑器后仍可修改</span><button id="applyManualCopyBtn" class="btn primary">使用这条文案</button></div>
+                      </div>
+                    </div>
+                    <div class="surface editor-box compact-editor-box">
+                      <div class="editor-head"><div><div class="label">最终使用文案</div><div class="tiny">后续图片生成与预览均以此内容为准</div></div><button id="restoreCopyBtn" class="btn small" disabled>恢复原文</button></div>
+                      <textarea id="finalCopy" class="textarea final-editor compact-final-editor" maxlength="1000" placeholder="请选择一条AI文案，或使用已有文案"></textarea><div id="copyCharCount" class="char-count">0 / 1000</div>
+                      <div id="copyImageWarning" class="edit-warning hidden">文案已修改，请确认现有图片是否仍然匹配。</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="moment-subsection image-subsection">
+                  <div class="image-step-head"><div><div class="moment-subsection-title">朋友圈图片</div><div class="tiny">每条朋友圈最多9张图片，每张AI图片最多6张参考图。</div></div><label class="radio no-image"><input id="noImageCheck" type="checkbox"> 本条朋友圈不使用图片</label></div>
+                  <div class="source-switch image-source-switch"><div class="source-tab active" data-image-source="ai">AI生成图片</div><div class="source-tab" data-image-source="existing">使用已有图片</div></div>
+                  <div id="imageContent">
+                    <div id="copyChangedNotice" class="edit-warning hidden" style="margin-bottom:14px"><div class="row between"><span>文案已修改，请确认图片是否仍然合适。</span><button id="confirmCopyImageMatch" class="btn small">已确认仍匹配</button></div></div>
+                    <div id="aiImageSource"><div id="slotList" class="slot-list"></div><div id="addSlotBtn" class="add-slot"><span class="plus">+</span> 新增一张图片</div></div>
+                    <div id="existingImageSource" class="hidden"><div class="existing-upload-head"><div><div class="label">已有图片</div><div class="tiny">点击下方区域上传本地图片或从素材中心导入，最多9张。</div></div></div><div id="existingImageGrid" class="existing-image-grid"></div></div>
+                  </div>
+                </div>
+                <div class="moment-subsection media-attachment-subsection">
+                  <div class="moment-subsection-title"><span>媒体附件（可选）</span><span class="tiny">可在朋友圈中补充其他媒体内容。</span></div>
+                  <div class="media-attachment-static">
+                    <button class="btn media-attachment-button" type="button" aria-disabled="true" tabindex="-1"><span class="media-attachment-plus">＋</span> 添加媒体附件</button>
+                    <span class="media-attachment-hint">支持链接、视频、素材雷达</span>
+                  </div>
+                </div>
+                <div class="moment-subsection moment-schedule-subsection">
+                  <div class="moment-subsection-title"><span>发布时间</span><span class="tiny">完成文案、图片和媒体附件设置后，配置当前任务的执行时间。</span></div>
+                  <div class="moment-schedule-layout"><div class="moment-time-field"><div class="moment-time-options"><label class="send-mode-option compact"><div class="send-mode-main"><input type="radio" name="sendMode" value="now"><div><b>立即发送</b><span>任务创建后立即通知员工</span></div></div></label><label class="send-mode-option compact"><div class="send-mode-main"><input type="radio" name="sendMode" value="custom"><div><b>定时发送</b><span>按指定时间通知员工</span></div></div><input id="customSendTime" type="datetime-local" class="input custom-time-input" disabled></label></div><div id="momentTimeNotice" class="tiny moment-time-notice"></div></div><button id="saveCollapseMomentBtn" class="btn primary save-collapse-btn" type="button">保存并收起</button></div>
+                </div>
+              </div></div>
+            <div class="add-moment-zone"><div class="add-moment-divider"><span>保存并收起当前朋友圈后，可继续创建下一条</span></div><button id="addMomentBtn" class="add-moment-entry" type="button"><span class="plus">+</span><span><b>继续新建一个朋友圈任务</b><small>共用发布员工和可见客户，最多10个任务</small></span></button></div>
+          </div>
+          <div id="step4Panel" class="form-section publish-section">
+            <div class="section-title">第三步：预览并确认发布</div>
+            <div class="section-desc">检查执行员工、可见客户、各任务发布时间和朋友圈实际发布效果。</div>
+            <div class="publish-preview-grid">
+              <div class="publish-preview-main">
+                <div class="review-section dispatch-summary-card">
+                  <div class="surface-hd"><div class="label">发布范围</div></div>
+                  <div class="surface-bd dispatch-summary dispatch-summary-five">
+                    <div class="dispatch-row"><span class="dispatch-key">执行员工</span><div id="reviewEmployeeSummary" class="dispatch-value">尚未选择员工</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">可见客户</span><div id="reviewCustomerSummary" class="dispatch-value">尚未确定客户范围</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">预计人数</span><div id="reviewEstimatedSummary" class="dispatch-value">—</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">任务数量</span><div id="reviewMomentCount" class="dispatch-value">1个</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">执行周期</span><div id="reviewCycleSummary" class="dispatch-value">待设置</div></div>
+                  </div>
+                </div>
+                <div id="previewToolbar" class="preview-toolbar">
+                  <div class="preview-view-switch"><button id="previewViewSingleBtn" class="preview-view-btn active">单条预览</button><button id="previewViewOverviewBtn" class="preview-view-btn">发布计划</button></div>
+                  <div class="tiny">多条任务按发布时间排列，可点击节点或左右切换。</div>
+                </div>
+                <div id="scheduleNotice" class="schedule-notice hidden"></div>
+                <div id="previewNavShell" class="preview-nav-shell"><button id="previewPrevBtn" class="preview-arrow" aria-label="上一条">‹</button><div id="previewNavTrack" class="preview-nav-track"></div><button id="previewNextBtn" class="preview-arrow" aria-label="下一条">›</button></div>
+                <div id="singlePreviewPane" class="single-preview-pane">
+                  <div id="previewCurrentCard" class="preview-current-card">
+                    <div class="preview-current-top"><div><div id="previewCounter" class="preview-counter">1 / 1</div><div id="previewStageName" class="preview-stage-name">未命名任务</div><div id="previewSchedule" class="preview-schedule">立即发送</div></div><button id="editPreviewMomentBtn" class="btn primary">编辑当前任务</button></div>
+                    <div class="preview-detail-grid">
+                      <div><span>文案</span><b id="previewCopySummary">尚未确定文案</b></div>
+                      <div><span>图片</span><b id="previewImageSummary">0张</b></div>
+                      <div><span>完成状态</span><b id="previewStatusSummary">待完善</b></div>
+                    </div>
+                    <div id="previewGuidance" class="preview-guidance">检查当前任务的文案、图片和发布时间。</div>
+                  </div>
+                </div>
+                <div id="sopOverviewPane" class="sop-overview-pane hidden"><div class="sop-overview-head"><div><div class="label">发布计划</div><div class="tiny">任务会自动按发布时间排列；相同时间保持创建顺序。</div></div></div><div id="sopOverviewList" class="sop-overview-list"></div></div>
+              </div>
+              <div class="publish-phone-column">
+                <div class="phone-wrap"><div class="phone-title-row"><div class="phone-title">效果预览</div><div id="imageSortHint" class="tiny hidden">拖动图片调整当前任务图片顺序</div></div><div id="phonePreview" class="phone"><div class="phone-status"><span>9:41</span><span>▮▮ ◔</span></div><div class="phone-nav"><span>‹</span><b>朋友圈</b><span>•••</span></div><div class="moment"><div class="user-line"><div class="avatar"></div><div class="moment-main"><div id="phoneUserName" class="user-name">发布员工</div><div id="phoneCopy" class="moment-copy"></div><div id="phoneImages" class="moment-images"></div><div class="moment-meta"><span id="phoneTime">刚刚</span><span class="more-box">••</span></div></div></div></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar form-bottom-bar"><div class="bottom-status">内容会自动保存为草稿</div><div class="row"><button id="cancelCreateBtn" class="btn large">取消</button><button id="createTaskBtn" class="btn primary large">保存</button></div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="tagModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">选择标签</div><button class="close-btn" data-close="tagModal">×</button></div><div class="modal-bd"><div class="tag-modal-layout"><div class="tag-left"><div class="tag-search"><input id="tagSearch" class="input" style="flex:1" placeholder="输入关键词"><button id="tagSearchBtn" class="btn primary">查询</button><button id="selectAllVisibleTags" class="btn text">全选</button></div><div id="tagCategoryList" class="tag-list"></div></div><div class="tag-right"><div class="selected-head"><span>已选择 <b id="selectedTagCount">0</b> 个标签</span><span id="clearTagsBtn" class="link">清空</span></div><div id="selectedTagBody" class="selected-body"></div></div></div></div><div class="modal-ft"><button class="btn" data-close="tagModal">取消</button><button id="confirmTagsBtn" class="btn primary">确定</button></div></div></div>
+<div id="imageSourceModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title" id="imageSourceTitle">添加图片</div><button class="close-btn" data-close="imageSourceModal">×</button></div><div class="modal-bd"><div class="source-choice"><div id="chooseLocalSource" class="choice-card"><div class="label">从本地上传</div><div class="tiny" style="margin-top:6px">选择电脑中的真实图片，可批量上传</div></div><div id="chooseMaterialSource" class="choice-card"><div class="label">从素材中心导入</div><div class="tiny" style="margin-top:6px">按文件夹查找并选择已有素材</div></div></div></div><div class="modal-ft"><button class="btn" data-close="imageSourceModal">取消</button></div></div></div>
+<input id="realImageInput" type="file" accept="image/*" multiple hidden>
+<div id="localUploadModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">确认上传图片</div><button class="close-btn" data-close="localUploadModal">×</button></div><div class="modal-bd"><div class="upload-option-row"><label class="checkbox-line"><input id="saveToMaterialCheck" type="checkbox"> 同时保存到素材中心</label><div id="uploadFolderWrap" class="folder-field-inline hidden"><span>所属文件夹</span><button id="uploadFolderTrigger" class="folder-select-trigger" type="button"><span class="folder-select-main"><span class="folder-glyph">▰</span><span id="uploadFolderLabel">未分类</span></span><span class="folder-chevron">⌄</span></button></div></div><div id="localUploadList" class="local-upload-list"></div></div><div class="modal-ft"><button class="btn" data-close="localUploadModal">取消</button><button id="confirmLocalUploadBtn" class="btn primary">确认上传</button></div></div></div>
+<div id="materialCenterModal" class="modal-mask"><div class="modal material-center-dialog"><div class="modal-hd"><div class="modal-title">从素材中心导入</div><button class="close-btn" data-close="materialCenterModal">×</button></div><div class="modal-bd material-center-body"><div class="material-center-layout"><aside class="material-folder-panel"><div class="material-folder-head"><div><b>素材文件夹</b><div class="tiny">支持多级文件夹管理</div></div><button id="createRootFolderBtn" class="btn text small" type="button">＋ 新建文件夹</button></div><div id="materialFolderTree" class="folder-tree"></div></aside><section class="material-content-panel"><div class="material-toolbar"><div class="material-current-folder"><b id="currentMaterialFolderName">全部素材</b><span id="currentMaterialFolderPath" class="tiny">查看全部文件夹中的素材</span></div><div class="row"><button id="createChildFolderBtn" class="btn small" type="button">新建子文件夹</button><span id="materialPickHint" class="tiny"></span></div></div><div id="materialGrid" class="material-grid"></div></section></div></div><div class="modal-ft"><button class="btn" data-close="materialCenterModal">取消</button><button id="confirmMaterialPickBtn" class="btn primary">导入选中图片</button></div></div></div>
+<div id="materialSaveModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">保存到素材中心</div><button class="close-btn" data-close="materialSaveModal">×</button></div><div class="modal-bd"><div class="material-save-form"><div class="material-preview"><img id="materialSavePreview" alt="素材预览"></div><div class="material-save-fields"><label><span>所属文件夹</span><button id="materialSaveFolderTrigger" class="folder-select-trigger full" type="button"><span class="folder-select-main"><span class="folder-glyph">▰</span><span id="materialSaveFolderLabel">未分类</span></span><span class="folder-chevron">⌄</span></button></label><label><span>标题</span><div class="title-input-wrap"><input id="materialSaveTitle" class="input" maxlength="20" placeholder="请输入标题"><span id="materialSaveCount">0/20</span></div></label></div></div></div><div class="modal-ft"><button class="btn" data-close="materialSaveModal">取消</button><button id="confirmMaterialSaveBtn" class="btn primary">确认保存</button></div></div></div>
+<div id="folderPickerModal" class="modal-mask"><div class="modal small folder-picker-dialog"><div class="modal-hd"><div class="modal-title">选择素材文件夹</div><button class="close-btn" data-close="folderPickerModal">×</button></div><div class="modal-bd"><div class="folder-picker-summary"><span>当前选择</span><b id="folderPickerCurrentPath">未分类</b></div><div class="folder-picker-toolbar"><button id="folderPickerNewRootBtn" class="btn small" type="button">＋ 新建文件夹</button><button id="folderPickerNewChildBtn" class="btn small" type="button">＋ 新建子文件夹</button></div><div id="folderPickerTree" class="folder-tree folder-picker-tree"></div></div><div class="modal-ft"><button class="btn" data-close="folderPickerModal">取消</button><button id="confirmFolderPickerBtn" class="btn primary">确定</button></div></div></div>
+<div id="folderCreateModal" class="modal-mask"><div class="modal small folder-create-dialog"><div class="modal-hd"><div class="modal-title" id="folderCreateTitle">新建文件夹</div><button class="close-btn" data-close="folderCreateModal">×</button></div><div class="modal-bd"><div class="folder-create-form"><label><span>上级文件夹</span><div id="folderCreateParentPath" class="folder-parent-display">素材中心</div></label><label><span>文件夹名称</span><input id="folderCreateName" class="input" maxlength="20" placeholder="请输入文件夹名称"></label><div class="tiny">支持继续在新建文件夹下创建下一级文件夹。</div></div></div><div class="modal-ft"><button class="btn" data-close="folderCreateModal">取消</button><button id="confirmFolderCreateBtn" class="btn primary">确认新建</button></div></div></div>
+
+<div id="taskConfirmModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">确认保存朋友圈任务</div><button class="close-btn" data-close="taskConfirmModal">×</button></div><div class="modal-bd"><div id="confirmTaskWarning" class="confirm-warning">本次将创建独立的朋友圈任务，共用发布员工和可见客户。</div><div class="confirm-summary"><div class="confirm-row"><span class="k">任务名称</span><span id="confirmTaskName" class="v confirm-task-names">-</span></div><div class="confirm-row"><span class="k">可见客户</span><span id="confirmAudience" class="v">-</span></div><div class="confirm-row"><span class="k">发布员工</span><span id="confirmEmployees" class="v">-</span></div><div class="confirm-row"><span class="k">创建任务数</span><span id="confirmMomentCount" class="v">-</span></div><div class="confirm-row"><span class="k">执行周期</span><span id="confirmCycle" class="v">-</span></div></div></div><div class="modal-ft"><button class="btn" data-close="taskConfirmModal">取消</button><button id="confirmCreateTaskBtn" class="btn primary">确认保存</button></div></div></div>
+<div id="deleteMomentModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">删除朋友圈</div><button class="close-btn" data-close="deleteMomentModal">×</button></div><div class="modal-bd"><div class="confirm-warning">删除后，该朋友圈任务的文案、图片和发布时间都会移除。</div><div>确定删除“<b id="deleteMomentName">当前任务</b>”吗？</div></div><div class="modal-ft"><button class="btn" data-close="deleteMomentModal">取消</button><button id="confirmDeleteMomentBtn" class="btn danger">确认删除</button></div></div></div>
+<div id="employeeModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">选择员工</div><button class="close-btn" data-close="employeeModal">×</button></div><div class="modal-bd"><div class="row" style="margin-bottom:12px"><select class="select" style="width:110px"><option>员工姓名</option></select><input class="input" style="width:300px" placeholder="输入关键词"><button class="btn primary">查询</button><div style="margin-left:auto" class="tiny">已选 <b id="employeeCount">0</b> 名员工　<span id="clearEmployeesBtn" class="link">清空</span></div></div><div class="employee-layout"><div class="employee-panel"><div class="employee-panel-hd">组织架构 / 员工标签</div><div class="employee-panel-bd"><div class="tree-row active">慧博科技研发</div><div class="tree-row">私域运营组</div><div class="tree-row">西安交付组</div></div></div><div class="employee-panel"><div class="employee-panel-hd">部门下所有</div><div id="employeeList" class="employee-panel-bd"></div></div><div class="employee-panel"><div class="employee-panel-hd">已选员工</div><div id="selectedEmployeeList" class="employee-panel-bd"></div></div></div></div><div class="modal-ft"><button class="btn" data-close="employeeModal">取消</button><button id="confirmEmployeesBtn" class="btn primary">确定</button></div></div></div>
+<div id="toast" class="toast"></div>
+<script>
+const $=id=>document.getElementById(id);
+const DRAFT_KEY='ai_moments_v4_8_2_reviewed';
+const storage=(()=>{try{const k='__ai_moments_storage_test__';window.localStorage.setItem(k,'1');window.localStorage.removeItem(k);return window.localStorage}catch(e){const mem={};return{getItem:k=>Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null,setItem:(k,v)=>{mem[k]=String(v)},removeItem:k=>{delete mem[k]}}}})();
+const copyLibrary={
+  new:[
+    {summary:'自然种草版',text:'新到了一条夏天很适合穿的法式收腰连衣裙。\n\n不是那种一眼很夸张的款，但上身会显得人很干净，腰线也比较自然。日常出门、约会、通勤都能穿。\n\n想看上身效果和细节图的可以私聊我，我按你的身高体重帮你看尺码。',reason:'适合新品刚上架时自然种草。',time:{label:'今晚 20:00',reason:'新品种草适合在晚间发布，客户更有时间看图、问尺码并私聊。',confidence:'高匹配'}},
+    {summary:'显瘦卖点版',text:'这条新款连衣裙，我觉得最值得看的是版型。\n\n腰线收得刚好，不是勒出来的紧，而是自然把比例拉出来；裙摆对胯和腿也比较友好。\n\n最近想找一条显瘦但不紧绷的裙子，可以私聊我看图。',reason:'突出显瘦、腰线和遮胯卖点。',time:{label:'今晚 20:30',reason:'显瘦类内容需要客户认真看上身图和版型细节。',confidence:'高匹配'}},
+    {summary:'场景代入版',text:'这条裙子很适合“不知道穿什么，但又想看起来有点精致”的时候。\n\n上班穿不会太隆重，下班约饭也不会太随便，配凉鞋、单鞋和小外套都可以。\n\n想看不同搭配效果的可以私聊我。',reason:'让客户代入通勤、约会和日常场景。',time:{label:'今天 18:30',reason:'下班后更容易代入通勤和约会场景。',confidence:'中匹配'}},
+    {summary:'质感细节版',text:'这条连衣裙的细节我还挺喜欢。\n\n面料不是软塌塌的，有一点垂感；腰部和裙摆的比例也处理得比较好。\n\n如果你买裙子比较在意面料、版型和上身质感，这条可以看看。',reason:'适合强调面料、垂感和版型。',time:{label:'今晚 21:00',reason:'稍晚一点更适合慢慢看质感和细节图。',confidence:'中匹配'}},
+    {summary:'互动引导版',text:'这条新款连衣裙到了，我有点纠结先主推哪个颜色。\n\n一个更温柔，适合日常和约会；一个更显气质，通勤穿也很好看。\n\n你们更喜欢哪一种？想看实拍图可以私聊我。',reason:'通过颜色选择降低互动门槛。',time:{label:'今天 12:30',reason:'午休时互动型内容更容易获得轻量回复。',confidence:'中匹配'}}
