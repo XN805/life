@@ -75,16 +75,22 @@ jobs:
               mark('overflow1440',{value:await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)});
               await page.setViewportSize({width:1366,height:768});mark('overflow1366',{value:await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)});
             }catch(e){result.errors.push(e.stack||String(e));}
-            if(browser)await browser.close();
+            try{if(browser)await browser.close();}catch(e){result.errors.push('close:'+String(e));}
             fs.writeFileSync('dist/debug-v483.json',JSON.stringify(result,null,2));
             console.log(JSON.stringify(result,null,2));
-          })();
+          })().catch(e=>{
+            fs.writeFileSync('dist/debug-v483-fatal.txt',e.stack||String(e));
+            process.exitCode=1;
+          });
           NODE
-          node /tmp/debug.js
+          set +e
+          node /tmp/debug.js > dist/node-output.txt 2>&1
+          echo $? > dist/node-exit.txt
+          exit 0
       - name: Commit diagnostics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/debug-v483.json
+          git add dist/debug-v483.json dist/debug-v483-fatal.txt dist/node-output.txt dist/node-exit.txt 2>/dev/null || true
           git commit -m "debug: capture v4.8.3 browser diagnostics" || exit 0
           git push origin HEAD:${{ github.head_ref }}
