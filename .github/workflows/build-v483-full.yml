@@ -1,0 +1,185 @@
+name: Build AI Moments v4.8.3 Full
+
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/build-v483-full.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build standalone HTML
+        shell: python
+        run: |
+          from pathlib import Path
+
+          parts = [Path(f"rebuild/base_{i:03d}.part").read_text(encoding="utf-8") for i in range(1, 7)]
+          base = "".join(parts)
+          if "<script>" not in base:
+              raise SystemExit("original script marker missing")
+          base = base.rsplit("<script>", 1)[0]
+          patch = Path("rebuild/v483_patch.htmlfrag").read_text(encoding="utf-8")
+          out = base + patch
+          out = out.replace("AI朋友圈 v4.8.2", "AI朋友圈 v4.8.3")
+          Path("dist").mkdir(exist_ok=True)
+          Path("dist/ai_moments_v4_8_3_reviewed.html").write_text(out, encoding="utf-8")
+          print(f"built {len(out):,} characters")
+
+      - name: Static checks
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          html = Path("dist/ai_moments_v4_8_3_reviewed.html").read_text(encoding="utf-8")
+          required = [
+              "朋友圈条数", "发布有效期", "新建一条朋友圈",
+              "momentPreviewModal", "data-preview-image",
+              "taskConfirmModal", "materialCenterModal",
+              "ai_moments_v4_8_3_reviewed"
+          ]
+          for item in required:
+              assert item in html, f"missing: {item}"
+          assert "最多10" not in html
+          assert "最多 10" not in html
+          assert html.count('id="step4Panel"') == 1
+          ids = re.findall(r'\bid="([^"]+)"', html)
+          duplicates = sorted({item for item in ids if ids.count(item) > 1})
+          assert not duplicates, f"duplicate DOM ids: {duplicates}"
+          scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
+          assert len(scripts) == 1, f"expected one script, found {len(scripts)}"
+          Path("/tmp/v483.js").write_text(scripts[0], encoding="utf-8")
+          print("static checks passed")
+
+      - name: JavaScript syntax
+        run: node --check /tmp/v483.js
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm install playwright@1.54.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Browser interaction and layout tests
+        run: |
+          cat > /tmp/test-v483.js <<'NODE'
+          const { chromium } = require('playwright');
+          const path = require('path');
+
+          (async () => {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+            const runtimeErrors = [];
+            page.on('pageerror', error => runtimeErrors.push(`page: ${error.message}`));
+            page.on('console', message => {
+              if (message.type() === 'error') runtimeErrors.push(`console: ${message.text()}`);
+            });
+
+            await page.goto('file://' + path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));
+            await page.click('#openAiBtn');
+            await page.waitForSelector('#basicInfoPanel');
+
+            const widths = await page.evaluate(() => ({
+              employee: document.querySelector('.employee-scope-card').getBoundingClientRect().width,
+              audience: document.querySelector('.audience-source-panel:not(.hidden)').getBoundingClientRect().width
+            }));
+            if (Math.abs(widths.employee - widths.audience) > 2) {
+              throw new Error(`scope widths differ: ${JSON.stringify(widths)}`);
+            }
+
+            const step4Display = await page.locator('#step4Panel').evaluate(el => getComputedStyle(el).display);
+            if (step4Display !== 'none') throw new Error('full fourth step is still visible');
+
+            await page.fill('#taskName', '618活动推广');
+            await page.fill('[data-rule-name]', '预热朋友圈');
+            await page.fill('#finalCopy', '这是一条用于验证创建、预览和图片排序的朋友圈文案。');
+
+            await page.fill('[data-slot-prompt]', '法式连衣裙正面商品图');
+            await page.click('[data-generate-image]');
+            await page.click('#addSlotBtn');
+            const prompts = page.locator('[data-slot-prompt]');
+            await prompts.nth(1).fill('法式连衣裙细节商品图');
+            await page.locator('[data-generate-image]').nth(1).click();
+
+            await page.click('[data-preview-moment]');
+            await page.waitForSelector('#momentPreviewModal.show');
+            if (await page.locator('.quick-preview-summary').count()) {
+              throw new Error('preview contains an unnecessary summary panel');
+            }
+            if (await page.locator('[data-preview-image]').count() !== 2) {
+              throw new Error('preview image count is incorrect');
+            }
+            const previewBox = await page.locator('.quick-preview-dialog').boundingBox();
+            const previewButtonBox = await page.locator('[data-preview-moment]').boundingBox();
+            if (!previewBox || !previewButtonBox) throw new Error('preview position could not be measured');
+            if (previewBox.x >= previewButtonBox.x && previewButtonBox.x > 370) {
+              throw new Error('preview did not open to the left of the button');
+            }
+            await page.locator('[data-preview-image]').nth(1).dragTo(page.locator('[data-preview-image]').nth(0));
+            await page.click('.preview-popover-close');
+
+            await page.click('#createTaskBtn');
+            await page.waitForSelector('#taskConfirmModal.show');
+            const countText = await page.locator('#confirmMomentCount').textContent();
+            if (countText !== '1条') throw new Error(`wrong confirmation count: ${countText}`);
+            if (await page.locator('#confirmScheduleList .confirm-schedule-row').count() !== 1) {
+              throw new Error('confirmation schedule rows are incorrect');
+            }
+            await page.click('#taskConfirmModal [data-close="taskConfirmModal"]');
+
+            await page.click('#saveCollapseMomentBtn');
+            if (await page.locator('[data-summary-validity]').count() !== 1) {
+              throw new Error('validity column is missing from collapsed card');
+            }
+            const validityText = await page.locator('[data-summary-validity]').textContent();
+            if (!validityText || !validityText.trim()) throw new Error('validity value is empty');
+
+            const addButtonBox = await page.locator('#addMomentBtn').boundingBox();
+            const sectionBox = await page.locator('#step2Panel').boundingBox();
+            if (!addButtonBox || !sectionBox) throw new Error('add button position could not be measured');
+            const rightGap = sectionBox.x + sectionBox.width - (addButtonBox.x + addButtonBox.width);
+            if (rightGap > 50) throw new Error(`add button is not right aligned; gap=${rightGap}`);
+
+            for (let i = 0; i < 11; i += 1) await page.click('#addMomentBtn');
+            if (await page.locator('[data-moment-card]').count() !== 12) {
+              throw new Error('unlimited moment creation failed');
+            }
+
+            const overflow1440 = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+            if (overflow1440 > 1) throw new Error(`horizontal overflow at 1440px: ${overflow1440}`);
+
+            await page.setViewportSize({ width: 1366, height: 768 });
+            const overflow1366 = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+            if (overflow1366 > 1) throw new Error(`horizontal overflow at 1366px: ${overflow1366}`);
+
+            if (runtimeErrors.length) throw new Error(runtimeErrors.join('\n'));
+            console.log('browser checks passed');
+            await browser.close();
+          })().catch(error => {
+            console.error(error);
+            process.exit(1);
+          });
+          NODE
+          node /tmp/test-v483.js
+
+      - name: Publish temporary direct download
+        id: temp_upload
+        run: |
+          URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload)
+          echo "DIRECT_URL=$URL"
+          echo "direct_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Upload reviewed HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-moments-v4-8-3-reviewed
+          path: dist/ai_moments_v4_8_3_reviewed.html
+          if-no-files-found: error
