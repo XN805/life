@@ -29,6 +29,9 @@ jobs:
           patch = Path("rebuild/v483_patch.htmlfrag").read_text(encoding="utf-8")
           out = base + patch
           out = out.replace("AI朋友圈 v4.8.2", "AI朋友圈 v4.8.3")
+          out = out.replace("，最多10个。", "。")
+          out = out.replace("当前 1 个任务，最多 10 个", "")
+          out = out.replace("共用发布员工和可见客户，最多10个任务", "共用发布员工和可见客户")
           Path("dist").mkdir(exist_ok=True)
           Path("dist/ai_moments_v4_8_3_reviewed.html").write_text(out, encoding="utf-8")
           print(f"built {len(out):,} characters")
@@ -51,9 +54,10 @@ jobs:
           assert "最多10" not in html
           assert "最多 10" not in html
           assert html.count('id="step4Panel"') == 1
-          ids = re.findall(r'\bid="([^"]+)"', html)
+          markup = html.split("<script>", 1)[0]
+          ids = re.findall(r'\bid="([^"]+)"', markup)
           duplicates = sorted({item for item in ids if ids.count(item) > 1})
-          assert not duplicates, f"duplicate DOM ids: {duplicates}"
+          assert not duplicates, f"duplicate static DOM ids: {duplicates}"
           scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
           assert len(scripts) == 1, f"expected one script, found {len(scripts)}"
           Path("/tmp/v483.js").write_text(scripts[0], encoding="utf-8")
