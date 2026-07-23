@@ -10,19 +10,31 @@
       "copy": 1,
       "parking": 1,
       "step2": 1,
-      "html": "\n            <div class=\"section-title\">第二步：设置朋友圈内容</div>\n            <div class=\"section-desc\">默认创建一个朋友圈任务。需要连续发布预热、宣传、提醒等内容时，可在完成当前任务后继续新增。</div>\n            <div class=\"moment-content-toolbar\">\n              <div><span class=\"label\">朋友圈任务</span><span id=\"momentCountLabel\" class=\"tiny moment-count-label\"></span></div>\n            </div>\n            <div id=\"momentList\" class=\"moment-modules\"><div class=\"moment-module active\" data-moment-card=\"m_mrxfwjvc_heqzio\"><div class=\"moment-module-head\">"
+      "html": "\n            <div class=\"section-title\">第二步：设置朋友圈内容</div>\n            <div class=\"section-desc\">默认创建一个朋友圈任务。需要连续发布预热、宣传、提醒等内容时，可在完成当前任务后继续新增。</div>\n            <div class=\"moment-content-toolbar\">\n              <div><span class=\"label\">朋友圈任务</span><span id=\"momentCountLabel\" class=\"tiny moment-count-label\"></span></div>\n            </div>\n            <div id=\"momentList\" class=\"moment-modules\"><div class=\"moment-module active\" data-moment-card=\"m_mrxfz8uk_naou4u\"><div class=\"moment-module-head\">"
     },
     {
       "name": "after-open",
-      "editor": 0,
-      "copy": 0,
+      "editor": 1,
+      "copy": 1,
       "parking": 1,
       "cards": 1,
       "step4": "none"
+    },
+    {
+      "name": "images",
+      "count": 2
+    },
+    {
+      "name": "preview",
+      "images": 2,
+      "summary": 0
+    },
+    {
+      "name": "create",
+      "modal": "modal-mask show",
+      "toast": "图片顺序已调整"
     }
   ],
   "errors": [],
-  "runtime": [
-    "TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.\n    at renderMoments (file:///home/runner/work/life/life/dist/ai_moments_v4_8_3_reviewed.html:788:883)\n    at renderAll (file:///home/runner/work/life/life/dist/ai_moments_v4_8_3_reviewed.html:771:50)\n    at $.onclick (file:///home/runner/work/life/life/dist/ai_moments_v4_8_3_reviewed.html:770:207)"
-  ]
+  "runtime": []
 }
