@@ -86,7 +86,7 @@ jobs:
           });
           NODE
           set +e
-          node /tmp/debug.js > dist/node-output.txt 2>&1
+          NODE_PATH="$PWD/node_modules" node /tmp/debug.js > dist/node-output.txt 2>&1
           echo $? > dist/node-exit.txt
           exit 0
       - name: Post diagnostics
