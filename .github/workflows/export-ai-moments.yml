@@ -1,0 +1,23 @@
+name: Export AI Moments Prototype
+
+on:
+  pull_request:
+    paths:
+      - 'artifacts/ai_moments_v4_8_3_submit_compact.html'
+      - '.github/workflows/export-ai-moments.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Upload prototype
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-moments-v4-8-3
+          path: artifacts/ai_moments_v4_8_3_submit_compact.html
+          if-no-files-found: error
