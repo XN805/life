@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>发布朋友圈 · AI朋友圈 v4.8.3</title>
+<style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f4f6f9}#app{display:block;width:100%;height:100%;border:0;background:#fff}</style>
+</head>
+<body>
+<iframe id="app" src="./ai_moments_v4_8_2_ux_polished_reviewed.html" title="AI朋友圈 v4.8.3"></iframe>
+<script id="patchSource" type="text/plain">
+(() => {
+  if(document.documentElement.dataset.v483Patched)return;
+  document.documentElement.dataset.v483Patched='true';
+  document.title='发布朋友圈 · AI朋友圈 v4.8.3';
+
+  const esc=value=>String(value??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const ruleName=(m,index=null)=>{
+    const list=orderedMoments();
+    const i=index===null?list.findIndex(x=>x.id===m.id):index;
+    return (m.stageName||'').trim()||`规则${Math.max(0,i)+1}`;
+  };
+  const materialLabel=m=>{
+    if(m.noImage)return'无素材';
+    if(m.imageSource==='ai')return (m.imageSlots||[]).some(s=>s.result)?'图片':'未设置';
+    if(m.existingMaterial)return({link:'链接',video:'视频',radar:'素材雷达'}[m.existingMaterial.type]||'素材');
+    return (m.existingImages||[]).length?'图片':'未设置';
+  };
+  const validityLabel=m=>m.validityMode==='custom'?(m.customValidityTime?formatLocalDateTime(m.customValidityTime):'未设置'):'当天';
+  const estimatedText=()=>{
+    const ctx=audienceContext();
+    const n=ctx.estimated??taskState.estimated;
+    return Number.isFinite(Number(n))?`${Number(n).toLocaleString()}人`:'未估算';
+  };
+
+  const style=document.createElement('style');
+  style.textContent=`
+    /* v4.8.3：范围等宽、轻量提交、就近排序 */
+    #step1Panel .employee-scope-card,
+    #step1Panel .audience-source-switch,
+    #step1Panel .audience-source-panel{width:100%;max-width:900px}
+    #step1Panel .audience-source-switch{display:flex;margin-top:14px}
+    #step1Panel .audience-source-panel{min-height:0}
+    #step1Panel .smart-audience-panel{padding:18px}
+    #step1Panel .audience-form{padding:18px 20px}
+    #step4Panel{display:none!important}
+    .form-bottom-bar{justify-content:flex-end}
+    .form-bottom-bar .bottom-status{display:none!important}
+    .moment-module-summary{grid-template-columns:140px 140px minmax(260px,1fr) 90px!important;gap:16px}
+    .summary-validity b{font-weight:700}
+    .add-moment-zone{max-width:none!important;display:flex;justify-content:flex-end;margin-top:16px!important}
+    .add-moment-entry{width:auto!important;min-height:36px!important;padding:0 16px!important;border-style:solid!important;border-radius:6px!important;background:#fff!important;gap:6px!important}
+    .add-moment-entry .plus{font-size:18px!important}
+    .add-moment-entry span:last-child{display:block!important}
+    .add-moment-entry b{font-size:13px!important}
+    .confirm-schedule-list{margin-top:14px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+    .confirm-schedule-head,.confirm-schedule-row{display:grid;grid-template-columns:54px minmax(120px,1fr) 150px 130px;gap:12px;align-items:center;padding:10px 12px}
+    .confirm-schedule-head{background:#f7f9fc;color:#667085;font-size:12px;font-weight:700}
+    .confirm-schedule-row{border-top:1px solid var(--line-soft);font-size:13px}
+    .confirm-schedule-row .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #momentPreviewModal .quick-preview-phone .moment-images.sortable .moment-image-item{cursor:grab;position:relative;border-radius:3px;overflow:hidden}
+    #momentPreviewModal .quick-preview-phone .moment-images.sortable .moment-image-item:active{cursor:grabbing}
+    #momentPreviewModal .quick-preview-phone .moment-image-item.dragging{opacity:.45;outline:2px solid var(--brand)}
+    #momentPreviewModal .quick-preview-phone .moment-image-item.drag-over{outline:2px solid var(--brand);outline-offset:1px}
+    #momentPreviewModal .quick-preview-phone .moment-images.sortable .drag-mark{display:grid}
+    #momentPreviewModal .quick-preview-phone .drag-mark{display:none;position:absolute;right:4px;top:4px;width:22px;height:22px;border-radius:5px;background:rgba(17,24,39,.72);color:#fff;place-items:center;font-size:12px;z-index:2}
+    @media(max-width:980px){
+      .moment-module-summary{grid-template-columns:1fr 1fr!important}
+      .summary-copy{grid-column:1/-1}
+      .confirm-schedule-head,.confirm-schedule-row{grid-template-columns:42px minmax(100px,1fr) 120px}
+      .confirm-schedule-head span:nth-child(4),.confirm-schedule-row span:nth-child(4){display:none}
+    }
+    @media(max-width:680px){
+      #step1Panel .employee-scope-card,#step1Panel .audience-source-switch,#step1Panel .audience-source-panel{max-width:none}
+      .moment-module-summary{grid-template-columns:1fr!important}
+      .summary-copy{grid-column:auto}
+      .add-moment-zone{justify-content:stretch}
+      .add-moment-entry{width:100%!important}
+    }
+  `;
+  document.head.appendChild(style);
+
+  const step2Title=$('step2Panel')?.querySelector('.section-title');
+  if(step2Title)step2Title.textContent='第三步：设置朋友圈内容';
+  const step4=$('step4Panel');
+  if(step4)step4.setAttribute('aria-hidden','true');
+  const createBtn=$('createTaskBtn');
+  if(createBtn)createBtn.textContent='创建任务';
+  const addBtn=$('addMomentBtn');
+  if(addBtn)addBtn.innerHTML='<span class="plus">＋</span><span><b>新建一条朋友圈</b></span>';
+
+  moduleCardHtml=function(m,i,editingId){
+    const st=momentStatus(m),active=m.id===editingId,name=ruleName(m,i);
+    return `<div class="moment-module ${active?'active':''}" data-moment-card="${m.id}">
+      <div class="moment-module-head">
+        <div class="moment-module-ident">
+          <div class="moment-module-index">第 ${i+1} 条</div>
+          <div class="rule-name-wrap"><input class="rule-name-input" data-rule-name="${m.id}" maxlength="20" value="${esc(name)}" aria-label="规则名称"><span class="rule-name-count" data-rule-count="${m.id}">${name.length}/20</span></div>
+          <span class="badge ${st.ok?'green':'orange'}" data-module-status="${m.id}">${st.label}</span>
+        </div>
+        <div class="moment-module-actions">
+          <button class="btn small" data-preview-rule="${m.id}">预览</button>
+          ${active?'<span class="editing-label">编辑中</span>':`<button class="btn small" data-edit-moment="${m.id}">编辑</button>`}
+          <button class="btn small danger" data-delete-moment="${m.id}" ${taskState.moments.length===1?'disabled':''}>删除</button>
+        </div>
+      </div>
+      <div class="moment-module-summary ${active?'hidden':''}">
+        <div><span class="summary-key">发布时间</span><b data-summary-time="${m.id}">${momentScheduleText(m)}</b></div>
+        <div class="summary-validity"><span class="summary-key">发布有效期</span><b data-summary-validity="${m.id}">${validityLabel(m)}</b></div>
+        <div class="summary-copy"><span class="summary-key">文案</span><span data-summary-copy="${m.id}" title="${esc(m.finalCopy||'')}">${momentSummaryText(m)}</span></div>
+        <div class="summary-material"><span class="summary-key">素材</span><b data-summary-material="${m.id}">${materialLabel(m)}</b></div>
+        ${st.issue?`<div class="module-issue" data-module-issue="${m.id}">${st.issue}</div>`:`<div class="module-issue hidden" data-module-issue="${m.id}"></div>`}
+      </div>
+      <div class="moment-module-editor-host" data-editor-host="${m.id}"></div>
+    </div>`;
+  };
+
+  let quickPreviewMomentId=null;
+  function quickListFor(m){return m.imageSource==='existing'?(m.existingImages||[]):(m.imageSlots||[])}
+  function quickItems(m){
+    if(m.noImage||m.existingMaterial)return[];
+    return m.imageSource==='existing'?(m.existingImages||[]).map(x=>({id:x.id,src:x.src})):(m.imageSlots||[]).filter(s=>s.result).map(s=>({id:s.id,src:s.result.src}));
+  }
+  function bindQuickSort(m){
+    let dragId=null;
+    document.querySelectorAll('[data-quick-image-id]').forEach(el=>{
+      el.ondragstart=e=>{dragId=el.dataset.quickImageId;el.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',dragId)};
+      el.ondragend=()=>{dragId=null;document.querySelectorAll('[data-quick-image-id]').forEach(x=>x.classList.remove('dragging','drag-over'))};
+      el.ondragover=e=>{e.preventDefault();if(el.dataset.quickImageId!==dragId)el.classList.add('drag-over')};
+      el.ondragleave=()=>el.classList.remove('drag-over');
+      el.ondrop=e=>{e.preventDefault();el.classList.remove('drag-over');const from=e.dataTransfer.getData('text/plain')||dragId,to=el.dataset.quickImageId;if(!from||!to||from===to)return;const list=quickListFor(m),fromIndex=list.findIndex(x=>x.id===from),toIndex=list.findIndex(x=>x.id===to);if(fromIndex<0||toIndex<0)return;const [item]=list.splice(fromIndex,1);list.splice(toIndex,0,item);renderQuickMedia(m);if(m.id===taskState.activeMomentId)renderImageSlots();persistDraftNow();showToast('图片顺序已调整')};
+    });
+  }
+  function renderQuickMedia(m){
+    const el=$('quickPhoneMedia');if(!el)return;
+    if(m.imageSource==='existing'&&m.existingMaterial&&!m.noImage){
+      const type=materialLabel(m),icon=({link:'↗',video:'▶',radar:'◎'}[m.existingMaterial.type]||'◇');
+      el.innerHTML=`<div class="phone-material-card"><div class="icon">${icon}</div><div class="info"><b>${esc(m.existingMaterial.title||type)}</b><span>${type}</span></div></div>`;
+      el.className='moment-images';return;
+    }
+    const items=quickItems(m),sortable=items.length>1;
+    el.innerHTML=items.map((item,i)=>`<div class="moment-image-item" draggable="${sortable}" data-quick-image-id="${item.id}"><span class="drag-mark">⋮⋮</span><img class="moment-image" draggable="false" src="${item.src}" alt="朋友圈图片${i+1}"></div>`).join('');
+    el.className='moment-images '+(items.length===1?'count-1':items.length===2?'count-2':items.length===3?'count-3':items.length===4?'count-4':items.length>4?'count-many':'')+(sortable?' sortable':'');
+    if(sortable)bindQuickSort(m);
+  }
+  function positionQuickPreview(button){
+    const dialog=$('momentPreviewModal')?.querySelector('.quick-preview-dialog');if(!dialog||!button)return;
+    const r=button.getBoundingClientRect(),width=Math.min(350,window.innerWidth-24),height=Math.min(570,window.innerHeight-24);
+    let left=r.left-width-10;if(left<12)left=Math.min(window.innerWidth-width-12,r.right+10);
+    const top=Math.max(12,Math.min(r.top-12,window.innerHeight-height-12));
+    dialog.style.left=`${Math.max(12,left)}px`;dialog.style.top=`${top}px`;
+  }
+  function openCompactPreview(id,button){
+    const m=momentById(id);if(!m)return;quickPreviewMomentId=id;
+    $('quickPhoneUserName').textContent=taskState.employees.length?taskState.employees[0].name:'发布员工';
+    $('quickPhoneCopy').textContent=m.finalCopy||'尚未确定文案';
+    $('quickPhoneTime').textContent=m.sendMode==='now'?'刚刚':(m.customTime?formatLocalDateTime(m.customTime):'待设置时间');
+    renderQuickMedia(m);openModal('momentPreviewModal');requestAnimationFrame(()=>positionQuickPreview(button));
+  }
+
+  bindMomentModuleEvents=function(){
+    document.querySelectorAll('[data-edit-moment]').forEach(el=>el.onclick=e=>{e.stopPropagation();setActiveMoment(el.dataset.editMoment,true)});
+    document.querySelectorAll('[data-delete-moment]').forEach(el=>el.onclick=e=>{e.stopPropagation();requestDeleteMoment(el.dataset.deleteMoment)});
+    document.querySelectorAll('[data-preview-rule]').forEach(el=>el.onclick=e=>{e.stopPropagation();openCompactPreview(el.dataset.previewRule,el)});
+    document.querySelectorAll('[data-rule-name]').forEach(el=>{
+      el.oninput=()=>{const m=momentById(el.dataset.ruleName);if(!m)return;m.stageName=el.value.slice(0,20);const count=document.querySelector(`[data-rule-count="${m.id}"]`);if(count)count.textContent=`${el.value.length}/20`;saveDraft()};
+      el.onblur=()=>{const m=momentById(el.dataset.ruleName);if(!m)return;if(!m.stageName.trim()){const index=taskState.moments.findIndex(x=>x.id===m.id);el.value=ruleName(m,index);const count=document.querySelector(`[data-rule-count="${m.id}"]`);if(count)count.textContent=`${el.value.length}/20`}persistDraftNow()};
+    });
+  };
+
+  updateActiveMomentModule=function(){
+    const m=activeMoment();if(!m)return;const st=momentStatus(m);
+    const status=document.querySelector(`[data-module-status="${m.id}"]`),time=document.querySelector(`[data-summary-time="${m.id}"]`),validity=document.querySelector(`[data-summary-validity="${m.id}"]`),copy=document.querySelector(`[data-summary-copy="${m.id}"]`),material=document.querySelector(`[data-summary-material="${m.id}"]`);
+    if(status){status.className=`badge ${st.ok?'green':'orange'}`;status.textContent=st.label}
+    if(time)time.textContent=momentScheduleText(m);if(validity)validity.textContent=validityLabel(m);
+    if(copy){copy.textContent=momentSummaryText(m);copy.title=m.finalCopy||''}if(material)material.textContent=materialLabel(m);
+  };
+
+  const confirmModal=$('taskConfirmModal');
+  if(confirmModal){
+    confirmModal.querySelector('.modal-title').textContent='确认创建朋友圈任务';
+    confirmModal.querySelector('.modal-bd').innerHTML=`<div class="confirm-summary"><div class="confirm-row"><span class="k">任务名称</span><span id="confirmTaskName" class="v">-</span></div><div class="confirm-row"><span class="k">发布员工</span><span id="confirmEmployees" class="v">-</span></div><div class="confirm-row"><span class="k">可见客户</span><span id="confirmAudience" class="v">-</span></div><div class="confirm-row"><span class="k">朋友圈条数</span><span id="confirmMomentCount" class="v">-</span></div></div><div id="confirmScheduleList" class="confirm-schedule-list"></div>`;
+    const confirmBtn=$('confirmCreateTaskBtn');if(confirmBtn)confirmBtn.textContent='确认创建';
+  }
+
+  openTaskConfirm=function(){
+    if(!validateAll())return;applyAutomaticMomentOrder();renderMomentList();
+    const list=orderedMoments(),ctx=audienceContext();
+    $('confirmTaskName').textContent=taskState.taskName||'-';
+    $('confirmEmployees').textContent=taskState.employees.map(e=>e.name).join('、')||'-';
+    $('confirmAudience').textContent=`${ctx.label} · 预计${estimatedText()}`;
+    $('confirmMomentCount').textContent=`${list.length}条`;
+    $('confirmScheduleList').innerHTML=`<div class="confirm-schedule-head"><span>序号</span><span>规则名称</span><span>发布时间</span><span>发布有效期</span></div>`+list.map((m,i)=>`<div class="confirm-schedule-row"><span>${i+1}</span><span class="name">${esc(ruleName(m,i))}</span><span>${momentScheduleText(m)}</span><span>${validityLabel(m)}</span></div>`).join('');
+    openModal('taskConfirmModal');
+  };
+  $('createTaskBtn').onclick=openTaskConfirm;
+
+  renderMomentList();renderReview();
+})();
+</script>
+<script>
+const frame=document.getElementById('app');
+frame.addEventListener('load',()=>{
+  const d=frame.contentDocument;if(!d)return;
+  const s=d.createElement('script');s.textContent=document.getElementById('patchSource').textContent;d.body.appendChild(s);
+});
+</script>
+</body>
+</html>
