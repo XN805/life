@@ -1,0 +1,16 @@
+name: Host Verified v4.8.3 HTML
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/host-v483-url.yml'
+      - 'dist/ai_moments_v4_8_3_reviewed.html'
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish verified HTML
+        run: |
+          git clone -q --depth 1 --branch v483-full-rebuild https://github.com/XN805/life.git repo
+          URL=$(curl -fsS -F 'file=@repo/dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload || true)
+          if [ -z "$URL" ]; then URL=$(curl -fsS -F 'file=@repo/dist/ai_moments_v4_8_3_reviewed.html' https://0x0.st); fi
+          echo "VERIFIED_HTML_URL=$URL"
