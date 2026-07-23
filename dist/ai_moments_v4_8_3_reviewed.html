@@ -1,0 +1,837 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>发布朋友圈 · AI朋友圈 v4.8.3</title>
+<style>
+:root{
+  --brand:#3278f6;--brand-hover:#2569df;--brand-soft:#edf4ff;--brand-line:#cfe0ff;
+  --text:#1f2937;--text-2:#475467;--muted:#7a8799;--line:#e5eaf2;--line-soft:#eef2f7;
+  --surface:#fff;--canvas:#f4f6f9;--success:#0f9f67;--success-soft:#eaf8f2;
+  --warning:#c77800;--warning-soft:#fff6e8;--danger:#e5484d;--danger-soft:#fff1f1;
+  --shadow:0 10px 30px rgba(15,23,42,.07);--radius:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{background:var(--canvas);color:var(--text);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.app{height:100%;display:flex;overflow:hidden}
+.sidebar{width:216px;flex:0 0 216px;background:#fff;border-right:1px solid var(--line);padding:18px 14px}
+.brand{display:flex;flex-direction:column;align-items:center;gap:9px;padding:4px 0 24px;color:#4b5563}.logo{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#b00096,#7a2ee6);color:#fff;font-size:21px;font-weight:800}
+.menu{display:grid;gap:4px}.menu-item{height:42px;border-radius:6px;display:flex;align-items:center;padding:0 12px;color:#394150}.menu-item .arrow{margin-left:auto;color:#9aa3b2}.menu-child{padding-left:18px;display:grid;gap:3px;margin:2px 0 8px}.menu-child div{height:38px;border-radius:5px;display:flex;align-items:center;padding:0 12px;color:#596274}.menu-child div.active{background:var(--brand);color:#fff}
+.main{flex:1;padding:18px;min-width:0;overflow:hidden}.shell{position:relative;height:calc(100vh - 36px);background:#fff;border-radius:9px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}.page{display:none;height:100%}.page.active{display:flex;flex-direction:column}
+.topbar{height:58px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex:0 0 auto}.title-row{display:flex;align-items:baseline;gap:10px}.title{font-size:18px;font-weight:700}.sub{font-size:13px;color:var(--muted)}
+.btn{height:34px;border:1px solid #d6ddea;background:#fff;border-radius:5px;padding:0 14px;color:#344054;display:inline-flex;align-items:center;justify-content:center;gap:6px}.btn:hover{border-color:#b9c6da}.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}.btn.primary:hover{background:var(--brand-hover)}.btn.text{border:0;background:transparent;color:var(--brand);padding:0 6px}.btn.danger{color:var(--danger);border-color:#f2c8cb}.btn.small{height:29px;padding:0 10px;font-size:12px}.btn.large{height:40px;padding:0 20px;font-weight:600}.btn:disabled{opacity:.5;cursor:not-allowed}
+.input,.select,.textarea{border:1px solid #d7deea;background:#fff;border-radius:7px;color:var(--text);outline:none}.input,.select{height:36px;padding:0 11px}.textarea{width:100%;padding:11px 12px;resize:vertical;line-height:1.65}.input:focus,.select:focus,.textarea:focus{border-color:var(--brand);box-shadow:0 0 0 2px rgba(50,120,246,.11)}
+.badge{height:22px;display:inline-flex;align-items:center;padding:0 8px;border-radius:11px;font-size:12px;white-space:nowrap}.badge.blue{background:var(--brand-soft);color:var(--brand)}.badge.green{background:var(--success-soft);color:var(--success)}.badge.orange{background:var(--warning-soft);color:var(--warning)}.badge.gray{background:#f1f3f6;color:#667085}.badge.red{background:var(--danger-soft);color:var(--danger)}
+.link{color:var(--brand);cursor:pointer}.tiny{font-size:12px;color:var(--muted)}.hidden{display:none!important}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.row.between{justify-content:space-between}.label{font-weight:700;color:#111827}.divider{height:1px;background:var(--line-soft);margin:16px 0}.radio{display:inline-flex;align-items:center;gap:7px;cursor:pointer}.radio input{accent-color:var(--brand)}
+.notice{margin:14px 18px 0;background:#fff9ef;color:#b36a00;padding:9px 14px;font-size:13px}.filterbar{margin:14px 18px 0;background:#f7f9fc;padding:14px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}.field{display:flex;align-items:center;gap:8px;color:#3f4858}.table-actions{padding:16px 18px;display:flex;gap:10px}
+table{width:calc(100% - 36px);margin:0 18px;border-collapse:collapse;border:1px solid var(--line)}th{height:40px;background:#f4f7fb;text-align:left;padding:0 12px;color:#374151;font-weight:600;font-size:13px;border-bottom:1px solid var(--line)}td{height:72px;padding:9px 12px;border-bottom:1px solid #edf0f5;color:#303846;font-size:13px}.thumb{width:44px;height:44px;border-radius:5px;background:linear-gradient(135deg,#eff3fb,#ccd7e8);display:grid;place-items:center;color:#8a94a6}.pager{height:56px;margin:0 18px;display:flex;align-items:center;gap:8px;color:#667085}.page-btn{width:32px;height:32px;border:1px solid #d7ddea;border-radius:4px;display:grid;place-items:center;background:#fff}.page-btn.active{background:var(--brand);border-color:var(--brand);color:#fff}
+.ai-head{height:70px;border-bottom:1px solid var(--line);padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex:0 0 auto}.draft-state{display:flex;align-items:center;gap:8px;font-size:12px;color:#667085}
+.step-strip{height:78px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;padding:0 28px;background:#fbfcfe;flex:0 0 auto}.steps{width:min(1040px,100%);display:grid;grid-template-columns:repeat(4,1fr)}.step{position:relative;display:flex;align-items:center;gap:10px;color:#8a95a6;cursor:default}.step:not(:last-child)::after{content:'';position:absolute;left:38px;right:14px;top:14px;height:1px;background:#dce3ed}.step.done:not(:last-child)::after{background:#8db5ff}.step-dot{width:28px;height:28px;border-radius:50%;border:1px solid #ccd5e2;background:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;z-index:1;flex:0 0 auto}.step.active,.step.done{color:#26364a}.step.active .step-dot{background:var(--brand);border-color:var(--brand);color:#fff}.step.done .step-dot{background:#e8f2ff;border-color:#9fc2ff;color:var(--brand)}.step-label{font-weight:600}.step-desc{font-size:12px;color:#8a95a6;margin-top:1px}
+.workspace{flex:1;min-height:0;overflow:auto;padding:26px 30px 96px;background:#fff}.step-panel{margin:0 auto}.step-panel.compact{max-width:900px}.step-panel.medium{max-width:1120px}.step-panel.wide{max-width:1260px}
+.section-title{font-size:17px;font-weight:700;margin-bottom:4px}.section-desc{font-size:13px;color:var(--muted);margin-bottom:20px}.surface{background:#fff;border:1px solid var(--line);border-radius:10px}.surface.soft{background:#fbfcfe}.surface-hd{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:12px}.surface-bd{padding:16px}
+.bottom-bar{height:72px;border-top:1px solid var(--line);background:rgba(255,255,255,.98);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:absolute;bottom:0;left:0;right:0;z-index:10}.bottom-hint{font-size:12px;color:#8a95a6;position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap}
+/* step 1 */
+.audience-form{padding:26px 30px}.form-row{display:grid;grid-template-columns:120px 1fr;align-items:start;gap:16px;padding:13px 0}.form-label{font-weight:600;padding-top:7px}.required::before{content:'*';color:var(--danger);margin-right:3px}.tag-result{min-height:44px;border:1px dashed #cfd9e8;border-radius:7px;background:#fbfcfe;padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.tag-chip{height:26px;display:inline-flex;align-items:center;padding:0 9px;border-radius:13px;background:var(--brand-soft);color:var(--brand);font-size:12px}.estimate-box{margin-top:10px;padding:10px 12px;border-radius:7px;background:#f7faff;color:#475467;font-size:13px}
+/* step 2 */
+.source-switch{display:flex;gap:28px;border-bottom:1px solid var(--line);height:46px;align-items:flex-end;padding:0 4px;margin-bottom:18px}.source-tab{height:46px;display:flex;align-items:center;border-bottom:2px solid transparent;color:#667085;cursor:pointer}.source-tab.active{color:var(--brand);border-color:var(--brand);font-weight:600}
+.copy-layout{display:grid;grid-template-columns:430px minmax(0,1fr);gap:18px;align-items:start}.generator-box{padding:16px}.template-chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px}.template-chip{height:30px;padding:0 12px;border:1px solid #d8dfeb;border-radius:15px;background:#fff;display:inline-flex;align-items:center;color:#475467;cursor:pointer}.template-chip.active{background:var(--brand-soft);border-color:#b9d0ff;color:var(--brand);font-weight:600}.copy-list{display:grid;gap:10px;margin-top:14px;max-height:430px;overflow:auto;padding-right:3px}.copy-option{border:1px solid var(--line);border-radius:9px;padding:12px;cursor:pointer;background:#fff}.copy-option:hover{border-color:#b9c9df}.copy-option.active{border-color:var(--brand);box-shadow:0 0 0 2px rgba(50,120,246,.08);background:#fbfdff}.copy-option-title{display:flex;justify-content:space-between;gap:8px;font-weight:600}.copy-option-text{font-size:13px;color:#475467;line-height:1.65;margin-top:7px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.editor-box{padding:16px;position:sticky;top:0}.editor-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}.final-editor{min-height:330px}.char-count{text-align:right;font-size:12px;color:#8a95a6;margin-top:6px}.edit-warning{margin-top:12px;padding:10px 12px;border-radius:7px;background:var(--warning-soft);color:var(--warning);font-size:12px}
+/* step 3 */
+.image-step-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:16px}.no-image{padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fbfcfe}.slot-list{display:grid;gap:14px}.image-slot{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}.image-slot.stale{border-color:#f0c98a}.slot-head{height:50px;padding:0 14px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fbfcfe}.slot-title{font-weight:700}.slot-body{padding:14px;display:grid;grid-template-columns:190px minmax(280px,1fr) 230px;gap:14px;align-items:stretch}.slot-col{min-width:0}.slot-label{font-size:12px;font-weight:600;color:#475467;margin-bottom:7px}.mode-toggle{display:inline-flex;padding:3px;background:#f1f4f8;border-radius:7px;margin-bottom:10px}.mode-btn{height:28px;border:0;background:transparent;border-radius:5px;padding:0 10px;color:#667085}.mode-btn.active{background:#fff;color:var(--brand);box-shadow:0 1px 4px rgba(15,23,42,.09);font-weight:600}.upload-tile{height:132px;border:1px dashed #c8d4e4;border-radius:8px;background:#fbfcfe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;color:#63738b;cursor:pointer;text-align:center;padding:10px}.upload-tile:hover{border-color:#9ebcf2;background:#f7faff}.plus{font-size:25px;line-height:1}.reference-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.mini-image{width:48px;height:48px;border:1px solid #dce5f1;border-radius:6px;object-fit:cover;background:#eef4ff}.slot-prompt{height:132px;resize:none}.slot-result{height:174px;border:1px dashed #c8d4e4;border-radius:8px;background:#fbfcfe;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;color:#8793a5;text-align:center}.slot-result img{width:100%;height:100%;object-fit:cover}.result-state{position:absolute;left:7px;top:7px}.slot-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap}.slot-message{font-size:12px;color:var(--warning);margin-top:7px}.add-slot{height:64px;border:1px dashed #bfcde0;border-radius:10px;background:#fbfcfe;color:var(--brand);font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer}.add-slot:hover{background:#f5f9ff;border-color:#9cbaf0}
+/* step 4 */
+.review-layout{display:grid;grid-template-columns:minmax(0,1.35fr) 390px;gap:22px;align-items:start}.review-left{display:grid;gap:14px}.review-section{border:1px solid var(--line);border-radius:10px;background:#fff}.review-section .surface-hd{padding:13px 15px}.review-section .surface-bd{padding:15px}.content-confirm{display:grid;grid-template-columns:1fr 260px;gap:14px}.copy-confirm{min-height:150px;background:#fbfcfe;border:1px solid var(--line-soft);border-radius:8px;padding:12px;white-space:pre-wrap;line-height:1.7}.image-confirm{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;align-content:start}.confirm-thumb{width:100%;aspect-ratio:1;border-radius:7px;object-fit:cover;border:1px solid #dce5f1;background:#f4f7fb}.risk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.risk-card{padding:11px;border:1px solid var(--line-soft);border-radius:8px;background:#fbfcfe}.risk-card b{display:block;font-size:13px;margin-bottom:4px}.risk-card span{font-size:12px;color:#667085}.time-card{padding:12px;border-radius:8px;background:#f7faff;border:1px solid #dce8ff}.employee-result{min-height:44px;border:1px dashed #cfd9e8;border-radius:7px;background:#fbfcfe;padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.phone-wrap{position:sticky;top:0}.phone-title{font-weight:700;margin-bottom:10px}.phone{width:365px;height:650px;border:1px solid #d9e0ea;border-radius:30px;background:#fff;margin:0 auto;box-shadow:0 10px 30px rgba(15,23,42,.09);padding:14px 15px 16px;overflow:hidden}.phone-status{height:26px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#344054}.phone-nav{height:42px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f2f5}.phone-nav b{font-size:16px}.moment{padding:14px 2px;overflow:auto;height:555px}.user-line{display:flex;gap:10px;align-items:flex-start}.avatar{width:42px;height:42px;border-radius:5px;background:linear-gradient(135deg,#b9c7db,#eef2f7);flex:0 0 auto}.moment-main{min-width:0;flex:1}.user-name{color:#576b95;font-weight:600}.moment-copy{white-space:pre-wrap;margin-top:5px;line-height:1.62;font-size:14px}.moment-images{display:grid;gap:4px;margin-top:9px;max-width:255px}.moment-images.count-1{grid-template-columns:1fr;max-width:210px}.moment-images.count-2,.moment-images.count-4{grid-template-columns:repeat(2,1fr)}.moment-images.count-3,.moment-images.count-many{grid-template-columns:repeat(3,1fr)}.moment-image{width:100%;aspect-ratio:1;object-fit:cover;background:#f1f4f8}.moment-meta{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:#8a95a6;font-size:12px}.more-box{background:#f1f3f5;border-radius:3px;padding:0 8px;color:#576b95;font-weight:700;letter-spacing:1px}
+/* modal */
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.38);display:none;align-items:center;justify-content:center;z-index:100}.modal-mask.show{display:flex}.modal{width:min(1000px,92vw);max-height:88vh;background:#fff;border-radius:10px;box-shadow:0 24px 70px rgba(15,23,42,.24);display:flex;flex-direction:column;overflow:hidden}.modal.small{width:min(760px,90vw)}.modal-hd{height:58px;border-bottom:1px solid var(--line);padding:0 18px;display:flex;align-items:center;justify-content:space-between}.modal-title{font-size:16px;font-weight:700}.close-btn{border:0;background:transparent;font-size:22px;color:#98a2b3}.modal-bd{padding:16px 18px;overflow:auto}.modal-ft{height:64px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:center;gap:12px;flex:0 0 auto}
+.tag-modal-layout{display:grid;grid-template-columns:58% 42%;min-height:490px;border:1px solid var(--line);border-radius:7px;overflow:hidden}.tag-left{border-right:1px solid var(--line);display:flex;flex-direction:column}.tag-search{padding:12px;border-bottom:1px solid var(--line);display:flex;gap:8px}.tag-list{overflow:auto;padding:0 12px}.tag-category{border-bottom:1px solid var(--line-soft)}.category-head{height:48px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}.category-tags{display:flex;gap:10px;flex-wrap:wrap;padding:0 0 14px}.select-tag{height:30px;padding:0 11px;border:1px solid transparent;border-radius:4px;background:#f4f5f7;color:#475467;display:inline-flex;align-items:center;cursor:pointer}.select-tag.selected{background:var(--brand-soft);color:var(--brand);border-color:#c7dafe}.tag-right{background:#fbfcfe;display:flex;flex-direction:column}.selected-head{height:56px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.selected-body{padding:14px;display:flex;gap:8px;align-content:flex-start;flex-wrap:wrap;overflow:auto}.empty-state{width:100%;height:300px;display:flex;align-items:center;justify-content:center;color:#98a2b3}
+.employee-layout{display:grid;grid-template-columns:240px 1fr 260px;gap:12px}.employee-panel{border:1px solid var(--line);border-radius:7px;min-height:420px;background:#fbfcfe}.employee-panel-hd{height:42px;padding:0 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;font-weight:600}.employee-panel-bd{padding:10px;overflow:auto}.tree-row,.person-row{min-height:34px;padding:6px 8px;border-radius:5px;display:flex;align-items:center;justify-content:space-between;gap:8px}.tree-row.active{background:#eaf2ff;color:var(--brand)}.person-row:hover{background:#f3f6fa}.status-expired{font-size:12px;color:#d98200}.person-row.disabled{opacity:.58}.selected-person{padding:7px 9px;border-radius:5px;background:#eaf2ff;color:var(--brand);margin-bottom:6px}
+.source-choice{display:grid;grid-template-columns:1fr 1fr;gap:14px}.choice-card{border:1px solid var(--line);border-radius:9px;padding:18px;cursor:pointer}.choice-card:hover{border-color:#a9c2ef;background:#f8fbff}.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(17,24,39,.94);color:#fff;padding:9px 14px;border-radius:7px;font-size:13px;opacity:0;pointer-events:none;transition:.2s;z-index:300}.toast.show{opacity:1}
+@media(max-width:1240px){.slot-body{grid-template-columns:170px 1fr 200px}.review-layout{grid-template-columns:1fr 350px}.phone{width:335px}.copy-layout{grid-template-columns:390px 1fr}}
+@media(max-width:980px){html,body{overflow:auto}.app{height:auto}.sidebar{display:none}.main{padding:0}.shell{height:auto;min-height:100vh;border-radius:0}.bottom-bar{left:0;position:fixed}.steps{grid-template-columns:repeat(4,1fr)}.step-desc{display:none}.copy-layout,.review-layout,.content-confirm{grid-template-columns:1fr}.slot-body{grid-template-columns:1fr}.phone-wrap{position:static}.workspace{padding-left:16px;padding-right:16px}.bottom-hint{display:none}.employee-layout{grid-template-columns:1fr}}
+
+/* v18 layout refinements */
+.table-actions{padding-top:14px}
+.compact-copy-layout{grid-template-columns:minmax(0,1.45fr) minmax(390px,.85fr);gap:16px;align-items:stretch}
+.copy-source-panel,.compact-editor-box{min-height:0}
+.compact-generator{padding:14px}
+.copy-config-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.compact-chips{margin:8px 0 10px}
+.compact-goal{height:92px;min-height:92px;resize:none}
+.candidate-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:11px 0 8px}
+.compact-copy-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:0;max-height:none;overflow:visible;padding-right:0}
+.compact-copy-list .copy-option{min-height:104px;padding:10px;display:flex;flex-direction:column;justify-content:space-between}
+.compact-copy-list .copy-option-title{font-size:13px;align-items:center}
+.compact-copy-list .copy-option-text{-webkit-line-clamp:2;font-size:12px;line-height:1.55;margin-top:5px}
+.empty-copy-state{grid-column:1/-1;padding:34px 0;text-align:center;border:1px dashed #d7dfeb;border-radius:8px;background:#fbfcfe}
+.compact-editor-box{padding:14px;display:flex;flex-direction:column}
+.compact-final-editor{min-height:286px;height:286px;resize:none;flex:1}
+.manual-source-editor{min-height:310px;resize:none}
+.image-source-switch{margin-bottom:14px}
+.existing-upload-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px}
+.existing-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.existing-image-card{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}
+.existing-image-card .existing-card-head{height:44px;padding:0 12px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;background:#fbfcfe}
+.existing-image-card .existing-card-body{padding:12px}
+.existing-image-card .slot-result{height:190px}
+.existing-empty{grid-column:1/-1;min-height:230px;border:1px dashed #c8d4e4;border-radius:10px;background:#fbfcfe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#7d8b9f}
+.review-layout{grid-template-columns:minmax(0,1fr) 410px;gap:20px}
+.review-left{align-content:start}
+.review-section .surface-bd{padding:14px}
+.phone{width:390px;height:660px}
+.moment{height:565px}
+.workspace{padding-top:22px}
+@media(max-width:1240px){.compact-copy-layout{grid-template-columns:minmax(0,1.25fr) minmax(360px,.75fr)}.compact-copy-list{grid-template-columns:repeat(2,minmax(0,1fr))}.existing-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.review-layout{grid-template-columns:minmax(0,1fr) 360px}.phone{width:345px}}
+
+
+/* v19: context-aware flow and viewport-fit layout */
+.step-strip{height:58px;padding:0 26px}
+.steps{width:min(960px,100%);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
+.step{display:grid;grid-template-columns:28px max-content minmax(18px,1fr);align-items:center;gap:9px;min-width:0;color:#8a95a6}
+.step:last-child{grid-template-columns:28px max-content}
+.step::after{display:none!important}
+.step-line{height:1px;background:#dce3ed;margin:0 14px 0 4px;min-width:18px}
+.step.done .step-line{background:#8db5ff}
+.step-label{font-size:14px;white-space:nowrap;position:relative;z-index:1}
+.workspace{padding:16px 24px 82px}
+.workspace.fit-view{overflow:hidden}
+#step2Panel:not(.hidden),#step4Panel:not(.hidden){height:100%;display:flex;flex-direction:column;min-height:0}
+#step2Panel .section-desc,#step4Panel .section-desc{margin-bottom:10px}
+#step2Panel .source-switch{margin-bottom:10px;height:38px}
+#step2Panel .source-tab{height:38px}
+.compact-copy-layout{grid-template-columns:460px minmax(0,1fr);gap:14px;align-items:stretch;flex:1;min-height:0}
+.copy-source-panel,.compact-editor-box{height:100%;overflow:hidden}
+.compact-generator{height:100%;display:flex;flex-direction:column;padding:12px}
+.copy-config-head{align-items:center}
+.copy-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}
+.compact-chips{margin:0}
+.count-picker{display:flex;align-items:center;gap:7px;white-space:nowrap}
+.segmented-count{display:inline-flex;border:1px solid #d8dfeb;border-radius:7px;overflow:hidden;background:#fff}
+.count-btn{width:30px;height:28px;border:0;border-right:1px solid #e7ebf1;background:#fff;color:#667085;padding:0}
+.count-btn:last-child{border-right:0}.count-btn.active{background:var(--brand);color:#fff;font-weight:700}
+.context-bar{margin:8px 0;padding:8px 10px;border:1px solid #dbe7fb;border-radius:7px;background:#f7faff;color:#52627a;font-size:12px;line-height:1.5}
+.context-bar b{color:#2b5fb7}.context-chip{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:11px;background:#eaf2ff;color:var(--brand);margin:2px 4px 2px 0}
+.compact-goal{height:68px;min-height:68px}
+.candidate-head{margin:8px 0 6px}
+.compact-copy-list{display:grid;grid-template-columns:1fr;grid-template-rows:repeat(5,minmax(0,1fr));gap:6px;flex:1;min-height:0;overflow:visible}
+.compact-copy-list .copy-option{min-height:0;padding:8px 10px;display:grid;grid-template-columns:132px minmax(0,1fr);gap:10px;align-items:center}
+.compact-copy-list .copy-option-title{font-size:12px;display:flex;flex-direction:column;align-items:flex-start;gap:4px}.compact-copy-list .copy-option-text{-webkit-line-clamp:2;font-size:12px;line-height:1.45;margin:0}
+.compact-copy-list .badge{height:20px}
+.empty-copy-state{grid-row:1/-1;display:grid;place-items:center;padding:0}
+.compact-editor-box{padding:12px;display:flex;flex-direction:column}
+.compact-final-editor{min-height:0;height:auto;flex:1;resize:none}
+.image-context-bar{margin:0 0 10px}
+.slot-context{font-size:12px;color:#667085;padding:7px 9px;background:#f8fafc;border:1px solid #edf1f6;border-radius:6px;margin-bottom:8px;line-height:1.45}
+#step4Panel .review-layout{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:stretch}
+#step4Panel .review-left{min-height:0;overflow:auto;align-content:start;gap:10px;padding-right:2px}
+#step4Panel .review-section .surface-hd{padding:10px 13px}
+#step4Panel .review-section .surface-bd{padding:11px 13px}
+#step4Panel .risk-grid{gap:7px}
+#step4Panel .risk-card{padding:8px 9px}
+.recommend-basis{margin-top:8px;padding-top:7px;border-top:1px dashed #d7e2f4;color:#63738a;font-size:12px}
+.phone-wrap{position:relative;top:auto;height:100%;min-height:0;display:flex;flex-direction:column}
+.phone-title{margin-bottom:7px}
+.phone{width:min(330px,100%);height:clamp(450px,calc(100vh - 290px),550px);border-radius:26px;padding:11px 13px 13px;flex:0 0 auto}
+.phone-status{height:22px}.phone-nav{height:38px}.moment{height:calc(100% - 60px);padding:11px 1px;overflow:auto}
+.avatar{width:38px;height:38px}.moment-copy{font-size:13px;line-height:1.55}.moment-images{max-width:235px}
+@media(max-height:780px){.workspace.fit-view{overflow:auto}.phone{height:470px}.compact-goal{height:58px;min-height:58px}.compact-copy-list{gap:4px}.compact-copy-list .copy-option{padding:6px 8px}}
+@media(max-width:1240px){.compact-copy-layout{grid-template-columns:420px minmax(0,1fr)}#step4Panel .review-layout{grid-template-columns:minmax(0,1fr) 330px}.phone{width:315px}}
+
+
+/* v19 fit correction */
+.compact-copy-list{gap:4px}
+.compact-copy-list .copy-option{padding:6px 8px}
+.compact-copy-list .copy-option-text{line-height:1.35;-webkit-line-clamp:2}
+
+
+/* v19 candidate density correction */
+.compact-copy-list .copy-option{padding:4px 7px;grid-template-columns:150px minmax(0,1fr)}
+.compact-copy-list .copy-option-title{flex-direction:row;align-items:center;gap:6px;white-space:nowrap}
+.compact-copy-list .copy-option-text{line-height:1.3;-webkit-line-clamp:1;white-space:normal}
+
+
+.review-audience{margin:0;padding:7px 10px;background:#fbfcfe}
+@media(max-height:780px){
+  .ai-head{height:58px}
+  .step-strip{height:50px}
+  .workspace{padding-top:10px;padding-bottom:72px}
+  .workspace.fit-view{overflow:hidden}
+  #step4Panel .section-desc{display:none}
+  #step4Panel .review-layout{gap:14px}
+  #step4Panel .review-left{gap:6px}
+  #step4Panel .review-section .surface-hd{padding:7px 10px}
+  #step4Panel .review-section .surface-bd{padding:7px 10px}
+  #step4Panel .risk-card{padding:5px 7px}
+  #step4Panel .risk-card b{margin-bottom:1px}
+  #step4Panel .risk-card span{line-height:1.25}
+  #step4Panel .time-card{padding:7px 9px}
+  #step4Panel .time-card .row[style*="margin-top:12px"]{margin-top:7px!important}
+  .recommend-basis{margin-top:5px;padding-top:5px}
+  .employee-result{min-height:36px;padding:5px 8px}
+  .review-audience{padding:5px 8px}
+  .phone-title{margin-bottom:4px}
+  .phone{height:410px;width:300px;padding:8px 10px 10px}
+  .phone-status{height:18px}.phone-nav{height:34px}.moment{height:calc(100% - 52px);padding:8px 1px}
+  .avatar{width:34px;height:34px}.moment-copy{font-size:12px;line-height:1.42}.moment-images{max-width:205px}
+}
+
+
+/* v20 merchant-facing refinements */
+#step2Panel .section-desc{margin-bottom:8px}
+.compact-copy-layout{grid-template-columns:minmax(620px,1.55fr) minmax(340px,.85fr);gap:16px}
+.copy-source-panel{min-width:0}
+.compact-generator{padding:14px;display:grid;grid-template-rows:auto auto 78px auto minmax(0,1fr);gap:8px}
+.copy-config-head{align-items:center}
+.copy-toolbar{margin-top:0;align-items:center}
+.compact-goal{height:78px;min-height:78px}
+.candidate-head{margin:0 0 2px}
+.compact-copy-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(86px,1fr);grid-template-rows:none;gap:8px;min-height:0;overflow:visible}
+.compact-copy-list .copy-option{display:block;min-height:86px;padding:9px 10px}
+.compact-copy-list .copy-option-title{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;font-size:12px}
+.compact-copy-list .copy-option-text{margin-top:6px;-webkit-line-clamp:2;font-size:12px;line-height:1.45}
+.compact-editor-box{padding:14px;min-width:0}
+.compact-final-editor{min-height:0;height:auto;flex:1}
+#copyAudienceContext,#imageGenerationContext,#recommendBasis{display:none!important}
+.image-step-head .section-desc{max-width:620px}
+.slot-context{display:none!important}
+.review-audience{margin:0!important;padding:9px 11px!important}
+.confirm-summary{display:grid;gap:10px}
+.confirm-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid var(--line-soft);font-size:13px}
+.confirm-row:last-child{border-bottom:0}
+.confirm-row .k{color:#667085}.confirm-row .v{color:#1f2937;font-weight:600;text-align:right}
+.confirm-warning{margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#fff7e8;color:#9a5b00;font-size:13px}
+@media(max-width:1180px){.compact-copy-layout{grid-template-columns:minmax(0,1.35fr) minmax(320px,.75fr)}}
+
+
+/* v21: audience source switch + smart targeting */
+.audience-step-panel{max-width:980px}
+.audience-source-switch{display:inline-flex;align-items:center;padding:4px;border:1px solid #dfe5ef;border-radius:9px;background:#f6f8fb;margin:0 0 14px}
+.audience-source-tab{height:34px;border:0;border-radius:6px;background:transparent;color:#667085;padding:0 18px;font-weight:600;cursor:pointer}
+.audience-source-tab.active{background:#fff;color:var(--brand);box-shadow:0 1px 5px rgba(16,24,40,.10)}
+.audience-source-tab .sparkle{margin-right:5px}
+.audience-source-panel{min-height:250px}
+.smart-audience-panel{padding:22px 24px}
+.smart-create-view{display:flex;flex-direction:column;gap:14px}
+.smart-query-box{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center}
+.smart-icon{width:44px;height:44px;border-radius:9px;background:#111827;color:#fff;display:grid;place-items:center;font-size:20px}
+.smart-query-input{height:52px;border:1px solid #d8dfeb;border-radius:8px;padding:0 16px;font-size:16px;color:#27364c;outline:none}
+.smart-query-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(47,124,246,.10)}
+.smart-suggestions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-left:56px}
+.smart-suggest-label{font-size:12px;color:#8a95a6}
+.smart-suggestions button{height:28px;border:1px solid #e4e8ef;border-radius:6px;background:#f8f9fb;color:#526074;padding:0 10px;font-size:12px;cursor:pointer}
+.smart-suggestions button:hover{border-color:#b8cef5;color:var(--brand);background:#f4f8ff}
+.smart-disclaimer{font-size:12px;color:#a0a8b5;padding-left:56px}
+.smart-report{border:1px solid #e1e6ee;border-radius:10px;background:#f8f9fb;padding:18px 20px;box-shadow:0 3px 12px rgba(16,24,40,.05)}
+.smart-report-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.smart-report-title-row{display:flex;align-items:center;gap:8px;font-size:16px}
+.smart-confidence,.smart-size{height:34px;display:inline-flex;align-items:center;border:1px solid #e2e7ef;border-radius:8px;background:#fff;padding:0 12px;font-size:12px;color:#4b586b}
+.smart-confidence i{width:7px;height:7px;border-radius:50%;background:#13a36b;margin-right:7px}
+.smart-size{background:#5146e5;color:#fff;border-color:#5146e5;font-size:13px}
+.smart-size b{font-size:17px;margin-left:5px}
+.smart-insight{margin-top:16px;border:1px solid #e0e6ef;border-radius:8px;background:#fff;padding:13px 14px;color:#41516a;line-height:1.65}
+.smart-insight-title{font-size:12px;color:#6f7d91;margin-bottom:5px;font-weight:600}
+.smart-rule-block{margin-top:14px}
+.smart-rule-title{font-size:12px;color:#7c8798;font-weight:600}
+.smart-rule-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.smart-rule-chip{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 10px;border-radius:7px;background:#eef4ff;color:#335f9f;font-size:12px;border:1px solid #d9e6fa}
+.smart-rule-chip::before{content:'•';color:#4d62e8;font-size:17px;line-height:1}.smart-report-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.copy-count-select{height:30px;width:76px;padding:0 26px 0 10px}
+.compact-copy-list{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:7px}
+.compact-copy-list .copy-option{grid-template-columns:108px minmax(0,1fr);padding:8px 9px}
+@media(max-width:1050px){.smart-query-box{grid-template-columns:40px minmax(0,1fr)}.smart-query-box .btn{grid-column:2;justify-self:end}.smart-suggestions,.smart-disclaimer{padding-left:52px}}
+
+
+/* v24: customer-first scope, employee assignment, preview drag sorting, latest send time */
+.audience-step-panel{max-width:1040px}
+.employee-scope-card{margin-top:16px}
+.employee-scope-card .surface-hd{padding:14px 16px}
+.employee-scope-card .surface-bd{padding:12px 16px}
+.audience-source-switch{margin-top:2px}
+.send-mode-list{display:grid;gap:10px;margin-top:12px}
+.send-mode-option{border:1px solid var(--line);border-radius:9px;background:#fff;padding:11px 12px;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer}
+.send-mode-option:has(input[type="radio"]:checked){border-color:#a9c6f9;background:#f8fbff}
+.send-mode-main{display:flex;align-items:center;gap:10px;min-width:180px}
+.send-mode-main input{accent-color:var(--brand)}
+.send-mode-main div{display:grid;gap:2px}
+.send-mode-main b{font-size:13px}
+.send-mode-main span{font-size:12px;color:#7d889a}
+.time-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.time-card-meta{display:flex;align-items:center;gap:8px}
+.time-rule-link{border:0;background:transparent;color:var(--brand);font-size:12px;cursor:pointer;padding:2px 0}
+.time-rule-link:hover{text-decoration:underline}
+.time-rule-panel{margin-top:10px;padding-top:10px;border-top:1px dashed #d7e2f4}
+.time-rule-panel.hidden{display:none}
+.time-rule-row{display:grid;grid-template-columns:110px 128px minmax(0,1fr);align-items:center;gap:10px}
+.time-rule-label{font-size:12px;font-weight:600;color:#475467}
+.time-rule-panel .input{height:34px;padding:6px 9px}
+.time-rule-note{font-size:12px;line-height:1.55;color:#7b8798}
+.smart-time-status{margin-top:7px;font-size:12px;color:#667085}
+.custom-time-input{width:210px;margin-left:auto}
+.phone-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.phone-title-row .phone-title{margin-bottom:0}
+.moment-images.sortable .moment-image-item{cursor:grab;position:relative;border-radius:3px;overflow:hidden}
+.moment-images.sortable .moment-image-item:active{cursor:grabbing}
+.moment-image-item.dragging{opacity:.45;outline:2px solid var(--brand)}
+.moment-image-item.drag-over{outline:2px solid var(--brand);outline-offset:1px}
+.moment-image-item .drag-mark{position:absolute;right:4px;top:4px;width:22px;height:22px;border-radius:5px;background:rgba(17,24,39,.72);color:#fff;display:grid;place-items:center;font-size:12px;z-index:2;letter-spacing:-1px}
+.moment-image-item .moment-image{display:block}
+@media(max-width:1200px){.time-rule-row{grid-template-columns:100px 120px minmax(0,1fr)}.review-layout{grid-template-columns:minmax(0,1fr) 350px}}
+
+
+.reference-strip{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ref-tile{width:96px;height:96px;border:1px dashed var(--line);border-radius:14px;background:#f8fafc;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;color:var(--sub);cursor:pointer;text-align:center;padding:8px}
+.ref-tile.filled{border-style:solid;background:#eef2ff;cursor:default;padding:0}
+.ref-thumb{width:100%;height:100%;object-fit:cover;display:block}
+.ref-tile.add-more{background:#fff}
+.slot-col-wide{flex:1.2}
+.slot-preview-col{max-width:260px}
+.slot-message{font-size:12px;color:var(--sub);margin-left:8px}
+.result-image{width:100%;height:100%;object-fit:cover;border-radius:12px;display:block}
+
+
+/* v3.2 review fixes */
+.compact-generator{grid-template-rows:auto auto 78px auto auto minmax(0,1fr)}
+.slot-body{grid-template-columns:minmax(0,1fr) 260px;gap:18px}
+.slot-col-wide .slot-actions{justify-content:flex-start}
+.slot-preview-col{max-width:none}
+.ref-tile{position:relative;width:104px;height:96px}
+.ref-tile.uploader b{font-size:13px;white-space:nowrap}
+.moment-image-item{position:relative}
+.moment-image-item .drag-mark{display:none}
+.moment-images.sortable .moment-image-item .drag-mark{display:grid}
+.ref-remove{position:absolute;right:5px;top:5px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(17,24,39,.72);color:#fff;font-size:16px;line-height:20px;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .15s}
+.ref-tile.filled:hover .ref-remove{opacity:1}
+#step4Panel .review-left{overflow:visible}
+@media(max-width:980px){.slot-body{grid-template-columns:1fr}.slot-preview-col{max-width:none}}
+
+
+/* v3.4 reviewed image workflow */
+.upload-option-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}.checkbox-line{display:inline-flex;align-items:center;gap:8px;color:#344054}.category-inline{display:inline-flex;align-items:center;gap:8px;color:#475467;font-size:13px}.local-upload-list{display:grid;gap:10px;max-height:430px;overflow:auto;padding-right:2px}.local-upload-item{display:grid;grid-template-columns:76px minmax(0,1fr);gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fbfcfe}.local-upload-thumb{width:76px;height:76px;border-radius:9px;object-fit:cover;border:1px solid #dce5f1;background:#eef2ff}.local-upload-fields{display:grid;gap:7px}.upload-title-row{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:8px;align-items:center}.upload-title-count{font-size:12px;color:#8a95a6;text-align:right}.material-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.material-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-height:440px;overflow:auto;padding-right:2px}.material-card{position:relative;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;cursor:pointer}.material-card:hover{border-color:#afc5ec}.material-card.active{border-color:var(--brand);box-shadow:0 0 0 2px rgba(50,120,246,.1);background:#fbfdff}.material-card img{width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:#eef2ff}.material-card-title{font-size:12px;font-weight:600;color:#344054;margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.material-card-meta{font-size:12px;color:#8a95a6;margin-top:2px}.material-check{position:absolute;right:13px;top:13px;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:12px}.material-empty{grid-column:1/-1;min-height:180px;border:1px dashed #c8d4e4;border-radius:10px;background:#fbfcfe;display:grid;place-items:center;color:#8a95a6}.material-save-form{display:grid;grid-template-columns:170px minmax(0,1fr);gap:18px;align-items:start}.material-preview{width:170px;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f6f8fb}.material-preview img{width:100%;height:100%;object-fit:cover}.material-save-fields{display:grid;gap:16px}.material-save-fields label{display:grid;gap:7px;color:#475467;font-weight:600}.title-input-wrap{position:relative}.title-input-wrap .input{width:100%;padding-right:58px}.title-input-wrap span{position:absolute;right:10px;top:8px;font-size:12px;color:#98a2b3}
+#step3Panel{max-width:1180px}.slot-list{display:grid;gap:14px}.image-slot{border-radius:12px}.slot-body{padding:16px;display:grid;grid-template-columns:254px minmax(320px,1fr) 250px;gap:18px;align-items:start}.slot-ref-col,.slot-prompt-col,.slot-preview-col{min-width:0}.ref-grid{display:grid;grid-template-columns:repeat(3,76px);grid-auto-rows:76px;gap:8px;min-height:160px;align-content:start}.ref-thumb-card,.ref-add-card{position:relative;width:76px;height:76px;border-radius:9px;overflow:hidden}.ref-thumb-card{border:1px solid #dce5f1;background:#eef2ff}.ref-thumb-card img{width:100%;height:100%;object-fit:cover}.ref-thumb-name{position:absolute;left:0;right:0;bottom:0;padding:3px 5px;background:linear-gradient(180deg,transparent,rgba(15,23,42,.78));color:#fff;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ref-remove{position:absolute;right:4px;top:4px;width:20px;height:20px;border:0;border-radius:50%;background:rgba(17,24,39,.78);color:#fff;display:grid;place-items:center;padding:0}.ref-add-card{border:1px dashed #c8d4e4;background:#fbfcfe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-align:center;color:#63738b;cursor:pointer;padding:5px}.ref-add-card:hover{border-color:#9ebcf2;background:#f7faff}.ref-add-card b{font-size:11px}.ref-add-card .tiny{font-size:10px;line-height:1.3}.ref-tip{font-size:11px;color:#98a2b3;margin-top:6px}.slot-prompt{height:160px;resize:none}.prompt-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}.prompt-actions .slot-message{margin:0;flex:1}.slot-preview-col .slot-result{height:196px}.preview-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}.preview-actions .btn.small{padding:0 8px}.existing-upload-head{margin-bottom:12px}.existing-image-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.existing-drop-area{grid-column:1/-1;min-height:220px;border:1px dashed #c8d4e4;border-radius:12px;background:#fbfcfe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:#7d8b9f;cursor:pointer}.existing-drop-area:hover,.existing-add-tile:hover{border-color:#9ebcf2;background:#f7faff}.existing-add-tile{min-height:194px;border:1px dashed #c8d4e4;border-radius:10px;background:#fbfcfe;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#7d8b9f;cursor:pointer}.existing-image-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:10px;display:grid;gap:9px}.existing-image-title{font-size:12px;font-weight:600;color:#344054;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.existing-image-card .slot-result{height:162px}.existing-card-actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}.existing-card-actions .btn.small{padding:0 8px}
+@media(max-width:1250px){.slot-body{grid-template-columns:238px minmax(300px,1fr) 230px}.ref-grid{grid-template-columns:repeat(3,70px);grid-auto-rows:70px;min-height:148px}.ref-thumb-card,.ref-add-card{width:70px;height:70px}.slot-preview-col .slot-result{height:182px}.material-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:980px){.slot-body{grid-template-columns:1fr}.ref-grid{grid-template-columns:repeat(3,76px)}.slot-preview-col .slot-result{height:240px}.material-grid,.existing-image-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.material-save-form{grid-template-columns:1fr}.material-preview{width:140px}}
+
+
+/* v4.0 single-page form layout */
+.ai-head{height:58px;padding:0 20px;background:#fff}
+.form-workspace{padding:18px 20px 96px;background:#f5f7fa;overflow:auto}
+.form-section{max-width:none!important;margin:0 0 18px;background:#fff;border:1px solid #edf0f5;border-radius:0;padding:0 20px 20px;box-shadow:none;scroll-margin-top:12px}
+.form-section>.section-title{margin:0 -20px 16px;padding:14px 20px;border-bottom:1px solid #edf0f5;font-size:15px;font-weight:700}
+.form-section>.section-desc{margin:-6px 0 16px;color:#7a8799}
+.basic-section{padding-bottom:20px}
+.basic-form-row{display:grid;grid-template-columns:92px minmax(320px,500px);gap:14px;align-items:center;padding:4px 0}
+.form-field-label{font-weight:600;color:#475467;text-align:right}
+.task-name-wrap{position:relative}.task-name-wrap .input{width:100%;padding-right:58px}.task-name-wrap span{position:absolute;right:10px;top:8px;font-size:12px;color:#98a2b3}
+.form-section.error-section{border-color:#ef9a9e;box-shadow:0 0 0 2px rgba(229,72,77,.08)}
+.form-section .surface{border-color:#e7ebf2}
+#step1Panel .employee-scope-card{margin-bottom:14px!important}
+#step1Panel .audience-source-panel{min-height:0}
+#step2Panel,#step4Panel{height:auto!important;display:block!important;min-height:0!important}
+#step2Panel .copy-source-panel,#step2Panel .compact-editor-box{height:auto;min-height:480px;overflow:visible}
+#step2Panel .compact-generator{height:auto;min-height:480px}
+#step2Panel .compact-final-editor{height:410px;min-height:410px;flex:none}
+#step2Panel .compact-copy-list{min-height:220px;grid-auto-rows:minmax(82px,auto)}
+#step3Panel{max-width:none!important}
+#step4Panel .review-layout{grid-template-columns:minmax(0,1fr) 390px;align-items:start}
+#step4Panel .review-left{overflow:visible;gap:14px}
+.dispatch-summary{display:grid;gap:0}.dispatch-row{display:grid;grid-template-columns:90px minmax(0,1fr);gap:14px;padding:12px 0;border-bottom:1px solid #eef2f7}.dispatch-row:last-child{border-bottom:0}.dispatch-key{color:#667085}.dispatch-value{color:#1f2937;font-weight:500;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dispatch-value .review-audience-tags{margin-top:7px}
+#step4Panel .phone-wrap{position:sticky;top:8px;height:auto}
+#step4Panel .phone{height:520px;width:min(360px,100%)}
+.form-bottom-bar{height:66px;justify-content:space-between}.bottom-status{font-size:12px;color:#8a95a6}
+#step1Panel .audience-source-switch{margin-top:2px}
+@media(max-width:1200px){#step4Panel .review-layout{grid-template-columns:minmax(0,1fr) 340px}#step4Panel .phone{width:330px}.compact-copy-layout{grid-template-columns:minmax(560px,1.35fr) minmax(320px,.75fr)}}
+@media(max-width:980px){.form-workspace{padding:14px 14px 90px}.form-section{padding:0 14px 16px}.form-section>.section-title{margin:0 -14px 14px;padding:13px 14px}.basic-form-row{grid-template-columns:1fr}.form-field-label{text-align:left}.compact-copy-layout,#step4Panel .review-layout{grid-template-columns:1fr}#step4Panel .phone-wrap{position:static}#step4Panel .phone{width:min(360px,100%)}.form-bottom-bar{position:fixed}.bottom-status{display:none}}
+
+
+/* v4.1 multi-moment SOP */
+.sop-content-section{padding-bottom:20px}
+.sop-content-layout{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start}
+.sop-list-panel{position:sticky;top:8px;overflow:hidden}
+.sop-list-head{padding:14px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.moment-list{padding:10px;display:grid;gap:8px;max-height:560px;overflow:auto}
+.moment-list-item{border:1px solid var(--line);border-radius:9px;padding:10px;cursor:pointer;background:#fff;transition:.16s}
+.moment-list-item:hover{border-color:#b9c9df;background:#fbfdff}.moment-list-item.active{border-color:var(--brand);background:#f7faff;box-shadow:0 0 0 2px rgba(50,120,246,.07)}
+.moment-list-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.moment-list-index{font-size:12px;color:#667085;font-weight:700}.moment-list-name{font-weight:700;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.moment-list-time{font-size:12px;color:#7a8799;margin-top:4px}.moment-list-issue{font-size:11px;color:#c77800;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sop-list-actions{padding:12px;border-top:1px solid var(--line-soft);display:grid;gap:8px}.sop-list-actions .btn{width:100%}.moment-editor{overflow:hidden}.moment-editor-head{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fbfcfe}
+.moment-base-grid{padding:16px;display:grid;grid-template-columns:minmax(300px,.8fr) minmax(460px,1.2fr);gap:18px;border-bottom:1px solid var(--line-soft)}
+.moment-name-field,.moment-time-field{display:grid;gap:8px}.moment-time-options{display:grid;grid-template-columns:1fr 1.35fr;gap:10px}.send-mode-option.compact{padding:10px 11px;margin:0}.send-mode-option.compact .custom-time-input{margin-top:8px;width:100%}.moment-time-notice{min-height:18px;color:#c77800}
+.moment-subsection{padding:16px;border-bottom:1px solid var(--line-soft)}.moment-subsection:last-child{border-bottom:0}.moment-subsection-title{font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}.image-subsection{background:#fcfdff}
+.sop-content-section .compact-copy-layout{grid-template-columns:minmax(560px,1.35fr) minmax(320px,.75fr)}
+.sop-content-section .compact-generator{min-height:440px}.sop-content-section .compact-editor-box{min-height:440px}.sop-content-section .compact-final-editor{height:370px;min-height:370px}
+.dispatch-summary-five{grid-template-columns:repeat(5,minmax(0,1fr));gap:0}.dispatch-summary-five .dispatch-row{display:block;padding:12px 14px;border-bottom:0;border-right:1px solid var(--line-soft)}.dispatch-summary-five .dispatch-row:last-child{border-right:0}.dispatch-summary-five .dispatch-key{display:block;margin-bottom:7px}.dispatch-summary-five .dispatch-value{min-height:28px}
+.preview-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 0 10px}.preview-view-switch{display:inline-flex;padding:3px;border:1px solid #dfe5ef;border-radius:8px;background:#f6f8fb}.preview-view-btn{height:32px;border:0;border-radius:6px;background:transparent;color:#667085;padding:0 16px}.preview-view-btn.active{background:#fff;color:var(--brand);font-weight:700;box-shadow:0 1px 4px rgba(15,23,42,.09)}
+.schedule-notice{margin-bottom:10px;padding:10px 12px;border-radius:8px;background:#fff6e8;color:#9a5b00;font-size:12px}.schedule-notice.hidden{display:none}
+.preview-nav-shell{display:grid;grid-template-columns:38px minmax(0,1fr) 38px;gap:8px;align-items:center;margin-bottom:14px}.preview-arrow{width:38px;height:38px;border:1px solid #d7deea;border-radius:8px;background:#fff;color:#475467;font-size:22px}.preview-arrow:disabled{opacity:.35;cursor:not-allowed}.preview-nav-track{display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin;padding:3px 1px 7px;scroll-behavior:smooth}
+.preview-nav-item{flex:0 0 150px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:9px 10px;cursor:pointer}.preview-nav-item.active{border-color:var(--brand);background:#f7faff;box-shadow:0 0 0 2px rgba(50,120,246,.07)}.preview-nav-item .n{font-size:11px;color:#8a95a6}.preview-nav-item .name{font-size:13px;font-weight:700;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.preview-nav-item .time{font-size:11px;color:#667085;margin-top:3px}.preview-nav-item .status{margin-top:5px;font-size:11px}
+.sop-review-layout{grid-template-columns:minmax(0,1fr) 390px!important}.preview-current-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:16px}.preview-current-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.preview-counter{font-size:12px;color:var(--brand);font-weight:700}.preview-stage-name{font-size:20px;font-weight:750;margin-top:5px}.preview-schedule{font-size:13px;color:#667085;margin-top:6px}.preview-guidance{margin-top:14px;padding:10px 12px;border-radius:8px;background:#f7f9fc;color:#667085;font-size:12px}
+.sop-overview-pane{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}.sop-overview-head{padding:14px 16px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:12px}.sop-overview-list{display:grid}.sop-overview-row{display:grid;grid-template-columns:54px 160px minmax(180px,1fr) 150px 100px 88px;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line-soft)}.sop-overview-row:last-child{border-bottom:0}.sop-overview-row.header{background:#f7f9fc;color:#667085;font-size:12px;font-weight:700}.sop-overview-row .stage{font-weight:700}.sop-overview-row .summary{font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.confirm-schedule-warnings{margin-top:12px;padding:10px 12px;border-radius:8px;background:#fff6e8;color:#9a5b00;font-size:12px;line-height:1.6}
+#phonePreview{touch-action:pan-y}.phone-slide-left{animation:phoneSlideLeft .2s ease}.phone-slide-right{animation:phoneSlideRight .2s ease}@keyframes phoneSlideLeft{from{transform:translateX(12px);opacity:.65}to{transform:none;opacity:1}}@keyframes phoneSlideRight{from{transform:translateX(-12px);opacity:.65}to{transform:none;opacity:1}}
+.form-section.error-section .moment-editor{border-color:#f3a4a8;box-shadow:0 0 0 2px rgba(229,72,77,.06)}
+@media(max-width:1250px){.sop-content-layout{grid-template-columns:230px minmax(0,1fr)}.moment-base-grid{grid-template-columns:1fr}.sop-content-section .compact-copy-layout{grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr)}.dispatch-summary-five{grid-template-columns:repeat(3,minmax(0,1fr))}.dispatch-summary-five .dispatch-row{border-bottom:1px solid var(--line-soft)}}
+@media(max-width:980px){.sop-content-layout{grid-template-columns:1fr}.sop-list-panel{position:static}.moment-list{max-height:300px}.sop-content-section .compact-copy-layout,.sop-review-layout{grid-template-columns:1fr!important}.moment-time-options{grid-template-columns:1fr}.dispatch-summary-five{grid-template-columns:1fr}.dispatch-summary-five .dispatch-row{border-right:0}.sop-overview-row{grid-template-columns:40px minmax(120px,1fr) 110px 78px}.sop-overview-row .summary,.sop-overview-row .images{display:none}}
+
+
+/* v4.1 layout corrections */
+.sop-content-layout{grid-template-columns:235px minmax(0,1fr)}
+.moment-base-grid{grid-template-columns:minmax(250px,.72fr) minmax(0,1.28fr)}
+.sop-content-section .compact-copy-layout{grid-template-columns:minmax(0,1.3fr) minmax(285px,.7fr)}
+.sop-content-section .copy-source-panel,.sop-content-section .compact-editor-box{min-width:0}
+.sop-overview-row{grid-template-columns:48px 145px 150px minmax(180px,1fr) 70px 90px 76px}
+.preview-nav-track:has(.preview-nav-item:only-child){justify-content:center}
+@media(max-width:1250px){.sop-content-layout{grid-template-columns:220px minmax(0,1fr)}.sop-content-section .compact-copy-layout{grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr)}}
+@media(max-width:980px){.sop-content-layout{grid-template-columns:1fr}.sop-overview-row{grid-template-columns:38px 110px minmax(120px,1fr) 78px 68px}}
+
+
+.send-mode-option.compact{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;justify-content:stretch;gap:8px;min-width:0}
+.send-mode-option.compact .send-mode-main{min-width:0}
+.send-mode-option.compact .custom-time-input{width:100%;min-width:0;margin:0}
+.moment-time-options{grid-template-columns:1fr 1fr}
+
+
+/* v4.3: default single moment, vertical modules, adaptive preview */
+.moment-content-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;padding:0 2px}
+.moment-count-label{margin-left:10px}
+.moment-modules{display:grid;gap:16px}
+.moment-module{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;transition:border-color .16s,box-shadow .16s}
+.moment-module.active{border-color:#a9c7ff;box-shadow:0 0 0 2px rgba(50,120,246,.06)}
+.moment-module.error-module{border-color:#ee9ba0;box-shadow:0 0 0 2px rgba(229,72,77,.08)}
+.moment-module-head{min-height:68px;padding:12px 16px;background:#fbfcfe;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.moment-module.active .moment-module-head{background:#f7faff}
+.moment-module-ident{min-width:0;display:grid;grid-template-columns:auto minmax(120px,1fr) auto;align-items:center;gap:12px;cursor:pointer}
+.moment-module-index{font-size:12px;color:#667085;font-weight:700;white-space:nowrap}
+.moment-module-title{font-size:15px;font-weight:700;color:#1f2937;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.moment-module-time{font-size:12px;color:#667085;white-space:nowrap}
+.moment-module-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.editing-label{font-size:12px;color:var(--brand);font-weight:600}
+.moment-module-summary{display:grid;grid-template-columns:170px minmax(260px,1fr) 100px;gap:18px;padding:13px 16px;align-items:start;cursor:pointer;background:#fff}
+.moment-module-summary:hover{background:#fbfdff}
+.moment-module-summary>div{display:grid;gap:4px;min-width:0}
+.summary-key{font-size:12px;color:#8a95a6}.summary-copy span:last-child{color:#475467;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.module-issue{grid-column:1/-1;color:var(--warning);font-size:12px;padding-top:4px}
+.moment-module-editor-host:empty{display:none}
+.moment-module-editor-host .moment-editor{border:0;border-radius:0;box-shadow:none}
+.moment-editor-head{padding:12px 18px;background:#fff}
+.moment-base-grid{padding:18px;grid-template-columns:minmax(300px,.8fr) minmax(520px,1.2fr);gap:22px}
+.moment-subsection{padding:18px}
+.sop-content-section .compact-copy-layout{grid-template-columns:minmax(0,1.2fr) minmax(380px,.8fr);gap:18px}
+.sop-content-section .compact-generator{min-height:460px}
+.sop-content-section .compact-editor-box{min-height:460px}
+.sop-content-section .compact-final-editor{height:388px;min-height:388px}
+.sop-content-section .compact-copy-list{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(88px,auto)}
+.add-moment-entry{width:100%;min-height:72px;margin-top:16px;border:1px dashed #a9c2ef;border-radius:12px;background:#f8fbff;color:var(--brand);display:flex;align-items:center;justify-content:center;gap:12px;cursor:pointer}
+.add-moment-entry:hover{background:#f2f7ff;border-color:#7fa8ee}.add-moment-entry .plus{font-size:26px}.add-moment-entry span:last-child{display:grid;text-align:left}.add-moment-entry b{font-size:14px}.add-moment-entry small{font-size:12px;color:#7a8799;font-weight:400}
+.add-moment-entry.is-disabled{opacity:.5;cursor:not-allowed}
+#step4Panel .preview-toolbar.hidden+#scheduleNotice.hidden+#singlePreviewPane .review-layout{margin-top:0}
+#previewToolbar.hidden{display:none!important}#previewNavShell.hidden{display:none!important}
+#step4Panel .preview-current-card{min-height:138px}
+#step4Panel .preview-counter.hidden{display:none!important}
+@media(max-width:1180px){.moment-base-grid{grid-template-columns:1fr}.sop-content-section .compact-copy-layout{grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr)}}
+@media(max-width:980px){.moment-module-head{align-items:flex-start;flex-direction:column}.moment-module-ident{width:100%;grid-template-columns:auto minmax(0,1fr)}.moment-module-time{grid-column:2}.moment-module-actions{width:100%;justify-content:flex-start}.moment-module-summary{grid-template-columns:1fr}.sop-content-section .compact-copy-layout{grid-template-columns:1fr}.moment-content-toolbar{align-items:flex-start}.sop-content-section .compact-final-editor{height:300px;min-height:300px}}
+
+
+
+/* v4.4 alignment: independent task names, copy-image-time flow, filled preview layout */
+.basic-section{display:none!important}
+.moment-name-subsection{background:#fff}
+.moment-task-name-row{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(420px,1.3fr);gap:24px;align-items:center}
+.moment-task-name-input{width:100%}
+.moment-schedule-subsection{background:#fbfcfe;border-top:1px solid var(--line-soft);border-bottom:0!important;padding-top:18px;padding-bottom:20px}
+.moment-schedule-subsection .moment-time-field{max-width:820px}
+.moment-schedule-subsection .moment-time-options{grid-template-columns:minmax(220px,.75fr) minmax(360px,1.25fr)}
+.add-moment-zone{margin-top:22px;padding-top:2px}
+.add-moment-divider{display:flex;align-items:center;gap:12px;margin-bottom:12px;color:#8a95a6;font-size:12px}
+.add-moment-divider::before,.add-moment-divider::after{content:'';height:1px;background:#e7ebf2;flex:1}.add-moment-divider span{white-space:nowrap}
+.add-moment-entry{margin-top:0;min-height:76px;background:#fff;border-color:#b8cdf2}
+.add-moment-entry:hover{background:#f7faff}
+.publish-preview-grid{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:20px;align-items:start}
+.publish-preview-main{min-width:0;display:grid;gap:14px;align-content:start}
+.publish-phone-column{min-width:0;border-left:1px solid var(--line-soft);padding-left:20px}
+.publish-phone-column .phone-wrap{position:sticky!important;top:8px;height:auto!important}
+.publish-phone-column .phone-title-row{margin-bottom:9px}
+.publish-phone-column .phone{width:min(350px,100%)!important;height:560px!important}
+.publish-phone-column .moment{height:calc(100% - 68px)!important}
+.publish-preview-grid .dispatch-summary-card{margin:0}
+.publish-preview-grid .preview-toolbar{margin:0}
+.publish-preview-grid .preview-nav-shell{margin:0}
+.preview-current-card{min-height:235px;padding:18px}
+.preview-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px}
+.preview-detail-grid>div{min-width:0;padding:12px;border:1px solid var(--line-soft);border-radius:8px;background:#fbfcfe;display:grid;gap:5px}
+.preview-detail-grid span{font-size:12px;color:#8a95a6}.preview-detail-grid b{font-size:13px;color:#344054;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dispatch-summary-five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.confirm-task-names{display:flex!important;justify-content:flex-end;gap:6px;flex-wrap:wrap;max-height:104px;overflow:auto}
+.confirm-task-names .tag-chip{height:auto;min-height:24px;padding:3px 8px;white-space:normal;text-align:left}
+.sop-overview-row{grid-template-columns:48px 140px minmax(150px,.7fr) minmax(180px,1.3fr) 62px 82px 68px}
+@media(max-width:1280px){.publish-preview-grid{grid-template-columns:minmax(0,1fr) 330px}.publish-phone-column{padding-left:16px}.publish-phone-column .phone{width:315px!important}.dispatch-summary-five{grid-template-columns:repeat(3,minmax(0,1fr))}.dispatch-summary-five .dispatch-row{border-bottom:1px solid var(--line-soft)}.moment-task-name-row{grid-template-columns:minmax(220px,.65fr) minmax(360px,1.35fr)}}
+@media(max-width:980px){.moment-task-name-row{grid-template-columns:1fr}.moment-schedule-subsection .moment-time-options{grid-template-columns:1fr}.publish-preview-grid{grid-template-columns:1fr}.publish-phone-column{border-left:0;border-top:1px solid var(--line-soft);padding:18px 0 0}.publish-phone-column .phone-wrap{position:static!important}.publish-phone-column .phone{width:min(360px,100%)!important;margin:0 auto}.preview-detail-grid{grid-template-columns:1fr}.add-moment-divider span{white-space:normal;text-align:center}.dispatch-summary-five{grid-template-columns:1fr}}
+
+
+/* v4.5 interaction corrections */
+.moment-module-ident{cursor:default}
+.moment-module-summary{cursor:default}
+.moment-module-summary:hover{background:#fff}
+.custom-time-input.time-invalid{border-color:var(--danger)!important;box-shadow:0 0 0 2px rgba(229,72,77,.10)!important}
+.moment-time-notice.error-text{color:var(--danger);font-weight:600}.form-section>.section-title{letter-spacing:.01em}
+
+/* v4.6 static media attachment placeholder */
+.media-attachment-subsection{background:#fff;border-top:1px solid var(--line-soft)}
+.media-attachment-static{min-height:64px;border:1px dashed #c8d4e4;border-radius:9px;background:#fbfcfe;display:flex;align-items:center;gap:14px;padding:14px 16px}
+.media-attachment-button{border-color:#b9cdf2;color:var(--brand);background:#fff;font-weight:600;pointer-events:none;cursor:default}
+.media-attachment-plus{font-size:18px;line-height:1}
+.media-attachment-hint{font-size:12px;color:var(--muted)}
+@media(max-width:680px){.media-attachment-static{align-items:flex-start;flex-direction:column;gap:8px}}
+
+
+/* v4.7：发布时间区域右侧保存并收起 */
+.moment-schedule-layout{display:grid;grid-template-columns:minmax(0,820px) auto;gap:20px;align-items:center}
+.moment-schedule-layout .moment-time-field{max-width:none!important;min-width:0}
+.save-collapse-btn{min-width:116px;height:38px;justify-self:end;white-space:nowrap}
+.moment-module-actions .editing-label{display:inline-flex;align-items:center;height:29px;padding:0 9px;border-radius:5px;background:var(--brand-soft);color:var(--brand);font-size:12px;font-weight:600}
+@media(max-width:980px){.moment-schedule-layout{grid-template-columns:1fr}.save-collapse-btn{justify-self:end}}
+
+
+/* v4.8 素材中心文件夹树 */
+.folder-field-inline{display:inline-flex;align-items:center;gap:8px;color:#475467;font-size:13px}
+.folder-select-trigger{height:36px;min-width:220px;max-width:360px;border:1px solid #d7deea;background:#fff;border-radius:7px;padding:0 10px;display:inline-flex;align-items:center;justify-content:space-between;gap:12px;color:#344054;cursor:pointer;text-align:left}
+.folder-select-trigger:hover{border-color:#aebbd0}.folder-select-trigger:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 2px rgba(50,120,246,.11)}
+.folder-select-trigger.full{width:100%;max-width:none}.folder-select-main{display:flex;align-items:center;gap:8px;min-width:0}.folder-select-main>span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.folder-glyph{color:#e7ad28;font-size:15px}.folder-chevron{color:#7a8799;font-size:16px}
+.material-center-dialog{width:min(1120px,94vw)}.material-center-body{padding:0!important}.material-center-layout{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:510px}.material-folder-panel{border-right:1px solid var(--line);background:#fbfcfe;display:flex;flex-direction:column;min-width:0}.material-folder-head{padding:15px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}.material-folder-head .btn.text{padding:0 3px}.material-content-panel{padding:16px 18px;min-width:0}.material-current-folder{display:grid;gap:2px}.material-current-folder b{font-size:14px}.material-toolbar{margin-bottom:14px;min-height:38px}.material-grid{max-height:445px}
+.folder-tree{padding:8px 6px;overflow:auto;flex:1}.folder-tree-row{height:36px;border-radius:6px;display:flex;align-items:center;gap:5px;padding-right:8px;color:#475467;cursor:pointer;user-select:none}.folder-tree-row:hover{background:#f0f4fa}.folder-tree-row.active{background:#eaf2ff;color:var(--brand);font-weight:600}.folder-tree-toggle{width:18px;height:24px;border:0;background:transparent;color:#8a95a6;padding:0;display:grid;place-items:center;cursor:pointer;font-size:11px}.folder-tree-toggle.placeholder{visibility:hidden}.folder-tree-icon{width:20px;color:#e8ad26;font-size:15px;flex:0 0 auto}.folder-tree-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}.folder-tree-count{font-size:11px;color:#98a2b3}.folder-tree-row.active .folder-tree-count{color:#6f9be9}.folder-tree-all{border-bottom:1px solid #edf0f5;margin-bottom:5px;padding-bottom:5px}
+.folder-picker-dialog{width:min(620px,90vw)}.folder-picker-summary{padding:10px 12px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;gap:10px;color:#667085}.folder-picker-summary b{color:#344054}.folder-picker-toolbar{display:flex;gap:8px;margin:12px 0}.folder-picker-tree{height:320px;border:1px solid var(--line);border-radius:8px;background:#fff}.folder-create-dialog{width:min(500px,90vw)}.folder-create-form{display:grid;gap:16px}.folder-create-form label{display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;align-items:center;color:#475467;font-weight:600}.folder-parent-display{height:36px;border:1px solid #e4e8ef;background:#f7f9fc;border-radius:7px;padding:7px 10px;color:#667085;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:980px){.material-center-layout{grid-template-columns:220px minmax(0,1fr)}.material-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* v4.8.1 信息减法、素材统一与就近预览 */
+.basic-info-section{padding-bottom:20px}.basic-info-card{padding:18px}.basic-info-row{display:grid;grid-template-columns:minmax(240px,.65fr) minmax(420px,1.35fr);gap:24px;align-items:center}.basic-info-row .title-input-wrap{width:100%}
+.moment-module-head{padding:12px 16px}.moment-module-ident{grid-template-columns:auto minmax(180px,360px) auto!important;gap:10px!important;flex:1}.rule-name-wrap{position:relative;min-width:0}.rule-name-input{width:100%;height:34px;padding:0 58px 0 10px;border:1px solid transparent;background:transparent;border-radius:6px;font-weight:700;color:#1f2937;outline:none}.rule-name-input:hover{border-color:#d7deea;background:#fff}.rule-name-input:focus{border-color:var(--brand);background:#fff;box-shadow:0 0 0 2px rgba(50,120,246,.10)}.rule-name-count{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;color:#98a2b3;pointer-events:none}.moment-module-ident .badge{justify-self:start}.moment-module-actions{flex:0 0 auto}.moment-module-summary{grid-template-columns:170px minmax(280px,1fr) 110px!important}.summary-material b{font-weight:700}.module-issue{grid-column:1/-1}
+.schedule-config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.schedule-config-block{min-width:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fff}.schedule-config-block .moment-subsection-title{margin-bottom:10px}.schedule-config-block .moment-time-options{grid-template-columns:repeat(2,minmax(0,1fr))!important}.validity-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.validity-option{min-height:76px;border:1px solid #d7deea;border-radius:9px;padding:12px;display:flex;gap:9px;align-items:flex-start;cursor:pointer;background:#fff}.validity-option:has(input:checked){border-color:#a9c7ff;background:#f7faff}.validity-option input{accent-color:var(--brand);margin-top:3px}.validity-option span{display:grid;gap:3px}.validity-option small{font-size:12px;color:#7a8799}.custom-validity-input{width:100%;margin-top:10px}.custom-validity-input.time-invalid{border-color:var(--danger)!important;box-shadow:0 0 0 2px rgba(229,72,77,.10)!important}.schedule-action-row{display:flex;justify-content:flex-end;margin-top:16px}.save-collapse-btn{justify-self:auto!important}
+.existing-image-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.existing-drop-area.material-entry{grid-column:1/-1;min-height:150px}.existing-material-card{grid-column:1/-1;border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff}.existing-material-main{display:flex;align-items:center;gap:12px;min-width:0}.existing-material-icon{width:48px;height:48px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:22px;flex:0 0 auto}.existing-material-info{display:grid;gap:4px;min-width:0}.existing-material-info b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.existing-material-actions{display:flex;gap:8px;flex:0 0 auto}
+.material-type-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.material-type-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:18px;text-align:left;display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:12px;cursor:pointer}.material-type-card:hover{border-color:#a9c7ff;background:#f8fbff}.material-type-icon{grid-row:1/3;width:42px;height:42px;border-radius:9px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:20px}.material-type-card b{font-size:14px}.material-type-card small{font-size:12px;color:#7a8799;margin-top:3px}
+.quick-preview-dialog{width:min(760px,92vw)}.quick-preview-body{display:grid;grid-template-columns:minmax(220px,1fr) 340px;gap:24px;align-items:start}.quick-preview-summary{display:grid;gap:0;border:1px solid var(--line);border-radius:10px;background:#fbfcfe}.quick-preview-summary>div{padding:13px 14px;border-bottom:1px solid var(--line-soft);display:grid;gap:5px}.quick-preview-summary>div:last-child{border-bottom:0}.quick-preview-summary span{font-size:12px;color:#7a8799}.quick-preview-summary b{font-size:13px;color:#344054}.quick-preview-phone{width:330px!important;height:540px!important;margin:0 auto}.phone-material-card{margin-top:10px;border:1px solid #e1e6ef;border-radius:8px;background:#f7f9fc;padding:10px;display:flex;align-items:center;gap:9px}.phone-material-card .icon{width:36px;height:36px;border-radius:7px;background:#eaf2ff;color:var(--brand);display:grid;place-items:center;flex:0 0 auto}.phone-material-card .info{display:grid;gap:2px;min-width:0}.phone-material-card b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.phone-material-card span{font-size:11px;color:#8a95a6}
+.dispatch-summary-six{grid-template-columns:repeat(3,minmax(0,1fr))!important}.dispatch-summary-six .dispatch-row{display:block;padding:12px 14px;border-bottom:1px solid var(--line-soft);border-right:1px solid var(--line-soft)}.dispatch-summary-six .dispatch-row:nth-child(3n){border-right:0}.dispatch-summary-six .dispatch-row:nth-last-child(-n+3){border-bottom:0}.dispatch-summary-six .dispatch-key{display:block;margin-bottom:7px}.dispatch-summary-six .dispatch-value{min-height:28px}.sop-overview-row{grid-template-columns:48px 140px minmax(150px,.7fr) minmax(180px,1.3fr) 86px 82px 68px!important}
+@media(max-width:1100px){.basic-info-row{grid-template-columns:1fr}.schedule-config-grid{grid-template-columns:1fr}.quick-preview-body{grid-template-columns:1fr}.dispatch-summary-six{grid-template-columns:repeat(2,minmax(0,1fr))!important}.dispatch-summary-six .dispatch-row:nth-child(3n){border-right:1px solid var(--line-soft)}.dispatch-summary-six .dispatch-row:nth-child(2n){border-right:0}.dispatch-summary-six .dispatch-row:nth-last-child(-n+3){border-bottom:1px solid var(--line-soft)}.dispatch-summary-six .dispatch-row:nth-last-child(-n+2){border-bottom:0}}
+@media(max-width:680px){.moment-module-ident{grid-template-columns:auto minmax(0,1fr)!important}.moment-module-ident .badge{grid-column:2}.moment-module-actions{width:100%;justify-content:flex-end}.moment-module-summary{grid-template-columns:1fr!important}.validity-options,.material-type-grid{grid-template-columns:1fr}.dispatch-summary-six{grid-template-columns:1fr!important}.dispatch-summary-six .dispatch-row{border-right:0!important;border-bottom:1px solid var(--line-soft)!important}.dispatch-summary-six .dispatch-row:last-child{border-bottom:0!important}.quick-preview-phone{width:min(330px,100%)!important}}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">慧</div><div>慧企SCRM</div></div>
+    <div class="menu">
+      <div class="menu-item">运营日历</div><div class="menu-item">客户运营<span class="arrow">⌄</span></div><div class="menu-item">群聊运营<span class="arrow">⌄</span></div><div class="menu-item">朋友圈运营<span class="arrow">⌃</span></div>
+      <div class="menu-child"><div>朋友圈管理</div><div class="active">发布朋友圈</div><div>发布计划</div><div>朋友圈统计</div></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="shell">
+      <section id="listPage" class="page active">
+        <div class="topbar"><div class="title-row"><div class="title">发布朋友圈</div><div class="sub">创建群发任务并通知成员发送，可用于商品/活动推广、日常客情维护、品牌宣传</div></div><div class="row"><button class="btn primary">更新数据</button><button class="btn text">查看功能说明</button></div></div>
+        <div class="notice">每位客户的微信朋友圈每天最多可展示 3 条成员发表的内容，企业和成员每天共用客户 3 条频率，请合理使用发表次数。</div>
+        <div class="filterbar"><div class="field">任务名称：<input class="input" style="width:180px" placeholder="请输入任务名称"></div><div class="field">朋友圈内容：<input class="input" style="width:180px" placeholder="请输入朋友圈内容"></div><div class="field">发布状态：<select class="select" style="width:120px"><option>不限</option></select></div><button class="btn primary">查询</button><button class="btn">重置</button></div>
+        <div class="table-actions"><button id="openAiBtn" class="btn primary">创建AI朋友圈</button></div>
+        <table><thead><tr><th>任务名称</th><th>朋友圈内容</th><th>发布状态</th><th>任务下发进度</th><th>已发表/需发表</th><th>客户点赞</th><th>客户评论</th><th>创建人</th><th>创建时间</th><th>操作</th></tr></thead><tbody>
+          <tr><td class="link">0528测试1-副本</td><td><div class="row"><div class="thumb">图</div>哈哈哈哈</div></td><td>已完成</td><td class="link">1/1</td><td>0/1</td><td>-</td><td>-</td><td>张三</td><td>2026-05-28 14:33</td><td><span class="link">详情</span>　<span class="link" style="color:#ef4444">删除</span></td></tr>
+          <tr><td class="link">双11连衣裙活动</td><td><div class="row"><div class="thumb">图</div>双11活动提醒...</div></td><td>待发布</td><td class="link">0/3</td><td>0/3</td><td>-</td><td>-</td><td>王超</td><td>2026-07-15 10:40</td><td><span class="link">详情</span>　<span class="link" style="color:#ef4444">删除</span></td></tr>
+        </tbody></table>
+        <div class="pager"><span>共 25 条</span><div class="page-btn">‹</div><div class="page-btn active">1</div><div class="page-btn">2</div><div class="page-btn">3</div><div class="page-btn">›</div></div>
+      </section>
+
+      <section id="aiPage" class="page">
+        <div class="ai-head"><div class="title-row"><div class="title">创建AI朋友圈</div><div class="sub">默认创建一个朋友圈任务，需要连续发布时可按需新增</div></div><div class="row"><div class="draft-state"><span class="badge blue">草稿</span><span id="draftStatus">未修改</span></div><button id="backListBtn" class="btn primary">返回</button></div></div>
+        <div id="workspace" class="workspace form-workspace">
+          <div id="step1Panel" class="form-section audience-step-panel">
+            <div class="section-title">第一步：设置推送范围</div><div class="section-desc">选择负责发布的员工，并确定本次朋友圈可见的客户范围。</div>
+            <div class="surface employee-scope-card" style="margin-bottom:16px">
+              <div class="surface-hd"><div><div class="label required">发布员工</div><div class="tiny">选择负责执行本次朋友圈发布的员工</div></div><button id="chooseEmployeesBtn" class="btn primary">选择员工</button></div>
+              <div class="surface-bd"><div id="employeeResult" class="employee-result"><span class="tiny">尚未选择员工</span></div></div>
+            </div>
+            <div class="audience-source-switch" role="tablist" aria-label="圈人方式">
+              <button class="audience-source-tab active" data-audience-source="ai" type="button"><span class="sparkle">✦</span> AI智能圈人</button>
+              <button class="audience-source-tab" data-audience-source="tag" type="button">标签圈人</button>
+            </div>
+            <div id="aiAudiencePanel" class="surface audience-source-panel smart-audience-panel">
+              <div id="smartAudienceCreate" class="smart-create-view">
+                <div class="smart-query-box">
+                  <div class="smart-icon">✦</div>
+                  <input id="smartAudienceQuery" class="smart-query-input" maxlength="100" placeholder="描述想要的人群，例如：帮我看看近期入会但还没购买的用户有哪些" />
+                  <button id="smartCreateBtn" class="btn primary large" type="button">开始创建</button>
+                </div>
+                <div class="smart-suggestions"><span class="smart-suggest-label">猜你想找：</span><button type="button" data-smart-suggest="请帮我创建已购买但未入会人群">已购买未入会</button><button type="button" data-smart-suggest="圈选所有收藏加购但还未购买的用户">收藏加购未购买</button><button type="button" data-smart-suggest="帮我创建有访问无购买人群">有访问无购买</button><button type="button" data-smart-suggest="帮我查找店铺会员人群">店铺会员</button><button type="button" data-smart-suggest="创建180天已购买会员人群">180天已购会员</button></div>
+                <div class="smart-disclaimer">AI生成结果仅供参考，请在使用前核对人群条件。</div>
+              </div>
+              <div id="smartAudienceReport" class="smart-report hidden">
+                <div class="smart-report-head"><div><div class="smart-report-title-row"><strong id="smartAudienceName">AI人群</strong><span id="smartAppliedBadge" class="badge green hidden">已使用</span></div><div class="tiny">根据你的描述生成</div></div><div class="row"><span class="smart-confidence"><i></i><span id="smartConfidence">高置信度</span></span><span class="smart-size">预计规模：<b id="smartEstimatedSize">0</b></span></div></div>
+                <div class="smart-insight"><div class="smart-insight-title">💡 AI洞察</div><div id="smartAudienceInsight"></div></div>
+                <div class="smart-rule-block"><div class="row between"><div><div class="smart-rule-title">人群条件</div><div class="tiny">以下条件取交集</div></div><button id="adjustSmartAudienceBtn" class="btn text" type="button">重新调整</button></div><div id="smartRuleChips" class="smart-rule-chips"></div></div>
+                <div class="smart-report-actions"><button id="regenerateSmartAudienceBtn" class="btn" type="button">重新生成</button><button id="applySmartAudienceBtn" class="btn primary" type="button">使用该人群</button></div>
+              </div>
+            </div>
+            <div id="tagAudiencePanel" class="surface audience-source-panel hidden"><div class="audience-form">
+              <div class="form-row"><div class="form-label required">可见客户</div><div class="row" style="padding-top:5px"><label class="radio"><input id="audienceAll" type="radio" name="audience" value="all" checked> 全部客户</label><label class="radio"><input id="audiencePartial" type="radio" name="audience" value="partial"> 部分客户</label></div></div>
+              <div id="tagRow" class="form-row hidden"><div class="form-label"></div><div><button id="chooseTagsBtn" class="btn">选择标签</button><div id="selectedTagResult" class="tag-result" style="margin-top:10px"><span class="tiny">尚未选择标签</span></div></div></div>
+              <div class="form-row"><div class="form-label required">估算人数</div><div><button id="estimateBtn" class="btn">估算推送人数</button><div id="estimateResult" class="estimate-box hidden"></div></div></div>
+            </div></div>
+          </div>
+          <div id="step2Panel" class="form-section sop-content-section">
+            <div class="section-title">第二步：设置朋友圈内容</div>
+            <div class="section-desc">默认创建一个朋友圈任务。需要连续发布预热、宣传、提醒等内容时，可在完成当前任务后继续新增。</div>
+            <div class="moment-content-toolbar">
+              <div><span class="label">朋友圈任务</span><span id="momentCountLabel" class="tiny moment-count-label"></span></div>
+            </div>
+            <div id="momentList" class="moment-modules"></div>
+            <div id="momentEditorParking" class="hidden">
+  <div id="momentEditor" class="moment-editor surface">
+    <div class="moment-subsection">
+      <div class="moment-subsection-title"><span>朋友圈文案</span><span class="tiny">最多1000字</span></div>
+      <div class="source-switch">
+        <div class="source-tab active" data-copy-source="ai">AI生成文案</div>
+        <div class="source-tab" data-copy-source="manual">使用已有文案</div>
+      </div>
+      <div class="copy-layout compact-copy-layout">
+        <div class="surface copy-source-panel">
+          <div id="copyAiSource" class="generator-box compact-generator">
+            <div class="copy-config-head"><div class="label">文案诉求</div></div>
+            <div class="copy-toolbar">
+              <div class="template-chips compact-chips">
+                <div class="template-chip active" data-template="new">新品宣传</div>
+                <div class="template-chip" data-template="double11">618活动</div>
+                <div class="template-chip" data-template="intent">高意向跟进</div>
+                <div class="template-chip" data-template="old">老客维护</div>
+              </div>
+              <div class="count-picker"><label class="tiny" for="copyCountSelect">生成数量</label><select id="copyCountSelect" class="select copy-count-select"><option value="1" selected>1条</option><option value="2">2条</option><option value="3">3条</option><option value="4">4条</option><option value="5">5条</option><option value="6">6条</option></select></div>
+            </div>
+            <div id="copyAudienceContext" class="context-bar hidden"></div>
+            <div id="audienceCopyNotice" class="edit-warning hidden">推送人群已调整，建议重新确认当前文案。</div>
+            <textarea id="copyGoal" class="textarea compact-goal" rows="3" placeholder="例如：生成一条618活动预热朋友圈，先制造期待感，不直接堆叠完整优惠规则。"></textarea>
+            <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="generateCopyBtn" class="btn primary">生成文案</button></div>
+            <div class="candidate-head"><span class="label">候选文案</span><span class="tiny">点击后在右侧编辑</span></div>
+            <div id="copyList" class="copy-list compact-copy-list"><div class="tiny empty-copy-state">还没有生成候选文案</div></div>
+          </div>
+          <div id="copyManualSource" class="generator-box compact-generator hidden">
+            <div class="label" style="margin-bottom:8px">已有文案</div>
+            <textarea id="manualSourceCopy" class="textarea manual-source-editor" rows="10" maxlength="1000" placeholder="直接粘贴已经写好的朋友圈内容"></textarea>
+            <div class="row between" style="margin-top:12px"><span class="tiny">复制到最终编辑器后仍可修改</span><button id="applyManualCopyBtn" class="btn primary">使用这条文案</button></div>
+          </div>
+        </div>
+        <div class="surface editor-box compact-editor-box">
+          <div class="editor-head"><div><div class="label">最终使用文案</div></div><button id="restoreCopyBtn" class="btn small" disabled>恢复原文</button></div>
+          <textarea id="finalCopy" class="textarea final-editor compact-final-editor" maxlength="1000" placeholder="请选择一条AI文案，或使用已有文案"></textarea>
+          <div id="copyCharCount" class="char-count">0 / 1000</div>
+          <div id="copyImageWarning" class="edit-warning hidden">文案已修改，请确认现有图片是否仍然匹配。</div>
+        </div>
+      </div>
+    </div>
+    <div class="moment-subsection image-subsection">
+      <div class="image-step-head">
+        <div><div class="moment-subsection-title">朋友圈素材</div></div>
+        <label class="radio no-image"><input id="noImageCheck" type="checkbox"> 本条朋友圈不使用素材</label>
+      </div>
+      <div class="source-switch image-source-switch">
+        <div class="source-tab active" data-image-source="ai">AI生成图片</div>
+        <div class="source-tab" data-image-source="existing">使用已有素材</div>
+      </div>
+      <div id="imageContent">
+        <div id="copyChangedNotice" class="edit-warning hidden" style="margin-bottom:14px"><div class="row between"><span>文案已修改，请确认图片是否仍然合适。</span><button id="confirmCopyImageMatch" class="btn small">已确认仍匹配</button></div></div>
+        <div id="aiImageSource"><div id="slotList" class="slot-list"></div><div id="addSlotBtn" class="add-slot"><span class="plus">+</span> 新增一张图片</div></div>
+        <div id="existingImageSource" class="hidden"><div class="existing-upload-head"><div><div class="label">已有素材</div></div></div><div id="existingImageGrid" class="existing-image-grid"></div></div>
+      </div>
+    </div>
+    <div class="moment-subsection moment-schedule-subsection"></div>
+  </div>
+</div>
+<div class="add-moment-zone"><div class="add-moment-divider"><span>保存并收起当前朋友圈后，可继续创建下一条</span></div><button id="addMomentBtn" class="add-moment-entry" type="button"><span class="plus">+</span><span><b>继续新建一个朋友圈任务</b><small>共用发布员工和可见客户</small></span></button></div>
+          </div>
+          <div id="step4Panel" class="form-section publish-section">
+            <div class="section-title">第三步：预览并确认发布</div>
+            <div class="section-desc">检查执行员工、可见客户、各任务发布时间和朋友圈实际发布效果。</div>
+            <div class="publish-preview-grid">
+              <div class="publish-preview-main">
+                <div class="review-section dispatch-summary-card">
+                  <div class="surface-hd"><div class="label">发布范围</div></div>
+                  <div class="surface-bd dispatch-summary dispatch-summary-five">
+                    <div class="dispatch-row"><span class="dispatch-key">执行员工</span><div id="reviewEmployeeSummary" class="dispatch-value">尚未选择员工</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">可见客户</span><div id="reviewCustomerSummary" class="dispatch-value">尚未确定客户范围</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">预计人数</span><div id="reviewEstimatedSummary" class="dispatch-value">—</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">任务数量</span><div id="reviewMomentCount" class="dispatch-value">1个</div></div>
+                    <div class="dispatch-row"><span class="dispatch-key">执行周期</span><div id="reviewCycleSummary" class="dispatch-value">待设置</div></div>
+                  </div>
+                </div>
+                <div id="previewToolbar" class="preview-toolbar">
+                  <div class="preview-view-switch"><button id="previewViewSingleBtn" class="preview-view-btn active">单条预览</button><button id="previewViewOverviewBtn" class="preview-view-btn">发布计划</button></div>
+                  <div class="tiny">多条任务按发布时间排列，可点击节点或左右切换。</div>
+                </div>
+                <div id="scheduleNotice" class="schedule-notice hidden"></div>
+                <div id="previewNavShell" class="preview-nav-shell"><button id="previewPrevBtn" class="preview-arrow" aria-label="上一条">‹</button><div id="previewNavTrack" class="preview-nav-track"></div><button id="previewNextBtn" class="preview-arrow" aria-label="下一条">›</button></div>
+                <div id="singlePreviewPane" class="single-preview-pane">
+                  <div id="previewCurrentCard" class="preview-current-card">
+                    <div class="preview-current-top"><div><div id="previewCounter" class="preview-counter">1 / 1</div><div id="previewStageName" class="preview-stage-name">未命名任务</div><div id="previewSchedule" class="preview-schedule">立即发送</div></div><button id="editPreviewMomentBtn" class="btn primary">编辑当前任务</button></div>
+                    <div class="preview-detail-grid">
+                      <div><span>文案</span><b id="previewCopySummary">尚未确定文案</b></div>
+                      <div><span>图片</span><b id="previewImageSummary">0张</b></div>
+                      <div><span>完成状态</span><b id="previewStatusSummary">待完善</b></div>
+                    </div>
+                    <div id="previewGuidance" class="preview-guidance">检查当前任务的文案、图片和发布时间。</div>
+                  </div>
+                </div>
+                <div id="sopOverviewPane" class="sop-overview-pane hidden"><div class="sop-overview-head"><div><div class="label">发布计划</div><div class="tiny">任务会自动按发布时间排列；相同时间保持创建顺序。</div></div></div><div id="sopOverviewList" class="sop-overview-list"></div></div>
+              </div>
+              <div class="publish-phone-column">
+                <div class="phone-wrap"><div class="phone-title-row"><div class="phone-title">效果预览</div><div id="imageSortHint" class="tiny hidden">拖动图片调整当前任务图片顺序</div></div><div id="phonePreview" class="phone"><div class="phone-status"><span>9:41</span><span>▮▮ ◔</span></div><div class="phone-nav"><span>‹</span><b>朋友圈</b><span>•••</span></div><div class="moment"><div class="user-line"><div class="avatar"></div><div class="moment-main"><div id="phoneUserName" class="user-name">发布员工</div><div id="phoneCopy" class="moment-copy"></div><div id="phoneImages" class="moment-images"></div><div class="moment-meta"><span id="phoneTime">刚刚</span><span class="more-box">••</span></div></div></div></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom-bar form-bottom-bar"><div class="bottom-status">内容会自动保存为草稿</div><div class="row"><button id="cancelCreateBtn" class="btn large">取消</button><button id="createTaskBtn" class="btn primary large">保存</button></div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div id="tagModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">选择标签</div><button class="close-btn" data-close="tagModal">×</button></div><div class="modal-bd"><div class="tag-modal-layout"><div class="tag-left"><div class="tag-search"><input id="tagSearch" class="input" style="flex:1" placeholder="输入关键词"><button id="tagSearchBtn" class="btn primary">查询</button><button id="selectAllVisibleTags" class="btn text">全选</button></div><div id="tagCategoryList" class="tag-list"></div></div><div class="tag-right"><div class="selected-head"><span>已选择 <b id="selectedTagCount">0</b> 个标签</span><span id="clearTagsBtn" class="link">清空</span></div><div id="selectedTagBody" class="selected-body"></div></div></div></div><div class="modal-ft"><button class="btn" data-close="tagModal">取消</button><button id="confirmTagsBtn" class="btn primary">确定</button></div></div></div>
+<div id="imageSourceModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title" id="imageSourceTitle">添加图片</div><button class="close-btn" data-close="imageSourceModal">×</button></div><div class="modal-bd"><div class="source-choice"><div id="chooseLocalSource" class="choice-card"><div class="label">从本地上传</div><div class="tiny" style="margin-top:6px">选择电脑中的真实图片，可批量上传</div></div><div id="chooseMaterialSource" class="choice-card"><div class="label">从素材中心导入</div><div class="tiny" style="margin-top:6px">按文件夹查找并选择已有素材</div></div></div></div><div class="modal-ft"><button class="btn" data-close="imageSourceModal">取消</button></div></div></div>
+<input id="realImageInput" type="file" accept="image/*" multiple hidden>
+<div id="localUploadModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">确认上传图片</div><button class="close-btn" data-close="localUploadModal">×</button></div><div class="modal-bd"><div class="upload-option-row"><label class="checkbox-line"><input id="saveToMaterialCheck" type="checkbox"> 同时保存到素材中心</label><div id="uploadFolderWrap" class="folder-field-inline hidden"><span>所属文件夹</span><button id="uploadFolderTrigger" class="folder-select-trigger" type="button"><span class="folder-select-main"><span class="folder-glyph">▰</span><span id="uploadFolderLabel">未分类</span></span><span class="folder-chevron">⌄</span></button></div></div><div id="localUploadList" class="local-upload-list"></div></div><div class="modal-ft"><button class="btn" data-close="localUploadModal">取消</button><button id="confirmLocalUploadBtn" class="btn primary">确认上传</button></div></div></div>
+<div id="materialCenterModal" class="modal-mask"><div class="modal material-center-dialog"><div class="modal-hd"><div class="modal-title">从素材中心导入</div><button class="close-btn" data-close="materialCenterModal">×</button></div><div class="modal-bd material-center-body"><div class="material-center-layout"><aside class="material-folder-panel"><div class="material-folder-head"><div><b>素材文件夹</b><div class="tiny">支持多级文件夹管理</div></div><button id="createRootFolderBtn" class="btn text small" type="button">＋ 新建文件夹</button></div><div id="materialFolderTree" class="folder-tree"></div></aside><section class="material-content-panel"><div class="material-toolbar"><div class="material-current-folder"><b id="currentMaterialFolderName">全部素材</b><span id="currentMaterialFolderPath" class="tiny">查看全部文件夹中的素材</span></div><div class="row"><button id="createChildFolderBtn" class="btn small" type="button">新建子文件夹</button><span id="materialPickHint" class="tiny"></span></div></div><div id="materialGrid" class="material-grid"></div></section></div></div><div class="modal-ft"><button class="btn" data-close="materialCenterModal">取消</button><button id="confirmMaterialPickBtn" class="btn primary">导入选中图片</button></div></div></div>
+<div id="materialSaveModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">保存到素材中心</div><button class="close-btn" data-close="materialSaveModal">×</button></div><div class="modal-bd"><div class="material-save-form"><div class="material-preview"><img id="materialSavePreview" alt="素材预览"></div><div class="material-save-fields"><label><span>所属文件夹</span><button id="materialSaveFolderTrigger" class="folder-select-trigger full" type="button"><span class="folder-select-main"><span class="folder-glyph">▰</span><span id="materialSaveFolderLabel">未分类</span></span><span class="folder-chevron">⌄</span></button></label><label><span>标题</span><div class="title-input-wrap"><input id="materialSaveTitle" class="input" maxlength="20" placeholder="请输入标题"><span id="materialSaveCount">0/20</span></div></label></div></div></div><div class="modal-ft"><button class="btn" data-close="materialSaveModal">取消</button><button id="confirmMaterialSaveBtn" class="btn primary">确认保存</button></div></div></div>
+<div id="folderPickerModal" class="modal-mask"><div class="modal small folder-picker-dialog"><div class="modal-hd"><div class="modal-title">选择素材文件夹</div><button class="close-btn" data-close="folderPickerModal">×</button></div><div class="modal-bd"><div class="folder-picker-summary"><span>当前选择</span><b id="folderPickerCurrentPath">未分类</b></div><div class="folder-picker-toolbar"><button id="folderPickerNewRootBtn" class="btn small" type="button">＋ 新建文件夹</button><button id="folderPickerNewChildBtn" class="btn small" type="button">＋ 新建子文件夹</button></div><div id="folderPickerTree" class="folder-tree folder-picker-tree"></div></div><div class="modal-ft"><button class="btn" data-close="folderPickerModal">取消</button><button id="confirmFolderPickerBtn" class="btn primary">确定</button></div></div></div>
+<div id="folderCreateModal" class="modal-mask"><div class="modal small folder-create-dialog"><div class="modal-hd"><div class="modal-title" id="folderCreateTitle">新建文件夹</div><button class="close-btn" data-close="folderCreateModal">×</button></div><div class="modal-bd"><div class="folder-create-form"><label><span>上级文件夹</span><div id="folderCreateParentPath" class="folder-parent-display">素材中心</div></label><label><span>文件夹名称</span><input id="folderCreateName" class="input" maxlength="20" placeholder="请输入文件夹名称"></label><div class="tiny">支持继续在新建文件夹下创建下一级文件夹。</div></div></div><div class="modal-ft"><button class="btn" data-close="folderCreateModal">取消</button><button id="confirmFolderCreateBtn" class="btn primary">确认新建</button></div></div></div>
+
+<div id="taskConfirmModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">确认保存朋友圈任务</div><button class="close-btn" data-close="taskConfirmModal">×</button></div><div class="modal-bd"><div id="confirmTaskWarning" class="confirm-warning">本次将创建独立的朋友圈任务，共用发布员工和可见客户。</div><div class="confirm-summary"><div class="confirm-row"><span class="k">任务名称</span><span id="confirmTaskName" class="v confirm-task-names">-</span></div><div class="confirm-row"><span class="k">可见客户</span><span id="confirmAudience" class="v">-</span></div><div class="confirm-row"><span class="k">发布员工</span><span id="confirmEmployees" class="v">-</span></div><div class="confirm-row"><span class="k">创建任务数</span><span id="confirmMomentCount" class="v">-</span></div><div class="confirm-row"><span class="k">执行周期</span><span id="confirmCycle" class="v">-</span></div></div></div><div class="modal-ft"><button class="btn" data-close="taskConfirmModal">取消</button><button id="confirmCreateTaskBtn" class="btn primary">确认保存</button></div></div></div>
+<div id="deleteMomentModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">删除朋友圈</div><button class="close-btn" data-close="deleteMomentModal">×</button></div><div class="modal-bd"><div class="confirm-warning">删除后，该朋友圈任务的文案、图片和发布时间都会移除。</div><div>确定删除“<b id="deleteMomentName">当前任务</b>”吗？</div></div><div class="modal-ft"><button class="btn" data-close="deleteMomentModal">取消</button><button id="confirmDeleteMomentBtn" class="btn danger">确认删除</button></div></div></div>
+<div id="employeeModal" class="modal-mask"><div class="modal"><div class="modal-hd"><div class="modal-title">选择员工</div><button class="close-btn" data-close="employeeModal">×</button></div><div class="modal-bd"><div class="row" style="margin-bottom:12px"><select class="select" style="width:110px"><option>员工姓名</option></select><input class="input" style="width:300px" placeholder="输入关键词"><button class="btn primary">查询</button><div style="margin-left:auto" class="tiny">已选 <b id="employeeCount">0</b> 名员工　<span id="clearEmployeesBtn" class="link">清空</span></div></div><div class="employee-layout"><div class="employee-panel"><div class="employee-panel-hd">组织架构 / 员工标签</div><div class="employee-panel-bd"><div class="tree-row active">慧博科技研发</div><div class="tree-row">私域运营组</div><div class="tree-row">西安交付组</div></div></div><div class="employee-panel"><div class="employee-panel-hd">部门下所有</div><div id="employeeList" class="employee-panel-bd"></div></div><div class="employee-panel"><div class="employee-panel-hd">已选员工</div><div id="selectedEmployeeList" class="employee-panel-bd"></div></div></div></div><div class="modal-ft"><button class="btn" data-close="employeeModal">取消</button><button id="confirmEmployeesBtn" class="btn primary">确定</button></div></div></div>
+<div id="toast" class="toast"></div>
+<style>
+/* v4.8.3 — compact scope, four-column summaries, local preview sorting, lightweight submit */
+#basicInfoPanel,#step1Panel .employee-scope-card,#step1Panel .audience-source-switch,#step1Panel .audience-source-panel{width:100%;max-width:900px;margin-left:0;margin-right:auto}
+#basicInfoPanel{padding-bottom:18px}.basic-info-card{padding:18px}.basic-info-row{display:grid;grid-template-columns:92px minmax(280px,400px);gap:14px;align-items:center}.basic-info-row .form-field-label{text-align:right}.basic-info-row .title-input-wrap{width:100%}
+#step1Panel>.section-desc,#step2Panel>.section-desc,.employee-scope-card .surface-hd .tiny,.moment-content-toolbar,.add-moment-divider,.moment-editor-head,.moment-name-subsection,.media-attachment-subsection{display:none!important}
+#step1Panel .employee-scope-card{margin-top:0!important;margin-bottom:14px!important}#step1Panel .audience-source-switch{display:flex;margin-top:0;margin-bottom:14px}#step1Panel .audience-source-panel{min-height:0}.smart-audience-panel{padding:18px 20px}.audience-form{padding:18px 20px}
+#step4Panel{display:none!important}.form-bottom-bar{justify-content:flex-end}.form-bottom-bar .bottom-status{display:none!important}
+.moment-module-ident{grid-template-columns:auto minmax(120px,260px) auto!important;gap:8px!important}.rule-name-input{max-width:260px}.rule-name-count{display:none}.rule-name-input:focus+.rule-name-count{display:block}
+.moment-module-summary{grid-template-columns:140px 150px minmax(260px,1fr) 90px!important;gap:16px;padding:14px 16px}.moment-module-summary>div{min-width:0}.summary-validity b,.summary-material b{font-weight:700}.summary-copy span:last-child{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.add-moment-zone{width:100%;max-width:none!important;display:flex;justify-content:flex-end;margin-top:16px!important;padding-top:0!important}.add-moment-entry{width:auto!important;min-height:36px!important;margin:0!important;padding:0 16px!important;border-style:solid!important;border-radius:6px!important;background:#fff!important;gap:6px!important}.add-moment-entry .plus{font-size:18px!important}.add-moment-entry span:last-child{display:block!important}.add-moment-entry b{font-size:13px!important}.add-moment-entry small{display:none!important}
+.image-step-head .tiny,.existing-upload-head .tiny,.moment-schedule-subsection>.moment-subsection-title>.tiny{display:none!important}
+.schedule-config-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.schedule-config-block{min-width:0;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fff}.schedule-config-block .moment-subsection-title{margin-bottom:10px}.schedule-config-block .moment-time-options{grid-template-columns:repeat(2,minmax(0,1fr))!important}.validity-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.validity-option{min-height:74px;border:1px solid #d7deea;border-radius:9px;padding:11px;display:flex;gap:9px;align-items:flex-start;cursor:pointer;background:#fff}.validity-option:has(input:checked){border-color:#a9c7ff;background:#f7faff}.validity-option input{accent-color:var(--brand);margin-top:3px}.validity-option span{display:grid;gap:2px}.validity-option small{font-size:12px;color:#7a8799}.custom-validity-input{width:100%;margin-top:10px}.schedule-action-row{display:flex;justify-content:flex-end;margin-top:16px}
+.material-type-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.material-type-card{border:1px solid var(--line);border-radius:10px;background:#fff;padding:17px;text-align:left;display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:12px;cursor:pointer}.material-type-card:hover{border-color:#a9c7ff;background:#f8fbff}.material-type-icon{grid-row:1/3;width:42px;height:42px;border-radius:9px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:20px}.material-type-card small{font-size:12px;color:#7a8799;margin-top:3px}.existing-material-card{grid-column:1/-1;border:1px solid var(--line);border-radius:10px;padding:15px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff}.existing-material-main{display:flex;align-items:center;gap:12px;min-width:0}.existing-material-icon{width:46px;height:46px;border-radius:10px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:20px;flex:0 0 auto}.existing-material-info{display:grid;gap:3px;min-width:0}.existing-material-info b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.existing-material-actions{display:flex;gap:8px}
+.preview-popover-mask{background:transparent!important;align-items:flex-start!important;justify-content:flex-start!important}.quick-preview-dialog{position:fixed;width:350px!important;max-height:none!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}.preview-popover-close{position:absolute;right:-8px;top:-8px;width:28px;height:28px;border:1px solid #d8dee8;border-radius:50%;background:#fff;color:#667085;box-shadow:0 3px 10px rgba(15,23,42,.15);z-index:3}.quick-preview-phone{width:330px!important;height:540px!important;margin:0!important}.quick-preview-phone .moment{height:calc(100% - 60px)}.quick-preview-phone .moment-images.sortable .moment-image-item{cursor:grab;position:relative;border-radius:3px;overflow:hidden}.quick-preview-phone .moment-image-item.dragging{opacity:.45;outline:2px solid var(--brand)}.quick-preview-phone .moment-image-item.drag-over{outline:2px solid var(--brand);outline-offset:1px}.quick-preview-phone .drag-mark{display:none;position:absolute;right:4px;top:4px;width:22px;height:22px;border-radius:5px;background:rgba(17,24,39,.72);color:#fff;place-items:center;font-size:12px;z-index:2}.quick-preview-phone .moment-images.sortable .drag-mark{display:grid}.phone-material-card{margin-top:9px;border:1px solid #e1e6ef;border-radius:8px;background:#f7f9fc;padding:10px;display:flex;align-items:center;gap:9px}.phone-material-card .icon{width:36px;height:36px;border-radius:7px;background:#eaf2ff;color:var(--brand);display:grid;place-items:center}.phone-material-card .info{display:grid;gap:2px;min-width:0}.phone-material-card b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.phone-material-card span{font-size:11px;color:#8a95a6}
+.confirm-schedule-list{margin-top:14px;border:1px solid var(--line);border-radius:8px;overflow:hidden}.confirm-schedule-head,.confirm-schedule-row{display:grid;grid-template-columns:48px minmax(110px,1fr) 150px 140px;gap:12px;align-items:center;padding:10px 12px}.confirm-schedule-head{background:#f7f9fc;color:#667085;font-size:12px;font-weight:700}.confirm-schedule-row{border-top:1px solid var(--line-soft);font-size:13px}.confirm-schedule-row .name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ref-grid-v483{display:grid;grid-template-columns:repeat(3,68px);gap:7px;margin-bottom:9px}.ref-card-v483,.ref-add-v483{width:68px;height:68px;border-radius:8px;overflow:hidden;position:relative}.ref-card-v483{border:1px solid #dce5f1}.ref-card-v483 img{width:100%;height:100%;object-fit:cover}.ref-add-v483{border:1px dashed #c8d4e4;background:#fbfcfe;display:grid;place-items:center;text-align:center;font-size:11px;color:#63738b}.ref-remove-v483{position:absolute;right:3px;top:3px;width:18px;height:18px;border:0;border-radius:50%;background:rgba(17,24,39,.75);color:#fff;padding:0}.ai-slot-v483{border:1px solid var(--line);border-radius:10px;background:#fff;overflow:hidden}.ai-slot-head-v483{height:44px;padding:0 12px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;justify-content:space-between;background:#fbfcfe}.ai-slot-body-v483{padding:13px;display:grid;grid-template-columns:220px minmax(260px,1fr) 220px;gap:14px}.ai-result-v483{height:180px;border:1px dashed #c8d4e4;border-radius:8px;background:#fbfcfe;display:grid;place-items:center;overflow:hidden;color:#8793a5}.ai-result-v483 img{width:100%;height:100%;object-fit:cover}.ai-actions-v483{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+@media(max-width:1050px){.schedule-config-grid{grid-template-columns:1fr}.ai-slot-body-v483{grid-template-columns:1fr 1fr}.ai-slot-body-v483>div:last-child{grid-column:1/-1}.moment-module-summary{grid-template-columns:1fr 1fr!important}.summary-copy{grid-column:1/-1}}
+@media(max-width:680px){#basicInfoPanel,#step1Panel .employee-scope-card,#step1Panel .audience-source-switch,#step1Panel .audience-source-panel{max-width:none}.basic-info-row{grid-template-columns:1fr}.basic-info-row .form-field-label{text-align:left}.moment-module-summary{grid-template-columns:1fr!important}.summary-copy{grid-column:auto}.add-moment-zone{justify-content:stretch}.add-moment-entry{width:100%!important}.material-type-grid,.validity-options,.ai-slot-body-v483{grid-template-columns:1fr}.ai-slot-body-v483>div:last-child{grid-column:auto}.confirm-schedule-head,.confirm-schedule-row{grid-template-columns:38px minmax(100px,1fr) 115px}.confirm-schedule-head span:nth-child(4),.confirm-schedule-row span:nth-child(4){display:none}}
+</style>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const q=(s,r=document)=>r.querySelector(s);
+const qa=(s,r=document)=>[...r.querySelectorAll(s)];
+const uid=p=>`${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
+const escapeHtml=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const DRAFT_KEY='ai_moments_v4_8_3_reviewed';
+const memoryStorage={};
+const storage=(()=>{try{localStorage.setItem('__v483','1');localStorage.removeItem('__v483');return localStorage}catch{return{getItem:k=>memoryStorage[k]??null,setItem:(k,v)=>memoryStorage[k]=String(v),removeItem:k=>delete memoryStorage[k]}}})();
+const nowLocal=()=>{const d=new Date(),pad=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const formatDate=v=>{if(!v)return'未设置';const d=new Date(v);if(Number.isNaN(d.getTime()))return'未设置';return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`};
+const templates={
+ new:[['自然种草版','新到了一条夏天很适合穿的法式收腰连衣裙。\n\n不是那种一眼很夸张的款，但上身会显得人很干净，腰线也比较自然。日常出门、约会、通勤都能穿。\n\n想看上身效果和细节图的可以私聊我，我按你的身高体重帮你看尺码。'],['显瘦卖点版','这条新款连衣裙，我觉得最值得看的是版型。\n\n腰线收得刚好，不是勒出来的紧，而是自然把比例拉出来；裙摆对胯和腿也比较友好。\n\n最近想找一条显瘦但不紧绷的裙子，可以私聊我看图。'],['场景代入版','这条裙子很适合“不知道穿什么，但又想看起来有点精致”的时候。\n\n上班穿不会太隆重，下班约饭也不会太随便，配凉鞋、单鞋和小外套都可以。\n\n想看不同搭配效果的可以私聊我。']],
+ double11:[['活动预热版','618活动快开始了，这次给老朋友准备了几款日常很好穿的单品。\n\n优惠不做复杂套路，想提前看款和尺码建议，可以先私聊我。'],['利益说明版','618活动已开启：部分新品参与满减，老客还有专属权益。\n\n具体到手价和适合尺码可以发我身高体重，我帮你核对。'],['限时提醒版','618活动进入最后阶段，之前收藏或问过的款式可以再确认一下库存。\n\n不确定尺码的直接发我信息，我帮你判断。']],
+ intent:[['温和跟进版','前几天你看过的那款我又整理了一下上身效果和尺码建议。\n\n不急着下单，想对比颜色或版型可以直接问我。'],['决策辅助版','你之前关注的款式，主要差别在版型和使用场景。\n\n把平时尺码和偏好告诉我，我可以帮你缩小选择范围。'],['库存提醒版','之前咨询的款式目前还有库存。\n\n如果还在考虑，我可以把细节图和尺码建议再发你参考。']],
+ old:[['老客关怀版','最近上了一些适合日常通勤的新款，想到你之前比较喜欢简洁好搭的版型。\n\n有空可以看看，不合适也没关系。'],['换季提醒版','最近天气变化比较快，店里补了一些适合换季叠穿的款式。\n\n老朋友想看搭配或尺码可以直接找我。'],['轻互动版','最近在选下一批主推款，想听听老朋友的意见：更喜欢简洁通勤，还是轻松休闲一点的？']]
+};
+const seedEmployees=[{id:'e1',name:'陈东东大号',dept:'慧博科技研发'},{id:'e2',name:'王超',dept:'私域运营组'},{id:'e3',name:'张三',dept:'西安交付组'},{id:'e4',name:'李楠',dept:'私域运营组'}];
+const tagGroups=[{name:'客户价值',tags:['高价值客户','高意向客户','普通客户']},{name:'购买行为',tags:['已购买','收藏加购未购买','180天未购买']},{name:'会员状态',tags:['店铺会员','未入会','老会员']}];
+const folderSeed=[{id:'f_unc',name:'未分类',parentId:null,open:true},{id:'f_test',name:'测试1',parentId:null,open:true},{id:'f_test_1',name:'二十三世',parentId:'f_test',open:true},{id:'f_gd',name:'广东',parentId:null,open:true},{id:'f_gd_1',name:'东东',parentId:'f_gd',open:true},{id:'f_new',name:'新品图',parentId:null,open:true},{id:'f_act',name:'活动图',parentId:null,open:true}];
+const svgData=(label,i=0)=>`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="700" height="700"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${['#e9efff','#f5e8ff','#e8f8f2','#fff0e7'][i%4]}"/><stop offset="1" stop-color="${['#9db7f5','#d3a8ef','#9fd8c1','#efb398'][i%4]}"/></linearGradient></defs><rect width="700" height="700" rx="36" fill="url(#g)"/><circle cx="530" cy="145" r="80" fill="rgba(255,255,255,.55)"/><rect x="155" y="130" width="390" height="430" rx="28" fill="rgba(255,255,255,.72)"/><path d="M270 455 L330 240 Q350 190 380 240 L440 455 Q450 500 405 515 L305 515 Q260 500 270 455" fill="#748fc9"/><text x="350" y="620" text-anchor="middle" font-size="34" font-family="Arial" fill="#334155">${label}</text></svg>`)}`;
+const seedMaterials=[{id:'mat1',title:'法式连衣裙正面',folderId:'f_new',src:svgData('新品图 1',0)},{id:'mat2',title:'法式连衣裙细节',folderId:'f_new',src:svgData('新品图 2',1)},{id:'mat3',title:'618活动海报',folderId:'f_act',src:svgData('活动图',3)},{id:'mat4',title:'广东门店素材',folderId:'f_gd_1',src:svgData('广东·东东',2)}];
+function newMoment(index=0){return{id:uid('m'),createdOrder:Date.now()+index,name:`规则${index+1}`,copySource:'ai',template:'new',copyGoal:'',candidates:[],finalCopy:'',originalCopy:'',imageSource:'ai',noImage:false,aiSlots:[{id:uid('slot'),prompt:'',refs:[],result:null}],existingImages:[],material:null,sendMode:'now',customTime:'',validityMode:'today',validityTime:''}}
+const defaultState=()=>({taskName:'',employees:[seedEmployees[0]],audienceSource:'tag',audienceMode:'all',tags:[],estimated:3680,smartQuery:'',smartAudience:null,smartApplied:false,moments:[newMoment(0)],activeMomentId:null,folders:folderSeed,materials:seedMaterials});
+let state=defaultState();state.activeMomentId=state.moments[0].id;
+let tempEmployees=new Set(),tempTags=new Set(),uploadQueue=[],materialSelection=new Set(),materialFolder='all',previewMomentId=null,dragPreviewId=null,deleteId=null,materialTarget='existing';
+function toast(msg){const el=$('toast');if(!el)return;el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),1800)}
+function openModal(id){$(id)?.classList.add('show')}
+function closeModal(id){$(id)?.classList.remove('show')}
+function saveDraft(immediate=false){$('draftStatus').textContent='保存中...';clearTimeout(saveDraft.t);saveDraft.t=setTimeout(()=>{try{storage.setItem(DRAFT_KEY,JSON.stringify(state))}catch{}$('draftStatus').textContent='已自动保存'},immediate?0:180)}
+function loadDraft(){try{const raw=storage.getItem(DRAFT_KEY);if(raw){const parsed=JSON.parse(raw);if(parsed&&Array.isArray(parsed.moments)&&parsed.moments.length){state={...defaultState(),...parsed};state.activeMomentId=state.activeMomentId&&state.moments.some(m=>m.id===state.activeMomentId)?state.activeMomentId:state.moments[0].id}}}catch{}}
+function activeMoment(){return state.moments.find(m=>m.id===state.activeMomentId)||state.moments[0]}
+function momentById(id){return state.moments.find(m=>m.id===id)}
+function materialType(m){if(m.noImage)return'无素材';if(m.material)return({link:'链接',video:'视频',radar:'素材雷达'}[m.material.type]||'素材');if(m.imageSource==='ai')return m.aiSlots.some(s=>s.result)?'图片':'未设置';return m.existingImages.length?'图片':'未设置'}
+function validityText(m){return m.validityMode==='custom'?(m.validityTime?formatDate(m.validityTime):'未设置'):'当天'}
+function scheduleText(m){return m.sendMode==='now'?'立即发送':(m.customTime?formatDate(m.customTime):'未设置')}
+function statusOf(m){const missing=[];if(!m.name.trim())missing.push('名称');if(!m.finalCopy.trim())missing.push('文案');if(!m.noImage&&!m.material&&!m.aiSlots.some(s=>s.result)&&!m.existingImages.length)missing.push('素材');if(m.sendMode==='custom'&&!m.customTime)missing.push('发布时间');if(m.validityMode==='custom'&&!m.validityTime)missing.push('有效期');return{ok:!missing.length,label:missing.length?'待完善':'已完成',issue:missing.length?`待完善：${missing.join('、')}`:''}}
+function orderedMoments(){return [...state.moments].sort((a,b)=>{const ar=a.sendMode==='now'?0:a.customTime?1:2,br=b.sendMode==='now'?0:b.customTime?1:2;if(ar!==br)return ar-br;if(ar===1){const d=new Date(a.customTime)-new Date(b.customTime);if(d)return d}return a.createdOrder-b.createdOrder})}
+function summaryCopy(m){const s=m.finalCopy.trim();return s?s.length>60?s.slice(0,60)+'…':s:'尚未确定文案'}
+function insertBasicInfo(){if($('basicInfoPanel'))return;const panel=document.createElement('div');panel.id='basicInfoPanel';panel.className='form-section basic-info-section';panel.innerHTML=`<div class="section-title">基本信息</div><div class="surface basic-info-card"><div class="basic-info-row"><div class="form-field-label required">任务名称</div><div class="title-input-wrap"><input id="taskName" class="input" maxlength="20" placeholder="请输入任务名称"><span id="taskNameCount">0/20</span></div></div></div>`;$('workspace').insertBefore(panel,$('step1Panel'));$('taskName').oninput=e=>{state.taskName=e.target.value.slice(0,20);$('taskNameCount').textContent=`${state.taskName.length}/20`;saveDraft()}}
+function prepareDom(){document.title='发布朋友圈 · AI朋友圈 v4.8.3';insertBasicInfo();q('#step2Panel>.section-title').textContent='第二步：设置朋友圈内容';q('.image-step-head .moment-subsection-title').textContent='朋友圈素材';qa('[data-image-source]').forEach(t=>{if(t.dataset.imageSource==='existing')t.textContent='使用已有素材'});const existingLabel=q('#existingImageSource .label');if(existingLabel)existingLabel.textContent='已有素材';const add=$('addMomentBtn');add.innerHTML='<span class="plus">＋</span><span><b>新建一条朋友圈</b></span>';q('.moment-schedule-subsection').innerHTML=`<div class="schedule-config-grid"><div class="schedule-config-block"><div class="moment-subsection-title">发布时间</div><div class="moment-time-options"><label class="send-mode-option compact"><div class="send-mode-main"><input type="radio" name="sendMode" value="now"><div><b>立即发送</b><span>任务创建后立即通知员工</span></div></div></label><label class="send-mode-option compact"><div class="send-mode-main"><input type="radio" name="sendMode" value="custom"><div><b>定时发送</b><span>按指定时间通知员工</span></div></div><input id="customSendTime" type="datetime-local" class="input custom-time-input"></label></div><div id="momentTimeNotice" class="tiny moment-time-notice"></div></div><div class="schedule-config-block"><div class="moment-subsection-title">发布有效期</div><div class="validity-options"><label class="validity-option"><input type="radio" name="validityMode" value="today"><span><b>当天</b><small>当天内员工可执行发表</small></span></label><label class="validity-option"><input type="radio" name="validityMode" value="custom"><span><b>自定义</b><small>指定截止时间</small></span></label></div><input id="customValidityTime" type="datetime-local" class="input custom-validity-input hidden"></div></div><div class="schedule-action-row"><button id="saveCollapseMomentBtn" class="btn primary save-collapse-btn" type="button">保存并收起</button></div>`;$('createTaskBtn').textContent='创建任务';$('step4Panel').setAttribute('aria-hidden','true');createDynamicModals();bindStaticEvents()}
+function createDynamicModals(){if(!$('momentPreviewModal'))document.body.insertAdjacentHTML('beforeend',`<div id="momentPreviewModal" class="modal-mask preview-popover-mask"><div class="quick-preview-dialog"><button class="preview-popover-close" type="button">×</button><div class="phone quick-preview-phone"><div class="phone-status"><span>9:41</span><span>▮▮ ◔</span></div><div class="phone-nav"><span>‹</span><b>朋友圈</b><span>•••</span></div><div class="moment"><div class="user-line"><div class="avatar"></div><div class="moment-main"><div id="quickPhoneUserName" class="user-name">发布员工</div><div id="quickPhoneCopy" class="moment-copy"></div><div id="quickPhoneMedia" class="moment-images"></div><div class="moment-meta"><span id="quickPhoneTime">刚刚</span><span class="more-box">••</span></div></div></div></div></div></div></div>`);if(!$('materialTypeModal'))document.body.insertAdjacentHTML('beforeend',`<div id="materialTypeModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div class="modal-title">添加素材</div><button class="close-btn" data-close="materialTypeModal">×</button></div><div class="modal-bd"><div class="material-type-grid"><button class="material-type-card" data-material-type="image"><span class="material-type-icon">▧</span><b>图片</b><small>上传本地图片或从素材中心导入</small></button><button class="material-type-card" data-material-type="link"><span class="material-type-icon">↗</span><b>链接</b><small>添加网页或商品链接</small></button><button class="material-type-card" data-material-type="video"><span class="material-type-icon">▶</span><b>视频</b><small>添加一个视频素材</small></button><button class="material-type-card" data-material-type="radar"><span class="material-type-icon">◎</span><b>素材雷达</b><small>选择素材雷达内容</small></button></div></div></div></div>`);if(!$('simpleMaterialModal'))document.body.insertAdjacentHTML('beforeend',`<div id="simpleMaterialModal" class="modal-mask"><div class="modal small"><div class="modal-hd"><div id="simpleMaterialTitle" class="modal-title">添加素材</div><button class="close-btn" data-close="simpleMaterialModal">×</button></div><div class="modal-bd"><label style="display:grid;gap:8px"><span id="simpleMaterialLabel" class="label">素材名称</span><input id="simpleMaterialInput" class="input" maxlength="120" placeholder="请输入"></label></div><div class="modal-ft"><button class="btn" data-close="simpleMaterialModal">取消</button><button id="confirmSimpleMaterial" class="btn primary">确定</button></div></div></div>`);const modal=$('taskConfirmModal');q('.modal-title',modal).textContent='确认创建朋友圈任务';q('.modal-bd',modal).innerHTML=`<div class="confirm-summary"><div class="confirm-row"><span class="k">任务名称</span><span id="confirmTaskName" class="v">-</span></div><div class="confirm-row"><span class="k">发布员工</span><span id="confirmEmployees" class="v">-</span></div><div class="confirm-row"><span class="k">可见客户</span><span id="confirmAudience" class="v">-</span></div><div class="confirm-row"><span class="k">朋友圈条数</span><span id="confirmMomentCount" class="v">-</span></div></div><div id="confirmScheduleList" class="confirm-schedule-list"></div>`;$('confirmCreateTaskBtn').textContent='确认创建'}
+function bindStaticEvents(){qa('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));$('openAiBtn').onclick=()=>{$('listPage').classList.remove('active');$('aiPage').classList.add('active');renderAll()};$('backListBtn').onclick=()=>{$('aiPage').classList.remove('active');$('listPage').classList.add('active')};$('cancelCreateBtn').onclick=$('backListBtn').onclick;$('chooseEmployeesBtn').onclick=openEmployees;$('confirmEmployeesBtn').onclick=confirmEmployees;$('clearEmployeesBtn').onclick=()=>{tempEmployees.clear();renderEmployeeModal()};$('audienceAll').onchange=updateAudienceFromForm;$('audiencePartial').onchange=updateAudienceFromForm;$('chooseTagsBtn').onclick=openTags;$('confirmTagsBtn').onclick=confirmTags;$('clearTagsBtn').onclick=()=>{tempTags.clear();renderTagModal()};$('estimateBtn').onclick=estimateAudience;qa('[data-audience-source]').forEach(b=>b.onclick=()=>switchAudience(b.dataset.audienceSource));qa('[data-smart-suggest]').forEach(b=>b.onclick=()=>{$('smartAudienceQuery').value=b.dataset.smartSuggest});$('smartCreateBtn').onclick=generateSmartAudience;$('regenerateSmartAudienceBtn').onclick=generateSmartAudience;$('adjustSmartAudienceBtn').onclick=()=>{$('smartAudienceReport').classList.add('hidden');$('smartAudienceCreate').classList.remove('hidden')};$('applySmartAudienceBtn').onclick=applySmartAudience;qa('[data-template]').forEach(b=>b.onclick=()=>{activeMoment().template=b.dataset.template;qa('[data-template]').forEach(x=>x.classList.toggle('active',x===b));saveDraft()});$('copyGoal').oninput=e=>{activeMoment().copyGoal=e.target.value;saveDraft()};$('generateCopyBtn').onclick=generateCopy;$('applyManualCopyBtn').onclick=()=>applyCopy($('manualSourceCopy').value);$('manualSourceCopy').oninput=e=>{activeMoment().manualCopy=e.target.value;saveDraft()};$('finalCopy').oninput=e=>{activeMoment().finalCopy=e.target.value.slice(0,1000);$('copyCharCount').textContent=`${activeMoment().finalCopy.length} / 1000`;updateActiveCard();saveDraft()};$('restoreCopyBtn').onclick=()=>{const m=activeMoment();if(m.originalCopy){m.finalCopy=m.originalCopy;loadEditor(m);saveDraft()}};qa('[data-copy-source]').forEach(t=>t.onclick=()=>switchCopySource(t.dataset.copySource));qa('[data-image-source]').forEach(t=>t.onclick=()=>switchImageSource(t.dataset.imageSource));$('noImageCheck').onchange=e=>{activeMoment().noImage=e.target.checked;renderImages();updateActiveCard();saveDraft()};$('addSlotBtn').onclick=addAiSlot;$('addMomentBtn').onclick=addMoment;$('saveCollapseMomentBtn').onclick=saveAndCollapse;$('createTaskBtn').onclick=openTaskConfirm;$('confirmCreateTaskBtn').onclick=()=>{closeModal('taskConfirmModal');toast('朋友圈任务已创建（演示）')};$('confirmDeleteMomentBtn').onclick=deleteMoment;$('chooseLocalSource').onclick=()=>{closeModal('imageSourceModal');$('realImageInput').click()};$('chooseMaterialSource').onclick=()=>{closeModal('imageSourceModal');openMaterialCenter()};$('realImageInput').onchange=handleFiles;$('confirmLocalUploadBtn').onclick=confirmLocalUpload;$('confirmMaterialPickBtn').onclick=confirmMaterialPick;$('createRootFolderBtn').onclick=()=>createFolder(null);$('createChildFolderBtn').onclick=()=>createFolder(materialFolder==='all'?null:materialFolder);$('momentPreviewModal').onclick=e=>{if(e.target===$('momentPreviewModal'))closeModal('momentPreviewModal')};q('.preview-popover-close').onclick=()=>closeModal('momentPreviewModal');qa('[data-material-type]').forEach(b=>b.onclick=()=>chooseMaterialType(b.dataset.materialType));$('confirmSimpleMaterial').onclick=confirmSimpleMaterial;document.addEventListener('keydown',e=>{if(e.key==='Escape')qa('.modal-mask.show').forEach(m=>m.classList.remove('show'))})}
+function renderAll(){renderBasic();renderScope();renderMoments();renderEditor();}
+function renderBasic(){$('taskName').value=state.taskName;$('taskNameCount').textContent=`${state.taskName.length}/20`}
+function renderScope(){$('employeeResult').innerHTML=state.employees.length?state.employees.map(e=>`<span class="tag-chip">${escapeHtml(e.name)}</span>`).join(''):'<span class="tiny">尚未选择员工</span>';switchAudience(state.audienceSource,false);if(state.audienceSource==='tag'){$('audienceAll').checked=state.audienceMode==='all';$('audiencePartial').checked=state.audienceMode==='partial';$('tagRow').classList.toggle('hidden',state.audienceMode!=='partial');renderSelectedTags();renderEstimate()}else renderSmartReport()}
+function switchAudience(type,save=true){state.audienceSource=type;qa('[data-audience-source]').forEach(b=>b.classList.toggle('active',b.dataset.audienceSource===type));$('aiAudiencePanel').classList.toggle('hidden',type!=='ai');$('tagAudiencePanel').classList.toggle('hidden',type!=='tag');if(save)saveDraft()}
+function openEmployees(){tempEmployees=new Set(state.employees.map(e=>e.id));renderEmployeeModal();openModal('employeeModal')}
+function renderEmployeeModal(){$('employeeList').innerHTML=seedEmployees.map(e=>`<label class="person-row"><span><b>${escapeHtml(e.name)}</b><span class="tiny" style="display:block">${escapeHtml(e.dept)}</span></span><input type="checkbox" data-emp-id="${e.id}" ${tempEmployees.has(e.id)?'checked':''}></label>`).join('');qa('[data-emp-id]').forEach(c=>c.onchange=()=>{c.checked?tempEmployees.add(c.dataset.empId):tempEmployees.delete(c.dataset.empId);renderEmployeeModal()});$('selectedEmployeeList').innerHTML=seedEmployees.filter(e=>tempEmployees.has(e.id)).map(e=>`<div class="selected-person">${escapeHtml(e.name)}</div>`).join('')||'<span class="tiny">尚未选择</span>';$('employeeCount').textContent=tempEmployees.size}
+function confirmEmployees(){state.employees=seedEmployees.filter(e=>tempEmployees.has(e.id));closeModal('employeeModal');renderScope();saveDraft()}
+function updateAudienceFromForm(){state.audienceMode=$('audiencePartial').checked?'partial':'all';$('tagRow').classList.toggle('hidden',state.audienceMode!=='partial');state.estimated=null;renderEstimate();saveDraft()}
+function openTags(){tempTags=new Set(state.tags);renderTagModal();openModal('tagModal')}
+function renderTagModal(){const term=$('tagSearch').value.trim();$('tagCategoryList').innerHTML=tagGroups.map(g=>`<div class="tag-category"><div class="category-head"><b>${g.name}</b></div><div class="category-tags">${g.tags.filter(t=>!term||t.includes(term)).map(t=>`<button class="select-tag ${tempTags.has(t)?'selected':''}" data-tag-name="${t}">${t}</button>`).join('')}</div></div>`).join('');qa('[data-tag-name]').forEach(b=>b.onclick=()=>{tempTags.has(b.dataset.tagName)?tempTags.delete(b.dataset.tagName):tempTags.add(b.dataset.tagName);renderTagModal()});$('selectedTagCount').textContent=tempTags.size;$('selectedTagBody').innerHTML=[...tempTags].map(t=>`<span class="tag-chip">${escapeHtml(t)}</span>`).join('')||'<div class="empty-state">尚未选择标签</div>'}
+function confirmTags(){state.tags=[...tempTags];state.estimated=null;closeModal('tagModal');renderSelectedTags();renderEstimate();saveDraft()}
+function renderSelectedTags(){$('selectedTagResult').innerHTML=state.tags.length?state.tags.map(t=>`<span class="tag-chip">${escapeHtml(t)}</span>`).join(''):'<span class="tiny">尚未选择标签</span>'}
+function estimateAudience(){if(state.audienceMode==='partial'&&!state.tags.length)return toast('请先选择标签');state.estimated=state.audienceMode==='all'?3680:Math.max(180,3680-state.tags.length*720);renderEstimate();saveDraft()}
+function renderEstimate(){const el=$('estimateResult');if(state.estimated==null){el.classList.add('hidden');return}el.classList.remove('hidden');el.innerHTML=`预计可触达 <b style="color:var(--brand)">${Number(state.estimated).toLocaleString()}</b> 人，实际人数以任务创建时为准。`}
+function generateSmartAudience(){const query=$('smartAudienceQuery').value.trim();if(!query)return toast('请先描述目标人群');state.smartQuery=query;state.smartAudience={name:query.length>16?query.slice(0,16)+'…':query,estimated:1260,rules:['近90天有访问','未完成购买','企业微信好友'],insight:'这类客户已有一定兴趣，但尚未完成转化，适合用真实上身效果和轻量权益降低决策门槛。'};state.smartApplied=false;renderSmartReport();saveDraft()}
+function renderSmartReport(){if(!state.smartAudience){$('smartAudienceCreate').classList.remove('hidden');$('smartAudienceReport').classList.add('hidden');$('smartAudienceQuery').value=state.smartQuery||'';return}$('smartAudienceCreate').classList.add('hidden');$('smartAudienceReport').classList.remove('hidden');$('smartAudienceName').textContent=state.smartAudience.name;$('smartEstimatedSize').textContent=state.smartAudience.estimated.toLocaleString();$('smartAudienceInsight').textContent=state.smartAudience.insight;$('smartRuleChips').innerHTML=state.smartAudience.rules.map(r=>`<span class="smart-rule-chip">${escapeHtml(r)}</span>`).join('');$('smartAppliedBadge').classList.toggle('hidden',!state.smartApplied);$('applySmartAudienceBtn').textContent=state.smartApplied?'已使用':'使用该人群'}
+function applySmartAudience(){if(!state.smartAudience)return;state.smartApplied=true;state.estimated=state.smartAudience.estimated;renderSmartReport();toast('已使用该人群');saveDraft()}
+function renderMoments(){const list=orderedMoments();$('momentList').innerHTML=list.map((m,i)=>momentCard(m,i)).join('');qa('[data-edit-moment]').forEach(b=>b.onclick=()=>{state.activeMomentId=b.dataset.editMoment;renderMoments();renderEditor();scrollToCard(b.dataset.editMoment)});qa('[data-preview-moment]').forEach(b=>b.onclick=e=>openPreview(b.dataset.previewMoment,e.currentTarget));qa('[data-delete-moment]').forEach(b=>b.onclick=()=>requestDelete(b.dataset.deleteMoment));qa('[data-rule-name]').forEach(inp=>{inp.oninput=()=>{const m=momentById(inp.dataset.ruleName);m.name=inp.value.slice(0,20);updateActiveCard();saveDraft()};inp.onblur=()=>{const m=momentById(inp.dataset.ruleName);if(!m.name.trim()){const i=state.moments.indexOf(m);m.name=`规则${i+1}`;renderMoments();renderEditor()}}});const active=activeMoment(),host=q(`[data-editor-host="${active.id}"]`);if(host)host.appendChild($('momentEditor'))}
+function momentCard(m,i){const st=statusOf(m),active=m.id===state.activeMomentId;return`<div class="moment-module ${active?'active':''}" data-moment-card="${m.id}"><div class="moment-module-head"><div class="moment-module-ident"><div class="moment-module-index">第 ${i+1} 条</div><div class="rule-name-wrap"><input class="rule-name-input" data-rule-name="${m.id}" maxlength="20" value="${escapeHtml(m.name)}" aria-label="规则名称"><span class="rule-name-count">${m.name.length}/20</span></div><span class="badge ${st.ok?'green':'orange'}" data-module-status="${m.id}">${st.label}</span></div><div class="moment-module-actions"><button class="btn small" data-preview-moment="${m.id}">预览</button>${active?'<span class="editing-label">编辑中</span>':`<button class="btn small" data-edit-moment="${m.id}">编辑</button>`}<button class="btn small danger" data-delete-moment="${m.id}" ${state.moments.length===1?'disabled':''}>删除</button></div></div><div class="moment-module-summary ${active?'hidden':''}"><div><span class="summary-key">发布时间</span><b data-summary-time="${m.id}">${scheduleText(m)}</b></div><div class="summary-validity"><span class="summary-key">发布有效期</span><b data-summary-validity="${m.id}">${validityText(m)}</b></div><div class="summary-copy"><span class="summary-key">文案</span><span data-summary-copy="${m.id}" title="${escapeHtml(m.finalCopy)}">${escapeHtml(summaryCopy(m))}</span></div><div class="summary-material"><span class="summary-key">素材</span><b data-summary-material="${m.id}">${materialType(m)}</b></div>${st.issue?`<div class="module-issue">${st.issue}</div>`:''}</div><div class="moment-module-editor-host" data-editor-host="${m.id}"></div></div>`}
+function scrollToCard(id){q(`[data-moment-card="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'start'})}
+function renderEditor(){const m=activeMoment();if(!m)return;$('momentEditor').classList.remove('hidden');loadEditor(m);renderCopyCandidates();renderImages();renderSchedule()}
+function loadEditor(m){qa('[data-template]').forEach(b=>b.classList.toggle('active',b.dataset.template===m.template));$('copyGoal').value=m.copyGoal||'';$('manualSourceCopy').value=m.manualCopy||'';$('finalCopy').value=m.finalCopy;$('copyCharCount').textContent=`${m.finalCopy.length} / 1000`;$('restoreCopyBtn').disabled=!m.originalCopy;switchCopySource(m.copySource,false);switchImageSource(m.imageSource,false);$('noImageCheck').checked=m.noImage}
+function switchCopySource(src,save=true){const m=activeMoment();m.copySource=src;qa('[data-copy-source]').forEach(t=>t.classList.toggle('active',t.dataset.copySource===src));$('copyAiSource').classList.toggle('hidden',src!=='ai');$('copyManualSource').classList.toggle('hidden',src!=='manual');if(save)saveDraft()}
+function generateCopy(){const m=activeMoment(),count=Math.max(1,Math.min(6,Number($('copyCountSelect').value)||1)),pool=templates[m.template]||templates.new,goal=m.copyGoal.trim();m.candidates=Array.from({length:count},(_,i)=>{const item=pool[i%pool.length];return{summary:item[0],text:goal?`${item[1]}\n\n${goal}`:item[1]}});renderCopyCandidates();saveDraft()}
+function renderCopyCandidates(){const m=activeMoment();$('copyList').innerHTML=m.candidates.length?m.candidates.map((c,i)=>`<div class="copy-option ${m.originalCopy===c.text?'active':''}" data-copy-index="${i}"><div class="copy-option-title"><span>${escapeHtml(c.summary)}</span><span class="badge blue">候选${i+1}</span></div><div class="copy-option-text">${escapeHtml(c.text)}</div></div>`).join(''):'<div class="tiny empty-copy-state">还没有生成候选文案</div>';qa('[data-copy-index]').forEach(c=>c.onclick=()=>applyCopy(m.candidates[Number(c.dataset.copyIndex)].text))}
+function applyCopy(text){const m=activeMoment();if(!text.trim())return toast('文案不能为空');m.originalCopy=text.trim();m.finalCopy=text.trim().slice(0,1000);loadEditor(m);renderCopyCandidates();updateActiveCard();saveDraft()}
+function switchImageSource(src,save=true){const m=activeMoment();m.imageSource=src;qa('[data-image-source]').forEach(t=>t.classList.toggle('active',t.dataset.imageSource===src));$('aiImageSource').classList.toggle('hidden',src!=='ai');$('existingImageSource').classList.toggle('hidden',src!=='existing');renderImages();if(save)saveDraft()}
+function renderImages(){const m=activeMoment();$('imageContent').classList.toggle('hidden',m.noImage);if(m.noImage)return;if(m.imageSource==='ai')renderAiSlots();else renderExisting()}
+function renderAiSlots(){$('slotList').innerHTML=activeMoment().aiSlots.map((s,i)=>`<div class="ai-slot-v483"><div class="ai-slot-head-v483"><b>图片 ${i+1}</b><button class="btn small danger" data-remove-slot="${s.id}" ${activeMoment().aiSlots.length===1?'disabled':''}>删除</button></div><div class="ai-slot-body-v483"><div><div class="slot-label">参考图片（可选）</div><div class="ref-grid-v483">${s.refs.map((r,j)=>`<div class="ref-card-v483"><img src="${r.src}" alt="参考图"><button class="ref-remove-v483" data-remove-ref="${s.id}:${j}">×</button></div>`).join('')}<label class="ref-add-v483">＋ 添加<input type="file" accept="image/*" multiple hidden data-ref-upload="${s.id}"></label></div><div class="tiny">最多6张参考图</div></div><div><div class="slot-label">图片要求</div><textarea class="textarea" rows="7" data-slot-prompt="${s.id}" placeholder="描述画面主体、场景和风格">${escapeHtml(s.prompt)}</textarea><div class="ai-actions-v483"><button class="btn primary" data-generate-image="${s.id}">${s.result?'重新生成图片':'生成图片'}</button></div></div><div><div class="slot-label">结果预览</div><div class="ai-result-v483">${s.result?`<img src="${s.result.src}" alt="生成结果">`:'等待生成'}</div><div class="ai-actions-v483">${s.result?`<button class="btn small" data-save-generated="${s.id}">导入素材中心</button>`:''}</div></div></div></div>`).join('');qa('[data-slot-prompt]').forEach(t=>t.oninput=()=>{const s=activeMoment().aiSlots.find(x=>x.id===t.dataset.slotPrompt);s.prompt=t.value;saveDraft()});qa('[data-generate-image]').forEach(b=>b.onclick=()=>generateImage(b.dataset.generateImage));qa('[data-remove-slot]').forEach(b=>b.onclick=()=>{const m=activeMoment();m.aiSlots=m.aiSlots.filter(s=>s.id!==b.dataset.removeSlot);renderAiSlots();updateActiveCard();saveDraft()});qa('[data-ref-upload]').forEach(inp=>inp.onchange=e=>addReferences(inp.dataset.refUpload,e.target.files));qa('[data-remove-ref]').forEach(b=>b.onclick=()=>{const[id,index]=b.dataset.removeRef.split(':');const s=activeMoment().aiSlots.find(x=>x.id===id);s.refs.splice(Number(index),1);renderAiSlots();saveDraft()});qa('[data-save-generated]').forEach(b=>b.onclick=()=>{const s=activeMoment().aiSlots.find(x=>x.id===b.dataset.saveGenerated);if(s?.result){state.materials.push({id:uid('mat'),title:`AI生成图${state.materials.length+1}`,folderId:'f_unc',src:s.result.src});toast('已保存到素材中心')}})}
+function addAiSlot(){const m=activeMoment();if(m.aiSlots.length>=9)return toast('每条朋友圈最多9张图片');m.aiSlots.push({id:uid('slot'),prompt:'',refs:[],result:null});renderAiSlots();saveDraft()}
+function addReferences(slotId,files){const slot=activeMoment().aiSlots.find(s=>s.id===slotId);[...files].slice(0,6-slot.refs.length).forEach(file=>{const reader=new FileReader();reader.onload=()=>{slot.refs.push({name:file.name,src:reader.result});renderAiSlots();saveDraft()};reader.readAsDataURL(file)})}
+function generateImage(slotId){const m=activeMoment(),slot=m.aiSlots.find(s=>s.id===slotId),i=m.aiSlots.indexOf(slot);slot.result={id:uid('img'),src:svgData(slot.prompt.trim()||`AI配图 ${i+1}`,i)};renderAiSlots();updateActiveCard();saveDraft()}
+function renderExisting(){const m=activeMoment(),grid=$('existingImageGrid');if(m.material){const icons={link:'↗',video:'▶',radar:'◎'};grid.innerHTML=`<div class="existing-material-card"><div class="existing-material-main"><div class="existing-material-icon">${icons[m.material.type]||'◇'}</div><div class="existing-material-info"><b>${escapeHtml(m.material.title)}</b><span class="tiny">${materialType(m)}</span></div></div><div class="existing-material-actions"><button class="btn small" data-change-material>更换</button><button class="btn small danger" data-remove-material>删除</button></div></div>`;q('[data-change-material]').onclick=openMaterialType;q('[data-remove-material]').onclick=()=>{m.material=null;renderExisting();updateActiveCard();saveDraft()};return}grid.innerHTML=m.existingImages.map((img,i)=>`<div class="existing-image-card"><div class="existing-image-title">${escapeHtml(img.title||`图片${i+1}`)}</div><div class="slot-result"><img src="${img.src}" alt="已有图片"></div><div class="existing-card-actions"><button class="btn small danger" data-remove-existing="${img.id}">删除</button></div></div>`).join('')+`<button class="existing-add-tile" id="existingAddTile" type="button"><span class="plus">＋</span><b>添加素材</b><span class="tiny">支持图片、链接、视频、素材雷达</span></button>`;$('existingAddTile').onclick=openMaterialType;qa('[data-remove-existing]').forEach(b=>b.onclick=()=>{m.existingImages=m.existingImages.filter(x=>x.id!==b.dataset.removeExisting);renderExisting();updateActiveCard();saveDraft()})}
+function openMaterialType(){openModal('materialTypeModal')}
+function chooseMaterialType(type){closeModal('materialTypeModal');if(type==='image'){materialTarget='existing';openModal('imageSourceModal');return}simpleMaterialType=type;$('simpleMaterialTitle').textContent={link:'添加链接',video:'添加视频',radar:'添加素材雷达'}[type];$('simpleMaterialLabel').textContent=type==='link'?'链接地址':'素材名称';$('simpleMaterialInput').value='';$('simpleMaterialInput').placeholder=type==='link'?'请输入 https:// 开头的链接':'请输入素材名称';openModal('simpleMaterialModal')}
+let simpleMaterialType='link';
+function confirmSimpleMaterial(){const value=$('simpleMaterialInput').value.trim();if(!value)return toast('请填写素材信息');const m=activeMoment();m.existingImages=[];m.material={type:simpleMaterialType,title:value};m.imageSource='existing';closeModal('simpleMaterialModal');renderImages();updateActiveCard();saveDraft()}
+function handleFiles(e){const files=[...e.target.files];if(!files.length)return;uploadQueue=[];let left=files.length;files.forEach(file=>{const reader=new FileReader();reader.onload=()=>{uploadQueue.push({id:uid('up'),title:file.name.replace(/\.[^.]+$/,'' ).slice(0,20),src:reader.result});if(--left===0)renderUploadQueue()};reader.readAsDataURL(file)});e.target.value=''}
+function renderUploadQueue(){$('localUploadList').innerHTML=uploadQueue.map((x,i)=>`<div class="local-upload-item"><img class="local-upload-thumb" src="${x.src}" alt="上传预览"><div class="local-upload-fields"><div class="upload-title-row"><input class="input" maxlength="20" data-upload-title="${i}" value="${escapeHtml(x.title)}"><span class="upload-title-count">${x.title.length}/20</span></div></div></div>`).join('');qa('[data-upload-title]').forEach(inp=>inp.oninput=()=>{uploadQueue[Number(inp.dataset.uploadTitle)].title=inp.value.slice(0,20);inp.nextElementSibling.textContent=`${inp.value.length}/20`});openModal('localUploadModal')}
+function confirmLocalUpload(){const m=activeMoment(),remaining=9-m.existingImages.length;m.material=null;m.existingImages.push(...uploadQueue.slice(0,remaining));m.imageSource='existing';uploadQueue=[];closeModal('localUploadModal');renderImages();updateActiveCard();saveDraft()}
+function folderById(id){return state.folders.find(f=>f.id===id)}
+function folderPath(id){const parts=[];let f=folderById(id);while(f){parts.unshift(f.name);f=folderById(f.parentId)}return parts.join(' / ')}
+function renderFolderTree(){const roots=state.folders.filter(f=>!f.parentId);const rows=[];const walk=(f,depth)=>{const kids=state.folders.filter(x=>x.parentId===f.id);rows.push(`<div class="folder-tree-row ${materialFolder===f.id?'active':''}" data-folder-id="${f.id}" style="padding-left:${8+depth*18}px"><button class="folder-tree-toggle ${kids.length?'':'placeholder'}" data-toggle-folder="${f.id}">${kids.length?(f.open?'⌄':'›'):''}</button><span class="folder-tree-icon">▰</span><span class="folder-tree-name">${escapeHtml(f.name)}</span><span class="folder-tree-count">${state.materials.filter(m=>m.folderId===f.id).length}</span></div>`);if(f.open)kids.forEach(k=>walk(k,depth+1))};roots.forEach(f=>walk(f,0));$('materialFolderTree').innerHTML=`<div class="folder-tree-all"><div class="folder-tree-row ${materialFolder==='all'?'active':''}" data-folder-id="all"><span class="folder-tree-toggle placeholder"></span><span class="folder-tree-icon">▦</span><span class="folder-tree-name">全部素材</span><span class="folder-tree-count">${state.materials.length}</span></div></div>${rows.join('')}`;qa('[data-folder-id]').forEach(r=>r.onclick=e=>{if(e.target.closest('[data-toggle-folder]'))return;materialFolder=r.dataset.folderId;materialSelection.clear();renderMaterialCenter()});qa('[data-toggle-folder]').forEach(b=>b.onclick=e=>{e.stopPropagation();const f=folderById(b.dataset.toggleFolder);f.open=!f.open;renderFolderTree()})}
+function renderMaterialCenter(){renderFolderTree();const items=materialFolder==='all'?state.materials:state.materials.filter(m=>m.folderId===materialFolder);$('currentMaterialFolderName').textContent=materialFolder==='all'?'全部素材':folderById(materialFolder)?.name||'素材';$('currentMaterialFolderPath').textContent=materialFolder==='all'?'查看全部文件夹中的素材':folderPath(materialFolder);$('materialGrid').innerHTML=items.length?items.map(m=>`<div class="material-card ${materialSelection.has(m.id)?'active':''}" data-material-id="${m.id}"><img src="${m.src}" alt="素材"><div class="material-card-title">${escapeHtml(m.title)}</div><div class="material-card-meta">${escapeHtml(folderPath(m.folderId))}</div>${materialSelection.has(m.id)?'<span class="material-check">✓</span>':''}</div>`).join(''):'<div class="material-empty">当前文件夹暂无素材</div>';qa('[data-material-id]').forEach(c=>c.onclick=()=>{materialSelection.has(c.dataset.materialId)?materialSelection.delete(c.dataset.materialId):materialSelection.add(c.dataset.materialId);renderMaterialCenter()});$('materialPickHint').textContent=`已选 ${materialSelection.size} 张`}
+function openMaterialCenter(){materialSelection.clear();materialFolder='all';renderMaterialCenter();openModal('materialCenterModal')}
+function confirmMaterialPick(){const m=activeMoment(),chosen=state.materials.filter(x=>materialSelection.has(x.id)),remaining=9-m.existingImages.length;m.material=null;m.existingImages.push(...chosen.slice(0,remaining).map(x=>({id:uid('img'),title:x.title,src:x.src})));m.imageSource='existing';closeModal('materialCenterModal');renderImages();updateActiveCard();saveDraft()}
+function createFolder(parentId){const name=prompt('请输入文件夹名称');if(!name?.trim())return;const clean=name.trim().slice(0,20);if(state.folders.some(f=>f.parentId===parentId&&f.name===clean))return toast('同级文件夹名称不能重复');const id=uid('f');state.folders.push({id,name:clean,parentId,open:true});if(parentId)folderById(parentId).open=true;materialFolder=id;renderMaterialCenter();saveDraft()}
+function renderSchedule(){const m=activeMoment();qa('[name="sendMode"]').forEach(r=>r.checked=r.value===m.sendMode);$('customSendTime').value=m.customTime||'';$('customSendTime').disabled=m.sendMode!=='custom';qa('[name="validityMode"]').forEach(r=>r.checked=r.value===m.validityMode);$('customValidityTime').value=m.validityTime||'';$('customValidityTime').classList.toggle('hidden',m.validityMode!=='custom');qa('[name="sendMode"]').forEach(r=>r.onchange=()=>{m.sendMode=r.value;$('customSendTime').disabled=m.sendMode!=='custom';updateActiveCard();saveDraft()});$('customSendTime').onchange=e=>{m.customTime=e.target.value;updateActiveCard();saveDraft()};qa('[name="validityMode"]').forEach(r=>r.onchange=()=>{m.validityMode=r.value;$('customValidityTime').classList.toggle('hidden',m.validityMode!=='custom');updateActiveCard();saveDraft()});$('customValidityTime').onchange=e=>{m.validityTime=e.target.value;updateActiveCard();saveDraft()};$('saveCollapseMomentBtn').onclick=saveAndCollapse}
+function updateActiveCard(){const m=activeMoment();if(!m)return;const st=statusOf(m),status=q(`[data-module-status="${m.id}"]`);if(status){status.className=`badge ${st.ok?'green':'orange'}`;status.textContent=st.label}const fields={time:scheduleText(m),validity:validityText(m),copy:summaryCopy(m),material:materialType(m)};Object.entries(fields).forEach(([k,v])=>{const el=q(`[data-summary-${k}="${m.id}"]`);if(el)el.textContent=v})}
+function saveAndCollapse(){const m=activeMoment();saveDraft(true);const list=orderedMoments(),i=list.findIndex(x=>x.id===m.id),next=list[i+1]||list[i-1];state.activeMomentId=next&&next.id!==m.id?next.id:'';renderMoments();if(!state.activeMomentId){$('momentEditorParking').appendChild($('momentEditor'));$('momentEditor').classList.add('hidden')}toast('已保存并收起')}
+function addMoment(){const m=newMoment(state.moments.length);state.moments.push(m);state.activeMomentId=m.id;renderMoments();renderEditor();scrollToCard(m.id);saveDraft()}
+function requestDelete(id){if(state.moments.length===1)return;deleteId=id;$('deleteMomentName').textContent=momentById(id)?.name||'当前朋友圈';openModal('deleteMomentModal')}
+function deleteMoment(){if(!deleteId)return;const index=state.moments.findIndex(m=>m.id===deleteId);state.moments.splice(index,1);if(state.activeMomentId===deleteId)state.activeMomentId=state.moments[Math.min(index,state.moments.length-1)].id;deleteId=null;closeModal('deleteMomentModal');renderMoments();renderEditor();saveDraft()}
+function readyImages(m){return m.imageSource==='ai'?m.aiSlots.filter(s=>s.result).map(s=>({id:s.id,src:s.result.src})):m.existingImages.map(x=>({id:x.id,src:x.src}))}
+function openPreview(id,button){const m=momentById(id);if(!m)return;previewMomentId=id;$('quickPhoneUserName').textContent=state.employees[0]?.name||'发布员工';$('quickPhoneCopy').textContent=m.finalCopy||'尚未确定文案';$('quickPhoneTime').textContent=m.sendMode==='now'?'刚刚':scheduleText(m);renderQuickMedia(m);openModal('momentPreviewModal');requestAnimationFrame(()=>positionPreview(button))}
+function positionPreview(button){const d=q('.quick-preview-dialog'),r=button.getBoundingClientRect(),w=350,h=560;let left=r.left-w-10;if(left<12)left=Math.min(innerWidth-w-12,r.right+10);let top=Math.max(12,Math.min(r.top-14,innerHeight-h-12));d.style.left=`${left}px`;d.style.top=`${top}px`}
+function renderQuickMedia(m){const el=$('quickPhoneMedia');if(m.material){const icons={link:'↗',video:'▶',radar:'◎'};el.className='moment-images';el.innerHTML=`<div class="phone-material-card"><div class="icon">${icons[m.material.type]||'◇'}</div><div class="info"><b>${escapeHtml(m.material.title)}</b><span>${materialType(m)}</span></div></div>`;return}const items=readyImages(m),sortable=items.length>1;el.className=`moment-images ${items.length===1?'count-1':items.length===2?'count-2':items.length===3?'count-3':items.length===4?'count-4':items.length>4?'count-many':''} ${sortable?'sortable':''}`;el.innerHTML=items.map((x,i)=>`<div class="moment-image-item" draggable="${sortable}" data-preview-image="${x.id}"><span class="drag-mark">⋮⋮</span><img class="moment-image" draggable="false" src="${x.src}" alt="朋友圈图片${i+1}"></div>`).join('');if(sortable)bindPreviewSort(m)}
+function bindPreviewSort(m){qa('[data-preview-image]').forEach(el=>{el.ondragstart=e=>{dragPreviewId=el.dataset.previewImage;el.classList.add('dragging');e.dataTransfer.setData('text/plain',dragPreviewId)};el.ondragend=()=>qa('[data-preview-image]').forEach(x=>x.classList.remove('dragging','drag-over'));el.ondragover=e=>{e.preventDefault();if(el.dataset.previewImage!==dragPreviewId)el.classList.add('drag-over')};el.ondragleave=()=>el.classList.remove('drag-over');el.ondrop=e=>{e.preventDefault();const from=e.dataTransfer.getData('text/plain')||dragPreviewId,to=el.dataset.previewImage;if(!from||from===to)return;const list=m.imageSource==='ai'?m.aiSlots:m.existingImages,fi=list.findIndex(x=>(m.imageSource==='ai'?x.id:x.id)===from),ti=list.findIndex(x=>x.id===to);if(fi<0||ti<0)return;const[item]=list.splice(fi,1);list.splice(ti,0,item);renderQuickMedia(m);if(m.id===state.activeMomentId)renderImages();saveDraft();toast('图片顺序已调整')}})}
+function validate(){const errors=[];if(!state.taskName.trim())errors.push('请填写任务名称');if(!state.employees.length)errors.push('请选择发布员工');if(state.audienceSource==='ai'&&!state.smartApplied)errors.push('请生成并使用AI人群');if(state.audienceSource==='tag'&&state.audienceMode==='partial'&&!state.tags.length)errors.push('请选择客户标签');state.moments.forEach((m,i)=>{const st=statusOf(m);if(!st.ok)errors.push(`第${i+1}条朋友圈${st.issue.replace('待完善：','缺少')}`);if(m.sendMode==='custom'&&m.customTime&&new Date(m.customTime)<=new Date())errors.push(`第${i+1}条发布时间不能早于当前时间`);if(m.validityMode==='custom'&&m.validityTime){const start=m.sendMode==='custom'?new Date(m.customTime):new Date();if(new Date(m.validityTime)<=start)errors.push(`第${i+1}条发布有效期必须晚于发布时间`)}});if(errors.length){toast(errors[0]);return false}return true}
+function audienceSummary(){if(state.audienceSource==='ai')return`${state.smartAudience?.name||'AI人群'}，预计${Number(state.smartAudience?.estimated||0).toLocaleString()}人`;return state.audienceMode==='all'?`全部客户，预计${Number(state.estimated||3680).toLocaleString()}人`:`部分客户（${state.tags.join('、')}），预计${Number(state.estimated||0).toLocaleString()}人`}
+function openTaskConfirm(){if(!validate())return;const list=orderedMoments();$('confirmTaskName').textContent=state.taskName;$('confirmEmployees').textContent=`${state.employees.length}人（${state.employees.map(e=>e.name).join('、')}）`;$('confirmAudience').textContent=audienceSummary();$('confirmMomentCount').textContent=`${list.length}条`;$('confirmScheduleList').innerHTML=`<div class="confirm-schedule-head"><span>序号</span><span>规则名称</span><span>发布时间</span><span>发布有效期</span></div>${list.map((m,i)=>`<div class="confirm-schedule-row"><span>${i+1}</span><span class="name">${escapeHtml(m.name)}</span><span>${scheduleText(m)}</span><span>${validityText(m)}</span></div>`).join('')}`;openModal('taskConfirmModal')}
+function hydrate(){loadDraft();prepareDom();renderAll();saveDraft(true)}
+hydrate();
+})();
+</script>
+</body>
+</html>
