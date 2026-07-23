@@ -21,3 +21,5 @@ jobs:
           name: ai-moments-v4-8-3
           path: artifacts/ai_moments_v4_8_3_submit_compact.html
           if-no-files-found: error
+      - name: Verify file exists
+        run: test -s artifacts/ai_moments_v4_8_3_submit_compact.html
