@@ -7,7 +7,9 @@ on:
       - 'rebuild/**'
 
 permissions:
-  contents: write
+  contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
   debug:
@@ -87,11 +89,14 @@ jobs:
           node /tmp/debug.js > dist/node-output.txt 2>&1
           echo $? > dist/node-exit.txt
           exit 0
-      - name: Commit diagnostics
+      - name: Post diagnostics
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dist/debug-v483.json dist/node-output.txt dist/node-exit.txt
-          test ! -f dist/debug-v483-fatal.txt || git add dist/debug-v483-fatal.txt
-          git commit -m "debug: capture v4.8.3 browser diagnostics" || exit 0
-          git push origin HEAD:${{ github.head_ref }}
+          {
+            echo '### v4.8.3 browser diagnostics'
+            echo '```json'
+            cat dist/debug-v483.json 2>/dev/null || cat dist/node-output.txt
+            echo '```'
+          } > dist/pr-comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file dist/pr-comment.md
