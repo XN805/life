@@ -1,0 +1,90 @@
+name: Debug AI Moments v4.8.3
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/debug-v483.yml'
+      - 'rebuild/**'
+
+permissions:
+  contents: write
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Build
+        shell: python
+        run: |
+          from pathlib import Path
+          base = "".join(Path(f"rebuild/base_{i:03d}.part").read_text(encoding="utf-8") for i in range(1,7))
+          base = base.rsplit("<script>",1)[0]
+          out = base + Path("rebuild/v483_patch.htmlfrag").read_text(encoding="utf-8")
+          out = out.replace("AI朋友圈 v4.8.2", "AI朋友圈 v4.8.3")
+          out = out.replace("，最多10个。", "。").replace("当前 1 个任务，最多 10 个", "").replace("共用发布员工和可见客户，最多10个任务", "共用发布员工和可见客户")
+          Path("dist").mkdir(exist_ok=True)
+          Path("dist/ai_moments_v4_8_3_reviewed.html").write_text(out,encoding="utf-8")
+      - name: Install browser
+        run: |
+          npm init -y >/dev/null
+          npm install playwright@1.54.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Run diagnostics
+        run: |
+          cat > /tmp/debug.js <<'NODE'
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const path = require('path');
+          (async()=>{
+            const result={checkpoints:[],errors:[],console:[]};
+            const mark=(name,data={})=>result.checkpoints.push({name,...data});
+            let browser;
+            try{
+              browser=await chromium.launch({headless:true}); mark('browser-launched');
+              const page=await browser.newPage({viewport:{width:1440,height:900}});
+              page.on('pageerror',e=>result.console.push('page:'+e.message));
+              page.on('console',m=>{if(m.type()==='error')result.console.push('console:'+m.text())});
+              await page.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html')); mark('page-loaded',{title:await page.title()});
+              await page.click('#openAiBtn'); mark('ai-opened');
+              await page.waitForSelector('#basicInfoPanel'); mark('basic-info-visible');
+              mark('scope-widths',await page.evaluate(()=>({employee:document.querySelector('.employee-scope-card')?.getBoundingClientRect().width,audience:document.querySelector('.audience-source-panel:not(.hidden)')?.getBoundingClientRect().width})));
+              mark('step4',{display:await page.locator('#step4Panel').evaluate(el=>getComputedStyle(el).display)});
+              await page.fill('#taskName','618活动推广');
+              await page.fill('[data-rule-name]','预热朋友圈');
+              await page.fill('#finalCopy','测试朋友圈文案'); mark('text-filled');
+              mark('slot-count-before',{count:await page.locator('[data-slot-prompt]').count()});
+              await page.fill('[data-slot-prompt]','法式连衣裙正面商品图');
+              await page.click('[data-generate-image]'); mark('first-image-generated',{count:await page.locator('.ai-result-v483 img').count()});
+              await page.click('#addSlotBtn'); mark('slot-added',{count:await page.locator('[data-slot-prompt]').count()});
+              await page.locator('[data-slot-prompt]').nth(1).fill('法式连衣裙细节商品图');
+              await page.locator('[data-generate-image]').nth(1).click(); mark('second-image-generated',{count:await page.locator('.ai-result-v483 img').count()});
+              await page.click('[data-preview-moment]');
+              await page.waitForSelector('#momentPreviewModal.show'); mark('preview-open',{images:await page.locator('[data-preview-image]').count(),summary:await page.locator('.quick-preview-summary').count()});
+              const pbox=await page.locator('.quick-preview-dialog').boundingBox(),bbox=await page.locator('[data-preview-moment]').boundingBox();mark('preview-position',{pbox,bbox});
+              await page.locator('[data-preview-image]').nth(1).dragTo(page.locator('[data-preview-image]').nth(0));mark('drag-complete');
+              await page.click('.preview-popover-close');mark('preview-closed');
+              await page.click('#createTaskBtn');mark('create-clicked',{modal:await page.locator('#taskConfirmModal').getAttribute('class')});
+              await page.waitForSelector('#taskConfirmModal.show',{timeout:3000});mark('confirm-open',{count:await page.locator('#confirmMomentCount').textContent(),rows:await page.locator('#confirmScheduleList .confirm-schedule-row').count()});
+              await page.click('#taskConfirmModal [data-close="taskConfirmModal"]');
+              await page.click('#saveCollapseMomentBtn');mark('collapsed',{validity:await page.locator('[data-summary-validity]').count()});
+              const add=await page.locator('#addMomentBtn').boundingBox(),section=await page.locator('#step2Panel').boundingBox();mark('add-position',{add,section,rightGap:section.x+section.width-(add.x+add.width)});
+              for(let i=0;i<11;i++)await page.click('#addMomentBtn');mark('twelve-added',{count:await page.locator('[data-moment-card]').count()});
+              mark('overflow1440',{value:await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)});
+              await page.setViewportSize({width:1366,height:768});mark('overflow1366',{value:await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)});
+            }catch(e){result.errors.push(e.stack||String(e));}
+            if(browser)await browser.close();
+            fs.writeFileSync('dist/debug-v483.json',JSON.stringify(result,null,2));
+            console.log(JSON.stringify(result,null,2));
+          })();
+          NODE
+          node /tmp/debug.js
+      - name: Commit diagnostics
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/debug-v483.json
+          git commit -m "debug: capture v4.8.3 browser diagnostics" || exit 0
+          git push origin HEAD:${{ github.head_ref }}
