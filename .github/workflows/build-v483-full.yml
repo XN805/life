@@ -179,7 +179,7 @@ jobs:
             process.exit(1);
           });
           NODE
-          node /tmp/test-v483.js
+          NODE_PATH="$PWD/node_modules" node /tmp/test-v483.js
 
       - name: Publish temporary direct download
         id: temp_upload
