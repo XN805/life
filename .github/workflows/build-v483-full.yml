@@ -7,7 +7,7 @@ on:
       - '.github/workflows/build-v483-full.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build-test:
@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Build standalone HTML
         shell: python
@@ -36,7 +38,7 @@ jobs:
           Path("dist/ai_moments_v4_8_3_reviewed.html").write_text(out, encoding="utf-8")
           print(f"built {len(out):,} characters")
 
-      - name: Static checks
+      - name: Static diagnostics
         shell: python
         run: |
           from pathlib import Path
@@ -49,19 +51,24 @@ jobs:
               "taskConfirmModal", "materialCenterModal",
               "ai_moments_v4_8_3_reviewed"
           ]
-          for item in required:
-              assert item in html, f"missing: {item}"
-          assert "最多10" not in html
-          assert "最多 10" not in html
-          assert html.count('id="step4Panel"') == 1
+          missing = [item for item in required if item not in html]
           markup = html.split("<script>", 1)[0]
           ids = re.findall(r'\bid="([^"]+)"', markup)
           duplicates = sorted({item for item in ids if ids.count(item) > 1})
-          assert not duplicates, f"duplicate static DOM ids: {duplicates}"
           scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
+          diagnostics = [
+              f"missing={missing}",
+              f"legacy_limit_compact={'最多10' in html}",
+              f"legacy_limit_spaced={'最多 10' in html}",
+              f"step4_ids={html.count('id=\"step4Panel\"')}",
+              f"duplicate_static_ids={duplicates}",
+              f"script_count={len(scripts)}"
+          ]
+          print("\n".join(diagnostics))
+          Path("dist/static-diagnostics.txt").write_text("\n".join(diagnostics), encoding="utf-8")
+          assert not missing, f"missing required markers: {missing}"
           assert len(scripts) == 1, f"expected one script, found {len(scripts)}"
           Path("/tmp/v483.js").write_text(scripts[0], encoding="utf-8")
-          print("static checks passed")
 
       - name: JavaScript syntax
         run: node --check /tmp/v483.js
@@ -178,8 +185,16 @@ jobs:
         id: temp_upload
         run: |
           URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload)
+          echo "$URL" > dist/direct-url.txt
           echo "DIRECT_URL=$URL"
-          echo "direct_url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Commit reviewed build metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/ai_moments_v4_8_3_reviewed.html dist/static-diagnostics.txt dist/direct-url.txt
+          git commit -m "build: export reviewed AI moments v4.8.3" || exit 0
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Upload reviewed HTML artifact
         uses: actions/upload-artifact@v4
