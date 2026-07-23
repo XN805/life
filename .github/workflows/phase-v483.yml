@@ -1,0 +1,55 @@
+name: Phased v4.8.3 Checks
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/phase-v483.yml'
+jobs:
+  phases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: python rebuild/build_v483.py >/dev/null
+      - name: Setup browser
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.54.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Phase 1 structure and scope
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');await p.waitForSelector('#basicInfoPanel');const d=await p.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,copy:document.querySelectorAll('#finalCopy').length,step4:getComputedStyle(document.querySelector('#step4Panel')).display,a:document.querySelector('.employee-scope-card').getBoundingClientRect().width,c:document.querySelector('.audience-source-panel:not(.hidden)').getBoundingClientRect().width}));if(d.editor!==1||d.copy!==1||d.step4!=='none'||Math.abs(d.a-d.c)>2)throw Error(JSON.stringify(d));await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js
+      - name: Phase 2 copy and AI images
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');await p.fill('#taskName','618活动');await p.fill('[data-rule-name]','预热');await p.fill('#finalCopy','验证文案');await p.fill('[data-slot-prompt]','正面图');await p.click('[data-generate-image]');await p.click('#addSlotBtn');await p.locator('[data-slot-prompt]').nth(1).fill('细节图');await p.locator('[data-generate-image]').nth(1).click();if(await p.locator('.ai-result-v483 img').count()!==2)throw Error('images');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js
+      - name: Phase 3 preview and sorting
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');await p.fill('#finalCopy','验证文案');await p.fill('[data-slot-prompt]','正面图');await p.click('[data-generate-image]');await p.click('#addSlotBtn');await p.locator('[data-slot-prompt]').nth(1).fill('细节图');await p.locator('[data-generate-image]').nth(1).click();await p.click('[data-preview-moment]');await p.waitForSelector('#momentPreviewModal.show');if(await p.locator('[data-preview-image]').count()!==2)throw Error('preview count');if(await p.locator('.quick-preview-summary').count())throw Error('extra summary');const x=await p.locator('.quick-preview-dialog').boundingBox(),y=await p.locator('[data-preview-moment]').boundingBox();if(x.x>=y.x&&y.x>370)throw Error('position');await p.locator('[data-preview-image]').nth(1).dragTo(p.locator('[data-preview-image]').nth(0));await p.click('.preview-popover-close');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js
+      - name: Phase 4 confirmation
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');await p.fill('#taskName','618活动');await p.fill('[data-rule-name]','预热');await p.fill('#finalCopy','验证文案');await p.fill('[data-slot-prompt]','商品图');await p.click('[data-generate-image]');await p.click('#createTaskBtn');await p.waitForSelector('#taskConfirmModal.show',{timeout:5000});if(await p.locator('#confirmMomentCount').textContent()!=='1条')throw Error('count');if(await p.locator('#confirmScheduleList .confirm-schedule-row').count()!==1)throw Error('rows');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js
+      - name: Phase 5 collapse and add position
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');await p.click('#saveCollapseMomentBtn');if(await p.locator('[data-summary-validity]').count()!==1)throw Error('validity');const a=await p.locator('#addMomentBtn').boundingBox(),s=await p.locator('#step2Panel').boundingBox(),g=s.x+s.width-(a.x+a.width);if(g>50)throw Error('gap '+g);await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js
+      - name: Phase 6 unlimited and overflow
+        run: |
+          cat > phase.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');for(let i=0;i<11;i++)await p.locator('#addMomentBtn').click();if(await p.locator('[data-moment-card]').count()!==12)throw Error('count');const x=await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);await p.setViewportSize({width:1366,height:768});const y=await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);if(x>1||y>1)throw Error('overflow '+x+','+y);await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node phase.js

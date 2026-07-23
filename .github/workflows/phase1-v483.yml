@@ -1,0 +1,48 @@
+name: Phase1 v4.8.3 Assertions
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/phase1-v483.yml'
+jobs:
+  phase1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - run: python rebuild/build_v483.py >/dev/null
+      - run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.54.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Editor element exists
+        run: |
+          cat > t.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');if(await p.locator('#momentEditor').count()!==1)throw Error('editor');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node t.js
+      - name: Final copy element exists
+        run: |
+          cat > t.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');if(await p.locator('#finalCopy').count()!==1)throw Error('copy');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node t.js
+      - name: One moment card exists
+        run: |
+          cat > t.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');if(await p.locator('[data-moment-card]').count()!==1)throw Error('card');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node t.js
+      - name: Fourth step hidden
+        run: |
+          cat > t.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage();await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');if(await p.locator('#step4Panel').evaluate(e=>getComputedStyle(e).display)!=='none')throw Error('step4');await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node t.js
+      - name: Scope widths match
+        run: |
+          cat > t.js <<'NODE'
+          const{chromium}=require('playwright'),path=require('path');(async()=>{const b=await chromium.launch({headless:true}),p=await b.newPage({viewport:{width:1440,height:900}});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));await p.click('#openAiBtn');const x=await p.evaluate(()=>({a:document.querySelector('.employee-scope-card').getBoundingClientRect().width,c:document.querySelector('.audience-source-panel:not(.hidden)').getBoundingClientRect().width}));if(Math.abs(x.a-x.c)>2)throw Error(JSON.stringify(x));await b.close()})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node t.js

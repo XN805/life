@@ -1,0 +1,27 @@
+name: Compact v4.8.3 Diagnostics
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/diag-v483-compact.yml'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Build
+        run: python rebuild/build_v483.py >/dev/null
+      - name: Setup
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.54.1 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Diagnose
+        run: |
+          cat > diag.js <<'NODE'
+          const {chromium}=require('playwright'),path=require('path');
+          (async()=>{let browser;const r={marks:[],errors:[],runtime:[]},m=(x,d={})=>r.marks.push({x,...d});try{browser=await chromium.launch({headless:true});const p=await browser.newPage({viewport:{width:1440,height:900}});p.on('pageerror',e=>r.runtime.push('page:'+e.message));p.on('console',x=>{if(x.type()==='error')r.runtime.push('console:'+x.text())});await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));m('load');await p.click('#openAiBtn');m('open');m('dom',await p.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,finalCopy:document.querySelectorAll('#finalCopy').length,parking:document.querySelectorAll('#momentEditorParking').length,active:document.querySelectorAll('[data-moment-card]').length})));await p.fill('#taskName','618活动推广');m('task');await p.fill('[data-rule-name]','预热朋友圈');m('rule');await p.fill('#finalCopy','验证朋友圈文案');m('copy');await p.fill('[data-slot-prompt]','正面商品图');m('prompt');await p.click('[data-generate-image]');m('image1',{imgs:await p.locator('.ai-result-v483 img').count()});await p.click('#addSlotBtn');m('addslot',{prompts:await p.locator('[data-slot-prompt]').count()});await p.locator('[data-slot-prompt]').nth(1).fill('细节图');await p.locator('[data-generate-image]').nth(1).click();m('image2',{imgs:await p.locator('.ai-result-v483 img').count()});await p.click('[data-preview-moment]');await p.waitForSelector('#momentPreviewModal.show',{timeout:5000});m('preview',{imgs:await p.locator('[data-preview-image]').count()});await p.locator('[data-preview-image]').nth(1).dragTo(p.locator('[data-preview-image]').nth(0));m('drag');await p.click('.preview-popover-close');await p.click('#createTaskBtn');m('create',{toast:await p.locator('#toast').textContent(),modal:await p.locator('#taskConfirmModal').getAttribute('class')});await p.waitForSelector('#taskConfirmModal.show',{timeout:5000});m('confirm',{count:await p.locator('#confirmMomentCount').textContent()});await p.click('#taskConfirmModal [data-close="taskConfirmModal"]');await p.click('#saveCollapseMomentBtn');m('collapse',{validity:await p.locator('[data-summary-validity]').count()});const a=await p.locator('#addMomentBtn').boundingBox(),s=await p.locator('#step2Panel').boundingBox();m('addpos',{gap:s.x+s.width-(a.x+a.width)});for(let i=0;i<11;i++)await p.locator('#addMomentBtn').click();m('multi',{count:await p.locator('[data-moment-card]').count()});m('overflow',{v:await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)});if(r.runtime.length)throw Error(r.runtime.join('|'));}catch(e){r.errors.push(e.stack||String(e))}finally{if(browser)await browser.close();console.log('DIAG_RESULT='+JSON.stringify(r))}})();
+          NODE
+          NODE_PATH="$PWD/node_modules" node diag.js

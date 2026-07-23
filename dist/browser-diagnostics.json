@@ -1,0 +1,40 @@
+{
+  "checks": [
+    {
+      "name": "source-loaded",
+      "title": "发布朋友圈 · AI朋友圈 v4.8.3"
+    },
+    {
+      "name": "before-open",
+      "editor": 1,
+      "copy": 1,
+      "parking": 1,
+      "step2": 1,
+      "html": "\n            <div class=\"section-title\">第二步：设置朋友圈内容</div>\n            <div class=\"section-desc\">默认创建一个朋友圈任务。需要连续发布预热、宣传、提醒等内容时，可在完成当前任务后继续新增。</div>\n            <div class=\"moment-content-toolbar\">\n              <div><span class=\"label\">朋友圈任务</span><span id=\"momentCountLabel\" class=\"tiny moment-count-label\"></span></div>\n            </div>\n            <div id=\"momentList\" class=\"moment-modules\"><div class=\"moment-module active\" data-moment-card=\"m_mrxfz8uk_naou4u\"><div class=\"moment-module-head\">"
+    },
+    {
+      "name": "after-open",
+      "editor": 1,
+      "copy": 1,
+      "parking": 1,
+      "cards": 1,
+      "step4": "none"
+    },
+    {
+      "name": "images",
+      "count": 2
+    },
+    {
+      "name": "preview",
+      "images": 2,
+      "summary": 0
+    },
+    {
+      "name": "create",
+      "modal": "modal-mask show",
+      "toast": "图片顺序已调整"
+    }
+  ],
+  "errors": [],
+  "runtime": []
+}

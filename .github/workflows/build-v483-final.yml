@@ -1,0 +1,188 @@
+name: Final AI Moments v4.8.3 Review
+
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/build-v483-final.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Build standalone HTML
+        run: python rebuild/build_v483.py
+
+      - name: Static and syntax checks
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html = Path('dist/ai_moments_v4_8_3_reviewed.html').read_text(encoding='utf-8')
+          required = ['朋友圈条数','发布有效期','新建一条朋友圈','momentPreviewModal','data-preview-image','taskConfirmModal','materialCenterModal','ai_moments_v4_8_3_reviewed']
+          missing = [item for item in required if item not in html]
+          assert not missing, missing
+          assert '最多10' not in html and '最多 10' not in html
+          assert html.count('id="step4Panel"') == 1
+          markup = html.split('<script>',1)[0]
+          ids = re.findall(r'\bid="([^"]+)"', markup)
+          duplicates = sorted({item for item in ids if ids.count(item)>1})
+          assert not duplicates, duplicates
+          scripts = re.findall(r'<script>([\s\S]*?)</script>', html)
+          assert len(scripts)==1, len(scripts)
+          Path('/tmp/v483.js').write_text(scripts[0],encoding='utf-8')
+          print('static checks passed')
+          PY
+          node --check /tmp/v483.js
+
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm install playwright@1.54.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+
+      - name: Browser interaction and layout tests
+        run: |
+          cat > test-v483-final.js <<'NODE'
+          const { chromium } = require('playwright');
+          const path = require('path');
+          const fs = require('fs');
+
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            const page = await browser.newPage({viewport:{width:1440,height:900}});
+            const runtime=[];
+            page.on('pageerror',e=>runtime.push('page:'+e.stack));
+            page.on('console',m=>{if(m.type()==='error')runtime.push('console:'+m.text())});
+            const checks=[];
+            const mark=name=>checks.push(name);
+            try {
+              await page.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));
+              await page.click('#openAiBtn');
+              await page.waitForSelector('#basicInfoPanel');
+              mark('page and basic information');
+
+              const counts = await page.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,finalCopy:document.querySelectorAll('#finalCopy').length}));
+              if(counts.editor!==1||counts.finalCopy!==1)throw new Error('editor DOM missing '+JSON.stringify(counts));
+
+              const widths=await page.evaluate(()=>({employee:document.querySelector('.employee-scope-card').getBoundingClientRect().width,audience:document.querySelector('.audience-source-panel:not(.hidden)').getBoundingClientRect().width}));
+              if(Math.abs(widths.employee-widths.audience)>2)throw new Error('scope widths differ '+JSON.stringify(widths));
+              if(await page.locator('#step4Panel').evaluate(el=>getComputedStyle(el).display)!=='none')throw new Error('step4 visible');
+              mark('compact scope and removed fourth step');
+
+              await page.fill('#taskName','618活动推广');
+              await page.fill('[data-rule-name]','预热朋友圈');
+              await page.fill('#finalCopy','这是一条用于验证预览、排序和创建确认的朋友圈文案。');
+              await page.fill('[data-slot-prompt]','法式连衣裙正面商品图');
+              await page.click('[data-generate-image]');
+              await page.click('#addSlotBtn');
+              await page.locator('[data-slot-prompt]').nth(1).fill('法式连衣裙细节商品图');
+              await page.locator('[data-generate-image]').nth(1).click();
+              if(await page.locator('.ai-result-v483 img').count()!==2)throw new Error('AI image generation failed');
+              mark('copy and two AI images');
+
+              await page.click('[data-preview-moment]');
+              await page.waitForSelector('#momentPreviewModal.show');
+              if(await page.locator('.quick-preview-summary').count())throw new Error('extra preview summary');
+              if(await page.locator('[data-preview-image]').count()!==2)throw new Error('preview images wrong');
+              const pbox=await page.locator('.quick-preview-dialog').boundingBox();
+              const bbox=await page.locator('[data-preview-moment]').boundingBox();
+              if(!pbox||!bbox)throw new Error('preview box unavailable');
+              if(pbox.x>=bbox.x&&bbox.x>370)throw new Error('preview not left of button');
+              await page.locator('[data-preview-image]').nth(1).dragTo(page.locator('[data-preview-image]').nth(0));
+              await page.click('.preview-popover-close');
+              mark('phone-only preview and image ordering');
+
+              await page.click('#createTaskBtn');
+              await page.waitForSelector('#taskConfirmModal.show');
+              if((await page.locator('#confirmMomentCount').textContent())!=='1条')throw new Error('wrong moment count');
+              if(await page.locator('#confirmScheduleList .confirm-schedule-row').count()!==1)throw new Error('wrong confirmation rows');
+              await page.click('#taskConfirmModal [data-close="taskConfirmModal"]');
+              mark('lightweight confirmation');
+
+              await page.click('#saveCollapseMomentBtn');
+              if(await page.locator('[data-summary-validity]').count()!==1)throw new Error('validity summary missing');
+              const add=await page.locator('#addMomentBtn').boundingBox();
+              const section=await page.locator('#step2Panel').boundingBox();
+              const rightGap=section.x+section.width-(add.x+add.width);
+              if(rightGap>50)throw new Error('add button not right aligned '+rightGap);
+              mark('collapsed validity and right aligned add');
+
+              for(let i=0;i<11;i++)await page.click('#addMomentBtn');
+              if(await page.locator('[data-moment-card]').count()!==12)throw new Error('moment limit still active');
+              mark('unlimited moment creation');
+
+              const overflow1440=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+              if(overflow1440>1)throw new Error('1440 overflow '+overflow1440);
+              await page.setViewportSize({width:1366,height:768});
+              const overflow1366=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
+              if(overflow1366>1)throw new Error('1366 overflow '+overflow1366);
+              mark('responsive overflow checks');
+
+              if(runtime.length)throw new Error(runtime.join('\n'));
+              fs.writeFileSync('dist/test-result.txt','PASS\n'+checks.join('\n'));
+              console.log('PASS',checks);
+            } catch (error) {
+              fs.writeFileSync('dist/test-result.txt','FAIL\n'+(error.stack||error)+'\nRuntime:\n'+runtime.join('\n'));
+              throw error;
+            } finally {
+              await browser.close();
+            }
+          })();
+          NODE
+          NODE_PATH="$PWD/node_modules" node test-v483-final.js
+
+      - name: Upload direct copy
+        id: direct
+        run: |
+          set -e
+          URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload || true)
+          if [ -z "$URL" ]; then
+            URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://0x0.st)
+          fi
+          echo "$URL" > dist/direct-url.txt
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Report success
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### v4.8.3 final review passed'
+            echo
+            cat dist/test-result.txt
+            echo
+            echo "DIRECT_URL=$(cat dist/direct-url.txt)"
+          } > dist/review-comment.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file dist/review-comment.md
+
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo '### v4.8.3 final review failed'
+            echo '```'
+            cat dist/test-result.txt 2>/dev/null || echo 'Test failed before producing diagnostics.'
+            echo '```'
+          } > /tmp/failure.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/failure.md
+
+      - name: Upload reviewed HTML artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-moments-v4-8-3-final-reviewed
+          path: |
+            dist/ai_moments_v4_8_3_reviewed.html
+            dist/test-result.txt
+          if-no-files-found: error

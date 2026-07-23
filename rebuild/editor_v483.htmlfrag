@@ -1,0 +1,60 @@
+<div id="momentEditorParking" class="hidden">
+  <div id="momentEditor" class="moment-editor surface">
+    <div class="moment-subsection">
+      <div class="moment-subsection-title"><span>朋友圈文案</span><span class="tiny">最多1000字</span></div>
+      <div class="source-switch">
+        <div class="source-tab active" data-copy-source="ai">AI生成文案</div>
+        <div class="source-tab" data-copy-source="manual">使用已有文案</div>
+      </div>
+      <div class="copy-layout compact-copy-layout">
+        <div class="surface copy-source-panel">
+          <div id="copyAiSource" class="generator-box compact-generator">
+            <div class="copy-config-head"><div class="label">文案诉求</div></div>
+            <div class="copy-toolbar">
+              <div class="template-chips compact-chips">
+                <div class="template-chip active" data-template="new">新品宣传</div>
+                <div class="template-chip" data-template="double11">618活动</div>
+                <div class="template-chip" data-template="intent">高意向跟进</div>
+                <div class="template-chip" data-template="old">老客维护</div>
+              </div>
+              <div class="count-picker"><label class="tiny" for="copyCountSelect">生成数量</label><select id="copyCountSelect" class="select copy-count-select"><option value="1" selected>1条</option><option value="2">2条</option><option value="3">3条</option><option value="4">4条</option><option value="5">5条</option><option value="6">6条</option></select></div>
+            </div>
+            <div id="copyAudienceContext" class="context-bar hidden"></div>
+            <div id="audienceCopyNotice" class="edit-warning hidden">推送人群已调整，建议重新确认当前文案。</div>
+            <textarea id="copyGoal" class="textarea compact-goal" rows="3" placeholder="例如：生成一条618活动预热朋友圈，先制造期待感，不直接堆叠完整优惠规则。"></textarea>
+            <div class="row" style="margin-top:12px;justify-content:flex-end"><button id="generateCopyBtn" class="btn primary">生成文案</button></div>
+            <div class="candidate-head"><span class="label">候选文案</span><span class="tiny">点击后在右侧编辑</span></div>
+            <div id="copyList" class="copy-list compact-copy-list"><div class="tiny empty-copy-state">还没有生成候选文案</div></div>
+          </div>
+          <div id="copyManualSource" class="generator-box compact-generator hidden">
+            <div class="label" style="margin-bottom:8px">已有文案</div>
+            <textarea id="manualSourceCopy" class="textarea manual-source-editor" rows="10" maxlength="1000" placeholder="直接粘贴已经写好的朋友圈内容"></textarea>
+            <div class="row between" style="margin-top:12px"><span class="tiny">复制到最终编辑器后仍可修改</span><button id="applyManualCopyBtn" class="btn primary">使用这条文案</button></div>
+          </div>
+        </div>
+        <div class="surface editor-box compact-editor-box">
+          <div class="editor-head"><div><div class="label">最终使用文案</div></div><button id="restoreCopyBtn" class="btn small" disabled>恢复原文</button></div>
+          <textarea id="finalCopy" class="textarea final-editor compact-final-editor" maxlength="1000" placeholder="请选择一条AI文案，或使用已有文案"></textarea>
+          <div id="copyCharCount" class="char-count">0 / 1000</div>
+          <div id="copyImageWarning" class="edit-warning hidden">文案已修改，请确认现有图片是否仍然匹配。</div>
+        </div>
+      </div>
+    </div>
+    <div class="moment-subsection image-subsection">
+      <div class="image-step-head">
+        <div><div class="moment-subsection-title">朋友圈素材</div></div>
+        <label class="radio no-image"><input id="noImageCheck" type="checkbox"> 本条朋友圈不使用素材</label>
+      </div>
+      <div class="source-switch image-source-switch">
+        <div class="source-tab active" data-image-source="ai">AI生成图片</div>
+        <div class="source-tab" data-image-source="existing">使用已有素材</div>
+      </div>
+      <div id="imageContent">
+        <div id="copyChangedNotice" class="edit-warning hidden" style="margin-bottom:14px"><div class="row between"><span>文案已修改，请确认图片是否仍然合适。</span><button id="confirmCopyImageMatch" class="btn small">已确认仍匹配</button></div></div>
+        <div id="aiImageSource"><div id="slotList" class="slot-list"></div><div id="addSlotBtn" class="add-slot"><span class="plus">+</span> 新增一张图片</div></div>
+        <div id="existingImageSource" class="hidden"><div class="existing-upload-head"><div><div class="label">已有素材</div></div></div><div id="existingImageGrid" class="existing-image-grid"></div></div>
+      </div>
+    </div>
+    <div class="moment-subsection moment-schedule-subsection"></div>
+  </div>
+</div>

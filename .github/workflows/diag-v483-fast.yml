@@ -1,0 +1,24 @@
+name: Fast v4.8.3 Diagnostic
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/diag-v483-fast.yml'
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.54.1-noble
+    steps:
+      - name: Clone and build
+        run: |
+          git clone -q --depth 1 --branch v483-full-rebuild https://github.com/XN805/life.git repo
+          cd repo
+          python3 rebuild/build_v483.py >/dev/null
+      - name: Browser diagnostic
+        working-directory: repo
+        run: |
+          cat > diag.js <<'NODE'
+          const {chromium}=require('playwright'),path=require('path');
+          (async()=>{const r={};let b;try{b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:1440,height:900}});const errors=[];p.on('pageerror',e=>errors.push(e.message));await p.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));r.before=await p.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,copy:document.querySelectorAll('#finalCopy').length,parking:document.querySelectorAll('#momentEditorParking').length,cards:document.querySelectorAll('[data-moment-card]').length}));await p.click('#openAiBtn');r.after=await p.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,copy:document.querySelectorAll('#finalCopy').length,parking:document.querySelectorAll('#momentEditorParking').length,cards:document.querySelectorAll('[data-moment-card]').length,step4:getComputedStyle(document.querySelector('#step4Panel')).display,a:document.querySelector('.employee-scope-card')?.getBoundingClientRect().width,c:document.querySelector('.audience-source-panel:not(.hidden)')?.getBoundingClientRect().width}));r.errors=errors;}catch(e){r.exception=e.stack||String(e)}finally{if(b)await b.close();console.log('RESULT='+JSON.stringify(r))}})();
+          NODE
+          node diag.js

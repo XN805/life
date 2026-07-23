@@ -1,0 +1,105 @@
+name: Release AI Moments v4.8.3
+
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/release-v483.yml'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Build and syntax
+        run: |
+          python rebuild/build_v483.py
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          h=Path('dist/ai_moments_v4_8_3_reviewed.html').read_text(encoding='utf-8')
+          required=['朋友圈条数','发布有效期','新建一条朋友圈','momentPreviewModal','taskConfirmModal','materialCenterModal']
+          missing=[x for x in required if x not in h]
+          assert not missing,missing
+          scripts=re.findall(r'<script>([\s\S]*?)</script>',h)
+          assert len(scripts)==1,len(scripts)
+          Path('/tmp/v483.js').write_text(scripts[0],encoding='utf-8')
+          print('legacy_limit',('最多10' in h or '最多 10' in h))
+          print('step4_count',h.count('id="step4Panel"'))
+          PY
+          node --check /tmp/v483.js
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null
+          npm install playwright@1.54.1 >/dev/null
+          npx playwright install --with-deps chromium >/dev/null
+      - name: Verify browser flows
+        run: |
+          cat > verify-v483.js <<'NODE'
+          const {chromium}=require('playwright');
+          const path=require('path');
+          const fs=require('fs');
+          (async()=>{
+            const browser=await chromium.launch({headless:true});
+            const page=await browser.newPage({viewport:{width:1440,height:900}});
+            const errors=[];page.on('pageerror',e=>errors.push(e.stack||e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text())});
+            const checks=[];const ok=x=>checks.push(x);
+            try{
+              await page.goto('file://'+path.resolve('dist/ai_moments_v4_8_3_reviewed.html'));
+              await page.click('#openAiBtn');await page.waitForSelector('#basicInfoPanel');
+              const dom=await page.evaluate(()=>({editor:document.querySelectorAll('#momentEditor').length,finalCopy:document.querySelectorAll('#finalCopy').length,step4:getComputedStyle(document.querySelector('#step4Panel')).display}));
+              if(dom.editor!==1||dom.finalCopy!==1||dom.step4!=='none')throw new Error('base DOM '+JSON.stringify(dom));ok('页面结构与第四步删除');
+              const widths=await page.evaluate(()=>({a:document.querySelector('.employee-scope-card').getBoundingClientRect().width,b:document.querySelector('.audience-source-panel:not(.hidden)').getBoundingClientRect().width}));
+              if(Math.abs(widths.a-widths.b)>2)throw new Error('范围宽度 '+JSON.stringify(widths));ok('员工与圈人等宽');
+              await page.fill('#taskName','618活动推广');await page.fill('[data-rule-name]','预热朋友圈');await page.fill('#finalCopy','验证朋友圈文案');
+              await page.fill('[data-slot-prompt]','正面商品图');await page.click('[data-generate-image]');await page.click('#addSlotBtn');await page.locator('[data-slot-prompt]').nth(1).fill('细节商品图');await page.locator('[data-generate-image]').nth(1).click();
+              if(await page.locator('.ai-result-v483 img').count()!==2)throw new Error('AI图片生成');ok('两张AI图片生成');
+              await page.click('[data-preview-moment]');await page.waitForSelector('#momentPreviewModal.show');
+              if(await page.locator('[data-preview-image]').count()!==2||await page.locator('.quick-preview-summary').count())throw new Error('预览内容');
+              const p=await page.locator('.quick-preview-dialog').boundingBox(),b=await page.locator('[data-preview-moment]').boundingBox();if(p.x>=b.x&&b.x>370)throw new Error('预览位置');
+              await page.locator('[data-preview-image]').nth(1).dragTo(page.locator('[data-preview-image]').nth(0));await page.click('.preview-popover-close');ok('就近手机预览与拖动排序');
+              await page.click('#createTaskBtn');await page.waitForSelector('#taskConfirmModal.show');if(await page.locator('#confirmMomentCount').textContent()!=='1条')throw new Error('朋友圈条数');await page.click('#taskConfirmModal [data-close="taskConfirmModal"]');ok('轻量确认弹窗');
+              await page.click('#saveCollapseMomentBtn');if(await page.locator('[data-summary-validity]').count()!==1)throw new Error('有效期摘要');
+              const add=await page.locator('#addMomentBtn').boundingBox(),sec=await page.locator('#step2Panel').boundingBox();if(sec.x+sec.width-(add.x+add.width)>50)throw new Error('新增按钮位置');ok('有效期摘要与右侧新增');
+              for(let i=0;i<11;i++)await page.click('#addMomentBtn');if(await page.locator('[data-moment-card]').count()!==12)throw new Error('数量限制');ok('取消十条限制');
+              const ov1=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);await page.setViewportSize({width:1366,height:768});const ov2=await page.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);if(ov1>1||ov2>1)throw new Error('横向溢出 '+ov1+','+ov2);ok('1440/1366布局');
+              if(errors.length)throw new Error('runtime:'+errors.join('\n'));
+              fs.writeFileSync('dist/release-result.txt','PASS\n'+checks.join('\n'));console.log(checks);
+            }catch(e){fs.writeFileSync('dist/release-result.txt','FAIL\n'+(e.stack||e)+'\n'+errors.join('\n'));throw e}finally{await browser.close()}
+          })();
+          NODE
+          NODE_PATH="$PWD/node_modules" node verify-v483.js
+      - name: Host reviewed HTML
+        id: host
+        run: |
+          URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload || true)
+          if [ -z "$URL" ]; then URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://0x0.st); fi
+          echo "$URL" > dist/direct-url.txt
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+      - name: Report release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          { echo '### v4.8.3 release verified'; echo; cat dist/release-result.txt; echo; echo "DIRECT_URL=$(cat dist/direct-url.txt)"; } > /tmp/release.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/release.md
+      - name: Report failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          { echo '### v4.8.3 release failed'; echo '```'; cat dist/release-result.txt 2>/dev/null || echo 'failed before browser result'; echo '```'; } > /tmp/release-fail.md
+          gh pr comment ${{ github.event.pull_request.number }} --body-file /tmp/release-fail.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ai-moments-v4-8-3-release
+          path: |
+            dist/ai_moments_v4_8_3_reviewed.html
+            dist/release-result.txt
+          if-no-files-found: error

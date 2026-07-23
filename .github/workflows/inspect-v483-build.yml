@@ -1,0 +1,28 @@
+name: Inspect v4.8.3 Build
+on:
+  pull_request:
+    paths:
+      - 'rebuild/**'
+      - '.github/workflows/inspect-v483-build.yml'
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Build and report structure
+        run: |
+          python rebuild/build_v483.py >/dev/null
+          python - <<'PY'
+          from pathlib import Path
+          h=Path('dist/ai_moments_v4_8_3_reviewed.html').read_text(encoding='utf-8')
+          print('EDITOR_SOURCE_COUNT='+str(h.count('id="momentEditor"')))
+          print('PARKING_SOURCE_COUNT='+str(h.count('id="momentEditorParking"')))
+          print('STEP2_CLOSE_INDEX='+str(h.find('</div>\n            <div class="add-moment-zone"')))
+          i=h.find('id="momentEditorParking"')
+          print('EDITOR_CONTEXT='+repr(h[max(0,i-150):i+250]))
+          PY
+          URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://temp.sh/upload || true)
+          if [ -z "$URL" ]; then URL=$(curl -fsS -F 'file=@dist/ai_moments_v4_8_3_reviewed.html' https://0x0.st || true); fi
+          echo "BUILD_URL=$URL"
